@@ -61,6 +61,7 @@ which are combined to complete the Bayesian inference for the parameters of
 interest.
 
 ```{r, eval=T, echo=TRUE}
+ps_dist   <- rwe_ps_dist(dta_ps)
 post_smps <- rwe_ps_powerp(dta_ps,
                            outcome_type = "binary",
                            total_borrow = 40,
@@ -72,7 +73,7 @@ post_smps <- rwe_ps_powerp(dta_ps,
 The mixing of posterior samples should be checked to ensure the convergence
 of the posterior sampling.
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
-traceplot(post_smps$stan_rst)
+traceplot(post_smps$stan_rst, pars = c("theta", "thetas"))
 ```
 
 Results can be further summarized as:
@@ -98,8 +99,7 @@ dta_ps <- rwe_ps(ex_dta,
                  cur_grp_level = "current",
                  nstrata = 5)
 
-ps_dist <- rwe_ps_dist(dta_ps)
-
+ps_dist   <- rwe_ps_dist(dta_ps)
 ps_borrow <- rwe_ps_borrow(total_borrow = 40, ps_dist)
 rst_cl    <- rwe_ps_cl(dta_ps, v_borrow = ps_borrow, v_outcome = "Y")
 summary(rst_cl)
@@ -125,6 +125,7 @@ dta_ps_2arm <- rwe_ps(ex_dta_rct,
 rst_2arm <- rwe_ps_cl2arm(dta_ps_2arm,
                           v_arm = "Arm",
                           trt_arm_level = 1,
+                          outcome_type = "continuous",
                           v_outcome = "Y",
                           total_borrow = 40)
 

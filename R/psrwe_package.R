@@ -16,10 +16,11 @@
 #' @importFrom grDevices colors
 #' @importFrom graphics  axis box legend lines par plot points text
 #'
-#' @importFrom parallel  detectCores
-#' @importFrom mvtnorm   rmvnorm
-#' @importFrom cowplot   plot_grid
-#' @importFrom dplyr     %>% group_by_ group_by summarize mutate count_ mutate_if rename_ filter
+#' @importFrom parallel detectCores
+#' @importFrom mvtnorm rmvnorm
+#' @importFrom cowplot plot_grid
+#' @importFrom dplyr %>% group_by_ group_by summarize mutate count_ mutate_if
+#'     rename_ filter select arrange
 #'
 #'
 #' @description

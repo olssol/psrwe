@@ -225,7 +225,7 @@ summary.RWE_CLRST <- function(object, ...) {
     ## stratum specific theta
     theta_strata <- object %>%
       dplyr::filter(is.na(Group)) %>%
-      select(-Group, -ID) %>%
+      dplyr::select(-Group, -ID) %>%
       arrange(Strata)
 
     ## stratum specific jknife variance
@@ -253,7 +253,7 @@ summary.RWE_CLRST <- function(object, ...) {
 
         cur_d <- theta_strata %>%
           dplyr::filter(Strata != cur_i[1, "Strata"]) %>%
-          select(-Variance)
+          dplyr::select(-Variance)
 
 
         cur_d <- rbind(cur_d,
@@ -302,8 +302,14 @@ rwe_ps_cl2arm <- function(data_withps, v_arm = "Arm", trt_arm_level = 1,
 
     ## treatment arm
     dta_trt <- data[inx_trt & inx_g1, ]
-    dta_trt_withps <- data_withps
-    dta_trt_withps$data <- dta_trt
+
+    ## add fake data to avoid warnings about no subjects found in the external
+    ## data source
+    fake_dta            <- dta_trt
+    fake_dta[["_grp_"]] <- 0
+
+    dta_trt_withps      <- data_withps
+    dta_trt_withps$data <- rbind(dta_trt, fake_dta)
 
     est_trt <- rwe_ps_cl(dta_trt_withps,
                          v_borrow = rep(0, data_withps$nstrata),

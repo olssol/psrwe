@@ -4,7 +4,7 @@ PKG_CPPFLAGS = -I"../inst/include" -I"$(STANHEADERS_SRC)" -I"$(BOOST_NOT_IN_BH_S
 
 CXX_STD = CXX11
 SOURCES = $(wildcard stan_files/*.stan)
-OBJECTS = $(SOURCES:.stan=.o) init.o
+OBJECTS = $(SOURCES:.stan=.o) RcppExports.o psrwe_cpp_tools.o
 
 all: $(SHLIB)
 
@@ -17,5 +17,5 @@ clean:
 %.cc: %.stan
 				"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "source(file.path('..', 'tools', 'make_cc.R')); make_cc(commandArgs(TRUE))" $<
 
-				
+
 .phony: clean

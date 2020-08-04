@@ -90,9 +90,9 @@ get_cur_d <- function(data, i, v_outcome) {
     cur_d0 <- data[data[["_strata_"]] == i & data[["_grp_"]] == 0,
                    v_outcome]
 
-    if (0 == length(cur_d1) |
-        0 == length(cur_d0)) {
-        stop(paste("Stratum ", i,
+    if (0 == nrow(cur_d1) |
+        0 == nrow(cur_d0)) {
+        warning(paste("Stratum ", i,
                    " contains no subjects from group 1 or 0",
                    sep = ""))
     }
