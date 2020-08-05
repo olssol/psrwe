@@ -90,8 +90,13 @@ get_cur_d <- function(data, i, v_outcome) {
     cur_d0 <- data[data[["_strata_"]] == i & data[["_grp_"]] == 0,
                    v_outcome]
 
-    if (0 == nrow(cur_d1) |
-        0 == nrow(cur_d0)) {
+    if (is.data.frame(cur_d1)) {
+        flag <- 0 == nrow(cur_d1) | 0 == nrow(cur_d0)
+    } else {
+        flag <- 0 == length(cur_d1) | 0 == length(cur_d0)
+    }
+
+    if (flag) {
         warning(paste("Stratum ", i,
                    " contains no subjects from group 1 or 0",
                    sep = ""))
@@ -115,16 +120,19 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
     rst <- NULL;
     for (v in vars) {
         if (!is.factor(data[[v]]))
-            next;
+            next
 
-        cur.freq <- data %>% count_(c(var.groupby, v)) %>%
+        cur.freq <- data %>%
+          count_(c(var.groupby, v)) %>%
           group_by_(.dots = var.groupby) %>%
-          mutate(Sum = sum(n), Freq = n/sum(n)) %>%
+          mutate(Sum  = sum(.data$n),
+                 Freq = .data$n / sum(.data$n)) %>%
           mutate_if(is.factor, as.character) %>%
           mutate(Cov = v) %>%
-          rename_(Value = v);
+          rename_(Value = v)
 
-        rst <- rbind(rst, data.frame(cur.freq));
+        rst <- rbind(rst,
+                     data.frame(cur.freq))
     }
 
     rst
@@ -138,6 +146,8 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
 plot_ps <- function(data.withps, overall.inc = TRUE, add.text = TRUE,
                     facet.scales = "free_y", ...) {
 
+    N0 <- N1 <- Dist <- Ps <- Group <- NULL
+
     stopifnot(inherits(data.withps,
                        what = get_rwe_class("DWITHPS")))
 
@@ -148,6 +158,7 @@ plot_ps <- function(data.withps, overall.inc = TRUE, add.text = TRUE,
     pskl$Strata <- as.factor(c(paste("Stratum ",
                                      1:nstrata, sep = ""),
                                "Overall"))
+
     xlim        <- range(dtaps[which(!is.na(dtaps[["_strata_"]])),"_ps_"],
                          na.rm = TRUE)
 
@@ -167,15 +178,15 @@ plot_ps <- function(data.withps, overall.inc = TRUE, add.text = TRUE,
 
         all.data <- rbind(all.data, cur.data);
     } else {
-        pskl <- pskl %>% filter(Strata != "Overall");
+        pskl <- pskl %>% dplyr::filter(.data$Strata != "Overall");
     }
 
     all.data$Group <- as.factor(all.data$Group);
     rst <- ggplot(data = all.data, aes(x = Ps)) +
         geom_density(alpha = 0.2,
-                       aes(group = Group,
-                           fill  = Group,
-                           linetype = Group),
+                     aes(group = Group,
+                         fill  = Group,
+                         linetype = Group),
                      trim  = TRUE,
                      na.rm = TRUE) +
         labs(x = "Propensity Score", y = "Density") +
@@ -202,26 +213,33 @@ plot_ps <- function(data.withps, overall.inc = TRUE, add.text = TRUE,
 }
 
 plot_balance_fac <- function(dtaps, v, overall.inc = TRUE) {
-    cur.d <- get_freq_tbl(dtaps, var.groupby = c("Strata", "Group"), vars = v)
-    cur.d <- cur.d %>% dplyr::filter(!is.na(Strata))
+    cur.d <- get_freq_tbl(dtaps,
+                          var.groupby = c("Strata", "Group"),
+                          vars = v)
+
+    cur.d <- cur.d %>%
+      dplyr::filter(!is.na(.data$Strata))
 
     cur.d$Strata <- paste("Stratum ", cur.d$Strata, sep = "")
     if (overall.inc) {
-        cur.overall <- get_freq_tbl(dtaps, var.groupby = "Group", vars = v);
+        cur.overall <- get_freq_tbl(dtaps,
+                                    var.groupby = "Group",
+                                    vars = v);
         cur.overall$Strata <- "Overall";
         cur.d <- rbind(cur.d, cur.overall);
     }
+
     cur.d$Group <- as.factor(cur.d$Group);
     cur.d$Value <- as.factor(cur.d$Value);
 
-    rst <- ggplot(data = cur.d, aes(x = Value, y = Freq)) +
+    rst <- ggplot(data = cur.d, aes(x = .data$Value, y = .data$Freq)) +
         geom_bar(alpha = 0.4,
                  stat = "identity",
                  position = "dodge",
                  color = "black",
-                 aes(group = Group,
-                     fill  = Group)) +
-        scale_fill_manual(values=c("gray20", "gray80")) +
+                 aes(group = .data$Group,
+                     fill  = .data$Group)) +
+        scale_fill_manual(values = c("gray20", "gray80")) +
         scale_y_continuous(breaks = NULL, limits = c(0,1)) +
         labs(x = "", y = "") +
         facet_grid(Strata ~ .);
@@ -231,6 +249,8 @@ plot_balance_fac <- function(dtaps, v, overall.inc = TRUE) {
 plot_balance_cont <- function(dtaps, v, nstrata,
                               overall.inc = TRUE,
                               facet.scales = "free_y") {
+
+    Value <- Group <- NULL
     cur.d <- NULL;
     for (i in 1:nstrata) {
         cur.sub      <- dtaps[which(i == dtaps[["_strata_"]]),];

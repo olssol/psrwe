@@ -34,6 +34,8 @@ single arm studies. two-arm randomized studies.}
 \item{trt_arm_level}{Arm level for the treatment arm. Ignored for single-arm
 studies.}
 
+\item{nstrata}{Number of PS strata to be created}
+
 \item{...}{Parameters to get propensity scores. \itemize{
 \item{ps_method}{\code{logistic} forlogistic regression or
 \code{randomforest} for randomforest) \item{...}{Parameters for

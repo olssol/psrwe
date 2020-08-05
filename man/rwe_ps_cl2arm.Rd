@@ -21,6 +21,8 @@ single arm studies. two-arm randomized studies.}
 \item{trt_arm_level}{Arm level for the treatment arm. Ignored for single-arm
 studies.}
 
+\item{total_borrow}{Total number of subjects to be borrowed}
+
 \item{...}{Parameters for \code{\link{rwe_ps_cl}}}
 }
 \value{

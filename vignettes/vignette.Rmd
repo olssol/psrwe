@@ -63,9 +63,9 @@ interest.
 ```{r, eval=T, echo=TRUE}
 ps_dist   <- rwe_ps_dist(dta_ps)
 post_smps <- rwe_ps_powerp(dta_ps,
-                           outcome_type = "binary",
                            total_borrow = 40,
                            v_distance   = ps_dist$Dist[1:dta_ps$nstrata],
+                           outcome_type = "binary",
                            v_outcome    = "Y")
 
 ```
@@ -93,13 +93,6 @@ stratum-specific estimates are then combined to obtain an overall
 population-level estimate of the parameter of interest.
 
 ```{r, eval=T, echo=TRUE}
-dta_ps <- rwe_ps(ex_dta,
-                 v_covs = paste("V", 1:7, sep = ""),
-                 v_grp = "Group",
-                 cur_grp_level = "current",
-                 nstrata = 5)
-
-ps_dist   <- rwe_ps_dist(dta_ps)
 ps_borrow <- rwe_ps_borrow(total_borrow = 40, ps_dist)
 rst_cl    <- rwe_ps_cl(dta_ps, v_borrow = ps_borrow, v_outcome = "Y")
 summary(rst_cl)
@@ -139,16 +132,13 @@ Chen, W.C., Wang, C., Li, H., Lu, N., Tiwari, R., Xu, Y. and Yue, L.Q., 2020.
 Propensity score-integrated composite likelihood approach for augmenting the
 control arm of a randomized controlled trial by incorporating real-world
 data. Journal of Biopharmaceutical Statistics, 30(3), pp.508-520.
-<DOI:10.1080/10543406.2020.1730877>
 
 Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., & Yue, L. Q.
 (2020). Propensity score-integrated composite likelihood approach for
 incorporating real-world evidence in single-arm clinical studies. Journal of
 biopharmaceutical statistics, 30(3), 495-507.
-<DOI:10.1080/10543406.2019.1684309>
 
 Wang, C., Li, H., Chen, W. C., Lu, N., Tiwari, R., Xu, Y., & Yue, L. Q.
 (2019). Propensity score-integrated power prior approach for incorporating
 real-world evidence in single-arm clinical studies. Journal of
 biopharmaceutical statistics, 29(5), 731-748.
-<DOI:10.1080/10543406.2019.1657133>

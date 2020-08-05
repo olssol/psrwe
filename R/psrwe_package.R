@@ -5,19 +5,19 @@
 #' @aliases   psrwe
 #' @useDynLib psrwe, .registration = TRUE
 #'
-#' @import stats
 #' @import Rcpp
 #' @import methods
 #' @import ggplot2
 #'
-#' @importFrom rstan         sampling extract stanc rstan_options traceplot stan_rhat
-#' @importFrom randomForest  randomForest
+#' @importFrom stats approxfun as.formula binomial cov density ecdf glm
+#'     integrate optim predict quantile sd var
+#' @importFrom rstan sampling extract stanc rstan_options traceplot stan_rhat
+#' @importFrom randomForest randomForest
 #'
 #' @importFrom grDevices colors
 #' @importFrom graphics  axis box legend lines par plot points text
 #'
 #' @importFrom parallel detectCores
-#' @importFrom mvtnorm rmvnorm
 #' @importFrom cowplot plot_grid
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count_ mutate_if
 #'     rename_ filter select arrange
@@ -62,19 +62,16 @@
 #' Propensity score-integrated composite likelihood approach for augmenting the
 #' control arm of a randomized controlled trial by incorporating real-world
 #' data. Journal of Biopharmaceutical Statistics, 30(3), pp.508-520.
-#' <DOI:10.1080/10543406.2020.1730877>
 #'
 #' Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., & Yue, L. Q.
 #' (2020). Propensity score-integrated composite likelihood approach for
 #' incorporating real-world evidence in single-arm clinical studies. Journal of
 #' biopharmaceutical statistics, 30(3), 495-507.
-#' <DOI:10.1080/10543406.2019.1684309>
 #'
 #' Wang, C., Li, H., Chen, W. C., Lu, N., Tiwari, R., Xu, Y., & Yue, L. Q.
 #' (2019). Propensity score-integrated power prior approach for incorporating
 #' real-world evidence in single-arm clinical studies. Journal of
 #' biopharmaceutical statistics, 29(5), 731-748.
-#' <DOI:10.1080/10543406.2019.1657133>
 #'
 NULL
 

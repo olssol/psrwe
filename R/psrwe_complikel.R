@@ -152,8 +152,8 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
           n_borrow / sig2_0 * (mean(dta_ext) - theta)
 
         ## d logl / d sig2.1
-        g[2] <- - n1 / 2 / sig2.1 +
-          n1 * mean((cur.data - theta)^2) / 2 /sig2_1 / sig2_1
+        g[2] <- - n1 / 2 / sig2_1 +
+          n1 * mean((dta_cur - theta)^2) / 2 / sig2_1 / sig2_1
         ## d logl / d sig2.0
         g[3] <- - n_borrow / 2 / sig2_0 +
           n_borrow * mean((dta_cur - theta)^2) / 2 / sig2_0 / sig2_0
@@ -224,17 +224,17 @@ summary.RWE_CLRST <- function(object, ...) {
 
     ## stratum specific theta
     theta_strata <- object %>%
-      dplyr::filter(is.na(Group)) %>%
-      dplyr::select(-Group, -ID) %>%
-      arrange(Strata)
+      dplyr::filter(is.na(.data$Group)) %>%
+      dplyr::select(-.data$Group, -.data$ID) %>%
+      arrange(.data$Strata)
 
     ## stratum specific jknife variance
     var_strata <- NULL
     for (i in seq_len(nrow(theta_strata))) {
         cur_s  <- theta_strata[i, ]
         cur_jk <- object %>%
-          dplyr::filter(!is.na(Group) &
-                        Strata == cur_s[1, "Strata"])
+          dplyr::filter(!is.na(.data$Group) &
+                        .data$Strata == cur_s[1, "Strata"])
 
         cur_var <- f_jk(cur_jk$Theta, cur_s[1, "Theta"])
         var_strata <- c(var_strata, cur_var)
@@ -252,8 +252,8 @@ summary.RWE_CLRST <- function(object, ...) {
             next
 
         cur_d <- theta_strata %>%
-          dplyr::filter(Strata != cur_i[1, "Strata"]) %>%
-          dplyr::select(-Variance)
+          dplyr::filter(.data$Strata != cur_i[1, "Strata"]) %>%
+          dplyr::select(-.data$Variance)
 
 
         cur_d <- rbind(cur_d,
@@ -280,6 +280,7 @@ summary.RWE_CLRST <- function(object, ...) {
 #'
 #' @inheritParams rwe_ps
 #' @inheritParams rwe_ps_cl
+#' @inheritParams rwe_ps_borrow
 #'
 #' @param ... Parameters for \code{\link{rwe_ps_cl}}
 #'

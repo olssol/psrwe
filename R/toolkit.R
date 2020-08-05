@@ -43,15 +43,17 @@ tkMakeLocal <- function(alist, dest.env='.GlobalEnv') {
 #' Call function by its name organized as a vector
 #'
 #' @param vec function names as a vector
+#' @param ... Parameters needed for the actual function
 #'
 #' @export
 #'
 tkCallFun <- function(vec, ...) {
-    eval(parse(text=paste("rst <- ",
-                          paste(vec, collapse = ""),
-                          "(...)",
-                          sep="")
+    rst <- NULL
+    eval(parse(text = paste("rst <- ",
+                            paste(vec, collapse = ""),
+                            "(...)",
+                            sep = "")
                )
-         );
+         )
     rst
 }

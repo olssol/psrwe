@@ -13,6 +13,7 @@
 #'     single arm studies. two-arm randomized studies.
 #' @param trt_arm_level Arm level for the treatment arm. Ignored for single-arm
 #'     studies.
+#' @param nstrata Number of PS strata to be created
 #' @param ... Parameters to get propensity scores. \itemize{
 #'     \item{ps_method}{\code{logistic} forlogistic regression or
 #'     \code{randomforest} for randomforest) \item{...}{Parameters for
@@ -218,8 +219,8 @@ rwe_ps_dist <- function(data_withps, min_n0 = 10,
 #'     \code{match_id}: matched id from dta_ext.
 #'
 #' @examples
-#' dta_cur <- ex_dta %>% dplyr::filter(Group == "current")
-#' dta_ext <- ex_dta %>% dplyr::filter(Group != "current")
+#' dta_cur <- ex_dta[which(ex_dta$Group == "current"), ]
+#' dta_ext <- ex_dta[which(ex_dta$Group != "current"), ]
 #' rwe_ps_match(dta_cur, dta_ext, v_covs = paste("V", 1:7, sep = ""),
 #'              ratio = 2)
 #'
@@ -297,6 +298,7 @@ rwe_ps_borrow <- function(total_borrow, dta_ps_dist, ...) {
 #'
 #' S3 method for visualizing PS adjustment
 #'
+#' @param x Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
 #'     \item{balance}{Covariate balance plot}}
 #' @param ... Additional parameter for the plot

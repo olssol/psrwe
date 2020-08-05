@@ -7,6 +7,8 @@
 \method{plot}{RWE_DWITHPS}(x, plot_type = c("ps", "balance"), ...)
 }
 \arguments{
+\item{x}{Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}}
+
 \item{plot_type}{Types of plots. \itemize{\item{ps}{PS density plot}
 \item{balance}{Covariate balance plot}}}
 

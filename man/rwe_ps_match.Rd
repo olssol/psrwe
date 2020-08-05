@@ -27,8 +27,8 @@ Match patients in external data source with patients in current study based
 on PS using nearest neighbor method
 }
 \examples{
-dta_cur <- ex_dta \%>\% dplyr::filter(Group == "current")
-dta_ext <- ex_dta \%>\% dplyr::filter(Group != "current")
+dta_cur <- ex_dta[which(ex_dta$Group == "current"), ]
+dta_ext <- ex_dta[which(ex_dta$Group != "current"), ]
 rwe_ps_match(dta_cur, dta_ext, v_covs = paste("V", 1:7, sep = ""),
              ratio = 2)
 
