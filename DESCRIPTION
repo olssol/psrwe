@@ -34,12 +34,11 @@ Imports:
     randomForest
 Suggests:
     knitr,
-    rmarkdown
+    markdown
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 SystemRequirements: GNU make
 NeedsCompilation: yes
-Suggests: knitr
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
