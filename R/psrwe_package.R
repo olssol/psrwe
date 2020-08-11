@@ -1,4 +1,4 @@
-#' R tools for synthesizing real-world evidence
+#' PS-Integrated Methods for Incorporating RWE in Clinical Studies
 #'
 #' @docType   package
 #' @name      psrwe-package
@@ -11,6 +11,7 @@
 #'
 #' @importFrom stats approxfun as.formula binomial cov density ecdf glm
 #'     integrate optim predict quantile sd var
+#'
 #' @importFrom rstan sampling extract stanc rstan_options traceplot stan_rhat
 #' @importFrom randomForest randomForest
 #'

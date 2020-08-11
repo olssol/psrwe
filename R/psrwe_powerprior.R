@@ -62,7 +62,7 @@ rwe_stan <- function(lst_data,
 #'     each stratum} \item{stan_rst}{Result from STAN sampling} }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'  dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:10, sep = ""),
 #'                   v_grp = "group", cur_grp_level = "current")
 #'  ps_dist <- rwe_ps_dist(dta_ps, metric = "ovl")

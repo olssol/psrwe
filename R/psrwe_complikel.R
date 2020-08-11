@@ -65,7 +65,6 @@ rwe_ps_cl <- function(data_withps, v_borrow = 0, v_outcome = "Y", ...) {
                             c(i, NA, NA, ns1, ns0, cur_theta))
 
         ##jackknife
-        jk_theta  <- NULL
         for (j in 1:ns1) {
             cur_jk <- rwe_cl(dta_cur = cur_d1[-j, v_outcome],
                              dta_ext = cur_d0[[v_outcome]],

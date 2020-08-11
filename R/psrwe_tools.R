@@ -205,7 +205,8 @@ plot_ps <- function(data.withps, overall.inc = TRUE, add.text = TRUE,
             geom_text(x = Inf, y = Inf, hjust = 1, vjust = 1,
                       aes(label = paste('n0=', N0,
                                         ", n1=", N1,
-                                        ", Distantce=", format(Dist, digits = 3),
+                                        ", Distantce=",
+                                        format(Dist, digits = 3),
                                         sep = "")),
                       data = pskl, size = 4);
     }

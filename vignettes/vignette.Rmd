@@ -4,7 +4,7 @@ author: "Chenguang Wang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{psrwe: Propensity Score-Integrated Approaches for Incorporating Real-World Evidence in Clinical Studies}
+  %\VignetteIndexEntry{psrwe: Propensity Score-Integrated Methods for Incorporating Real-World Evidence in Clinical Studies}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

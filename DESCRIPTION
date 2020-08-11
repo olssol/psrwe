@@ -1,14 +1,22 @@
 Package: psrwe
-Title: Propensity Score-Integrated Approaches for Incorporating Real-World Evidence in Clinical Studies
+Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
 Version: 1.0
 Author: Chenguang Wang [aut, cre]
         Trustees of Columbia University [cph] (tools/make_cpp.R, R/stanmodels.R)
 Maintainer: Chenguang Wang <cwang68@jhmi.edu>
-Description: Functions are provided implement the methods proposed in Wang et al. (2019)
-    <doi:10.1080/10543406.2019.1657133>, Wang et al. (2020)
-    <doi:10.1080/10543406.2019.1684309> and Chen et al. (2020)
-    <doi:10.1080/10543406.2020.1730877> for incorporating
-    real-world evidence in clinical studies.
+Description: High-quality real-world data can be transformed into scientific
+    real-world evidence (RWE) for regulatory and healthcare decision-making
+    using proven analytical methods and techniques. For example, propensity
+    score (PS) methodology can be applied to pre-select a subset of real-world
+    data containing patients that are similar to those in the current clinical
+    study in terms of covariates, and to stratify the selected patients together
+    with those in the current study into more homogeneous strata. Then, methods
+    such as power prior approach or composite likelihood approach can be applied
+    in each stratum to draw inference for the parameters of interest. This
+    package provides functions that implement the PS-integrated RWE analysis
+    methods proposed in Wang et al. (2019) <doi:10.1080/10543406.2019.1657133>,
+    Wang et al. (2020) <doi:10.1080/10543406.2019.1684309> and Chen et al.
+    (2020) <doi:10.1080/10543406.2020.1730877>.
 Depends:
     methods,
     R (>= 3.5.0),
