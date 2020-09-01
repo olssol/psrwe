@@ -4,7 +4,7 @@
 \name{psrwe-package}
 \alias{psrwe-package}
 \alias{psrwe}
-\title{R tools for synthesizing real-world evidence}
+\title{PS-Integrated Methods for Incorporating RWE in Clinical Studies}
 \description{
 This package provide R functions for conducting clinical studies with
 real-world evidence incorporated in the study design and analysis.

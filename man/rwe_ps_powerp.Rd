@@ -45,7 +45,7 @@ Draw posterior samples of the parameters of interest for the PS-power prior
 approach
 }
 \examples{
-\dontrun{
+\donttest{
  dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:10, sep = ""),
                   v_grp = "group", cur_grp_level = "current")
  ps_dist <- rwe_ps_dist(dta_ps, metric = "ovl")

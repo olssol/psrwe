@@ -1,6 +1,6 @@
 Package: psrwe
 Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
-Version: 1.0
+Version: 1.2
 Author: Chenguang Wang [aut, cre]
         Trustees of Columbia University [cph] (tools/make_cpp.R, R/stanmodels.R)
 Maintainer: Chenguang Wang <cwang68@jhmi.edu>
@@ -19,16 +19,16 @@ Description: High-quality real-world data can be transformed into scientific
     (2020) <doi:10.1080/10543406.2020.1730877>.
 Depends:
     methods,
-    R (>= 3.5.0),
-    rstan (>= 2.19.2),
-    Rcpp (>= 1.0.2)
+    R (>= 4.0),
+    rstan (>= 2.19.3),
+    Rcpp (>= 1.0.5)
 License: GPL (>= 3)
 LinkingTo:
-    BH (>= 1.69.0-1),
-    Rcpp (>= 1.0.2),
-    rstan (>= 2.14),
-    RcppEigen (>= 0.3.3.5.0),
-    StanHeaders (>= 2.18.1-10)
+    BH (>= 1.72.0-3),
+    rstan (>= 2.19.3),
+    Rcpp (>= 1.0.5),
+    RcppEigen (>= 0.3.3.7.0),
+    StanHeaders (>= 2.21.0-5)
 RcppModules:
     stan_fit4powerp_mod,
     stan_fit4powerps_mod,
@@ -36,10 +36,10 @@ RcppModules:
     stan_fit4prior_mod
 Imports:
     parallel (>= 3.2),
-    cowplot,
-    dplyr,
-    ggplot2,
-    randomForest
+    cowplot (>= 1.0.0),
+    dplyr (>= 0.8.5),
+    ggplot2 (>= 3.3.2),
+    randomForest (>= 4.6-14)
 Suggests:
     knitr,
     markdown

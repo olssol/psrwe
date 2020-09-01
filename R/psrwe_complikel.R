@@ -16,6 +16,7 @@
 #'     summarized by its S3 method \code{summary}.
 #'
 #' @examples
+#' \donttest{
 #' dta_ps <- rwe_ps(ex_dta,
 #'                  v_covs = paste("V", 1:7, sep = ""),
 #'                  v_grp = "Group",
@@ -24,7 +25,7 @@
 #' ps_dist <- rwe_ps_dist(dta_ps)
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 40, ps_dist)
 #' rst_cl    <- rwe_ps_cl(dta_ps, v_borrow = ps_borrow)
-#' summary(rst_cl)
+#' summary(rst_cl)}
 #'
 #' @export
 #'

@@ -125,5 +125,5 @@ metric_mhb <- function(cov0, cov1) {
   x1    <- colMeans(cov1)
 
   rst <- sum((t(x1 - x0) %*% sinv) * (x1 - x0))
-  1/rst
+  1/ rst
 }
