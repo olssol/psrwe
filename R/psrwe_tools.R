@@ -123,13 +123,14 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
             next
 
         cur.freq <- data %>%
-          count_(c(var.groupby, v)) %>%
-          group_by_(.dots = var.groupby) %>%
-          mutate(Sum  = sum(.data$n),
-                 Freq = .data$n / sum(.data$n)) %>%
-          mutate_if(is.factor, as.character) %>%
-          mutate(Cov = v) %>%
-          rename_(Value = v)
+            count_(c(var.groupby, v)) %>%
+            group_by(.dots = var.groupby) %>%
+            mutate(Sum  = sum(.data$n),
+                   Freq = .data$n / sum(.data$n)) %>%
+            ungroup() %>%
+            mutate_if(is.factor, as.character) %>%
+            mutate(Cov = v) %>%
+            rename_(Value = v)
 
         rst <- rbind(rst,
                      data.frame(cur.freq))
