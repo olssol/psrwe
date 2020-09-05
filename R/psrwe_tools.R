@@ -122,8 +122,8 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
         if (!is.factor(data[[v]]))
             next
 
-        cur.freq <- data %>%
-            count(c(var.groupby, v)) %>%
+        cur_freq <- data %>%
+            count(.dots = c(var.groupby, v)) %>%
             group_by(.dots = var.groupby) %>%
             mutate(Sum  = sum(.data$n),
                    Freq = .data$n / sum(.data$n)) %>%
@@ -133,7 +133,7 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
             rename(Value = v)
 
         rst <- rbind(rst,
-                     data.frame(cur.freq))
+                     data.frame(cur_freq))
     }
 
     rst
