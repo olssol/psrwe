@@ -11,7 +11,7 @@
 #'
 tkExpRst <- function(numbers, template.f,  out.f="rst.txt", sub.str="AA") {
     if (!file.exists(template.f)) {
-        return;
+        return(NULL)
     }
     ##read
     tpla <- readChar(template.f, file.info(template.f)$size);
@@ -22,7 +22,7 @@ tkExpRst <- function(numbers, template.f,  out.f="rst.txt", sub.str="AA") {
     }
 
     ##write out
-    write(tpla, file=out.f);
+    write(tpla, file = out.f);
 }
 
 
@@ -33,7 +33,7 @@ tkExpRst <- function(numbers, template.f,  out.f="rst.txt", sub.str="AA") {
 #'
 #' @export
 #'
-tkMakeLocal <- function(alist, dest.env='.GlobalEnv') {
+tkMakeLocal <- function(alist, dest.env) {
     for (i in 1:length(alist)) {
         assign(names(alist[i]), alist[[i]], dest.env);
     }
@@ -43,15 +43,17 @@ tkMakeLocal <- function(alist, dest.env='.GlobalEnv') {
 #' Call function by its name organized as a vector
 #'
 #' @param vec function names as a vector
+#' @param ... Parameters needed for the actual function
 #'
 #' @export
 #'
 tkCallFun <- function(vec, ...) {
-    eval(parse(text=paste("rst <- ",
-                          paste(vec, collapse = ""),
-                          "(...)",
-                          sep="")
+    rst <- NULL
+    eval(parse(text = paste("rst <- ",
+                            paste(vec, collapse = ""),
+                            "(...)",
+                            sep = "")
                )
-         );
+         )
     rst
 }

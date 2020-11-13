@@ -4,7 +4,7 @@
 \alias{tkMakeLocal}
 \title{Import objects in a list into a designated environment}
 \usage{
-tkMakeLocal(alist, dest.env = ".GlobalEnv")
+tkMakeLocal(alist, dest.env)
 }
 \arguments{
 \item{alist}{list of objects}
