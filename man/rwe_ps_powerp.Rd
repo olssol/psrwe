@@ -46,8 +46,8 @@ approach
 }
 \examples{
 \donttest{
- dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:10, sep = ""),
-                  v_grp = "group", cur_grp_level = "current")
+ dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:7, sep = ""),
+                  v_grp = "Group", cur_grp_level = "current")
  ps_dist <- rwe_ps_dist(dta_ps, metric = "ovl")
  post_smps <- rwe_ps_powerp(dta_ps, outcome_type = "binary",
                             total_borrow = 30,
