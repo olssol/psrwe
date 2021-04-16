@@ -1,6 +1,6 @@
 Package: psrwe
 Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
-Version: 1.2.1
+Version: 1.3
 Author: Chenguang Wang [aut, cre]
         Trustees of Columbia University [cph] (tools/make_cpp.R, R/stanmodels.R)
 Maintainer: Chenguang Wang <cwang68@jhmi.edu>
