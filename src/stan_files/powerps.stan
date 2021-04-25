@@ -1,6 +1,6 @@
 //
 //  STRATIFIED POWER PRIOR FOR CONTINUOUS DATA
-//  Power parameter As follows 
+//  Power parameter As follows
 //
 data {
   int<lower = 2> S;
@@ -45,12 +45,12 @@ transformed parameters {
 
   for (i in 1:S) {
     if (0 == FIXVS) {
-      as[i]  = 1 < A*vs[i]/N0[i] ? 1:A*vs[i]/N0[i];
+      as[i]  = 1 < A * vs[i] / N0[i] ? 1 : A * vs[i] / N0[i];
     } else {
-      as[i]  = 1 < A*RS[i]/N0[i] ? 1:A*RS[i]/N0[i];
+      as[i]  = 1 < A * RS[i] / N0[i] ? 1 : A * RS[i] / N0[i];
     }
     sds[i] = 0 == as[i] ? 0 : SD0[i] / sqrt(as[i] * N0[i]);
-  } 
+  }
 }
 
 model {
