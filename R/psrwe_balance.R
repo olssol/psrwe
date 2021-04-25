@@ -1,19 +1,22 @@
-#' Distance between two distributions
+#' @title Distance between two distributions
 #'
-#' Get balance by different metrics
+#' @description Calculate difference measures using different metrics.
 #'
-#' @param cov0 Vector (or matrix for \code{mhb}) of samples from the first
-#'     distribution
-#' @param cov1 Vector (or matrix for \code{mhb}) of samples from the second
-#'     distribution
-#' @param metric Metrics of distances with options
-#' \describe{ \item{ovl}{Overlapping area}
-#'     \item{ksd}{Kullback-Leibler distance} \item{std}{Standardized difference
-#'     in mean} \item{abb}{Absolute difference in mean} \item{ley}{Levy
-#'     distance} \item{mhb}{Mahalanobis distance}
+#' @param cov0 Vector (or matrix for \code{metric = "mhb"}) of samples from the
+#'   first distribution.
+#' @param cov1 Vector (or matrix for \code{metric = "mhb"}) of samples from the
+#'   second distribution.
+#' @param metric Metric to use for calculating the distance with options:
+#' \describe{
+#'   \item{\code{ovl}}{Overlapping area} (default)
+#'   \item{\code{ksd}}{Kullback-Leibler distance}
+#'   \item{\code{std}}{Standardized difference in means}
+#'   \item{\code{abd}}{Absolute difference in means}
+#'   \item{\code{ley}}{Levy distance}
+#'   \item{\code{mhb}}{Mahalanobis distance}
 #' }
 #'
-#' @return A real value of the distance
+#' @return A real value of the distance.
 #'
 #' @examples
 #'
@@ -42,82 +45,86 @@ get_distance <- function(cov0, cov1,
 }
 
 
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-##             PRIVATE FUNCTIONS
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-
-## overlapping coefficient
+#' @title Overlapping coefficient
+#' 
+#' @inheritParams get_distance
+#' 
+#' @noRd
 metric_ovl <- function(cov0, cov1) {
   cov <- c(cov0, cov1)
   if (length(unique(cov)) <= 10) {
       all_x <- c(rep(0, length(cov0)),
                  rep(1, length(cov1)))
-      pt    <- apply(prop.table(table(cov, all_x), 2),
-                     1, min)
+      pt    <- apply(prop.table(table(cov, all_x), 2), 1, min)
 
     return(sum(pt))
   }
 
-  mn <- min(cov) * 1.25;
-  mx <- max(cov) * 1.25;
+  mn <- min(cov) * (1 - 1e-12)
+  mx <- max(cov) * (1 + 1e+12)
 
   f1 <- approxfun(density(cov1, from = mn, to = mx,
-                          bw = "nrd"));
+                          bw = "nrd"))
   f0 <- approxfun(density(cov0, from = mn, to = mx,
-                          bw = "nrd"));
+                          bw = "nrd"))
 
-  fn <- function(x)
-    pmin(f1(x), f0(x))
-
-  s <- try(integrate(fn, lower = mn, upper = mx,
+  s <- try(integrate(function(x) pmin(f1(x), f0(x)),
+                     lower = mn, upper = mx,
                      subdivisions = 500)$value)
 
-  ifelse(inherits(s, "try-error"),
-         NA,
-         s)
+  ifelse(inherits(s, "try-error"), NA, s)
 }
 
-## K-S distance
+#' @title K-S distance
+#' 
+#' @inheritParams get_distance
+#' 
+#' @noRd
 metric_ksd <- function(cov0, cov1) {
-    cov    <- c(cov0, cov1);
-    cdf_1  <- ecdf(cov1);
-    cdf_0  <- ecdf(cov0);
-    1/max(abs(cdf_1(cov) - cdf_0(cov)))
+    cov    <- c(cov0, cov1)
+    cdf_1  <- ecdf(cov1)
+    cdf_0  <- ecdf(cov0)
+    1 / max(abs(cdf_1(cov) - cdf_0(cov)))
 }
 
-## Levy distance
+#' @title Levy distance
+#' 
+#' @inheritParams get_distance
+#' 
+#' @noRd
 metric_ley <- function(cov0, cov1) {
-    cov   <- c(cov0, cov1);
-    cdf_1 <- ecdf(cov1);
-    cdf_0 <- ecdf(cov0);
-    e     <- max(abs(cdf_1(cov) - cdf_0(cov)))
-
-    if (length(unique(cov)) <= 10)
-        return(e)
-
-    x     <- seq(min(cov), max(cov), length.out = 1000);
-    check <- all(cdf_0(x - e) - e <= cdf_1(x) &
+  cov   <- c(cov0, cov1)
+  cdf_1 <- ecdf(cov1)
+  cdf_0 <- ecdf(cov0)
+  e     <- max(abs(cdf_1(cov) - cdf_0(cov)))
+  
+  if (length(unique(cov)) <= 10) {
+    return(e)
+  }
+  
+  x     <- seq(min(cov), max(cov), length.out = 1000)
+  check <- all(cdf_0(x - e) - e <= cdf_1(x) &
                  cdf_1(x) <= cdf_0(x + e) + e)
-
-    while (check) {
-        e <- e - .01
-        check <- all(cdf_0(x - e) - e <= cdf_1(x) &
-                     cdf_1(x) <= cdf_0(x + e) + e)
-    }
-
-    1/e
+  
+  while (check) {
+    e <- e - 1e-12
+    check <- all(cdf_0(x - e) - e <= cdf_1(x) &
+                   cdf_1(x) <= cdf_0(x + e) + e)
+  }
+  
+  1 / e
 }
 
-## mahalanobis balance
-##
-## covs should be a reduced datset that contains only those covariates
-## that will be used for calculating Mahalanobis balance, for example,
-## covs = dat[,1:6]
-## trt should be the exposure variable,
-## for example, trt=dat$X
-##
+#' @title Mahalanobis balance
+#' 
+#' @inheritParams get_distance
+#'
+#' @details Both \code{covs} should be a reduced datset that contains only those
+#'   covariates that will be used for calculating Mahalanobis balance, for
+#'   example, \code{covs = dat[, 1:6]}. \code{trt} should be the exposure
+#'   variable, for example, \code{trt = dat$X}.
+#'   
+#' @noRd
 metric_mhb <- function(cov0, cov1) {
   cov01 <- rbind(cov0, cov1)
   sinv  <- solve(cov(cov01))
@@ -125,5 +132,5 @@ metric_mhb <- function(cov0, cov1) {
   x1    <- colMeans(cov1)
 
   rst <- sum((t(x1 - x0) %*% sinv) * (x1 - x0))
-  1/ rst
+  1 / rst
 }

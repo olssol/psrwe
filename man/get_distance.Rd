@@ -7,24 +7,27 @@
 get_distance(cov0, cov1, metric = c("ovl", "ksd", "std", "abd", "ley", "mhb"))
 }
 \arguments{
-\item{cov0}{Vector (or matrix for \code{mhb}) of samples from the first
-distribution}
+\item{cov0}{Vector (or matrix for \code{metric = "mhb"}) of samples from the
+first distribution.}
 
-\item{cov1}{Vector (or matrix for \code{mhb}) of samples from the second
-distribution}
+\item{cov1}{Vector (or matrix for \code{metric = "mhb"}) of samples from the
+second distribution.}
 
-\item{metric}{Metrics of distances with options
-\describe{ \item{ovl}{Overlapping area}
-    \item{ksd}{Kullback-Leibler distance} \item{std}{Standardized difference
-    in mean} \item{abb}{Absolute difference in mean} \item{ley}{Levy
-    distance} \item{mhb}{Mahalanobis distance}
+\item{metric}{Metric to use for calculating the distance with options:
+\describe{
+  \item{\code{ovl}}{Overlapping area} (default)
+  \item{\code{ksd}}{Kullback-Leibler distance}
+  \item{\code{std}}{Standardized difference in means}
+  \item{\code{abd}}{Absolute difference in means}
+  \item{\code{ley}}{Levy distance}
+  \item{\code{mhb}}{Mahalanobis distance}
 }}
 }
 \value{
-A real value of the distance
+A real value of the distance.
 }
 \description{
-Get balance by different metrics
+Calculate difference measures using different metrics.
 }
 \examples{
 
