@@ -59,8 +59,8 @@ metric_ovl <- function(cov0, cov1) {
     return(sum(pt))
   }
 
-  mn <- min(cov) * (1 - 1e-12)
-  mx <- max(cov) * (1 + 1e+12)
+  mn <- pmax(0, min(cov) - 1e-3)
+  mx <- pmin(1, max(cov) + 1e-3)
 
   f1 <- approxfun(density(cov1, from = mn, to = mx,
                           bw = "nrd"))
