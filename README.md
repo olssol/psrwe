@@ -1,0 +1,52 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# psrwe
+
+<!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/psrwe)](https://CRAN.R-project.org/package=psrwe)
+[![Lifecycle:
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+<!-- badges: end -->
+
+High-quality real-world data can be transformed into scientific
+real-world evidence (RWE) for regulatory and healthcare decision-making
+using proven analytical methods and techniques. For example, propensity
+score (PS) methodology can be applied to pre-select a subset of
+real-world data containing patients that are similar to those in the
+current clinical study in terms of covariates, and to stratify the
+selected patients together with those in the current study into more
+homogeneous strata. Then, methods such as the power prior approach or
+composite likelihood approach can be applied in each stratum to draw
+inference for the parameters of interest. This package provides
+functions that implement the PS-integrated RWE analysis methods proposed
+in [Wang et al. (2019)](https://doi.org/10.1080/10543406.2019.1657133),
+[Wang et al. (2020)](https://doi.org/10.1080/10543406.2019.1684309) and
+[Chen et al. (2020)](https://doi.org/10.1080/10543406.2020.1730877).
+
+## Installation
+
+You can install the released version of `psrwe` from
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("psrwe")
+```
+
+And the **official** development version from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("olssol/psrwe")
+```
+
+A separate **unofficial** development version of the package is
+available from:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("graemeleehickey/psrwe")
+```
