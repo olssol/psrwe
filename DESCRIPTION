@@ -5,8 +5,8 @@ Authors@R: c(
     person(given = "Chenguang", family = "Wang",
            email = "cwang68@jhmi.edu", 
            role = c("aut", "cre")),
-           comment = c(ORCID = "0000-0002-4989-0054"))
     person(given = "Trustees of Columbia University",
+           role = "cph",
            comment = "tools/make_cpp.R, R/stanmodels.R"))    
 Description: High-quality real-world data can be transformed into scientific
     real-world evidence (RWE) for regulatory and healthcare decision-making
