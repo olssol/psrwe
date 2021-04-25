@@ -11,3 +11,4 @@ to ensure integration is over the proper support.
 * Minor updates to `get_distance.R`.
 * Added a README file.
 * Switched to `Authors@R` in DESCRIPTION file.
+* Delete junk files from GitHub repo.
