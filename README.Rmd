@@ -31,7 +31,7 @@ prior approach or composite likelihood approach can be applied in each stratum
 to draw inference for the parameters of interest. This package provides
 functions that implement the PS-integrated RWE analysis methods proposed in
 [Wang et al. (2019)](https://doi.org/10.1080/10543406.2019.1657133),
-[Wang et al. (2020)](https://doi.org/10.1080/10543406.2019.1684309) and
+[Wang et al. (2020)](https://doi.org/10.1080/10543406.2019.1684309), and
 [Chen et al. (2020)](https://doi.org/10.1080/10543406.2020.1730877).
     
 ## Installation
@@ -55,3 +55,11 @@ A separate **unofficial** development version of the package is available from:
 # install.packages("devtools")
 devtools::install_github("graemeleehickey/psrwe")
 ```
+
+## References
+
+1. Wang C, Li H, Chen WC, Lu N, Tiwari R, Xu Y, Yue LQ. Propensity score-integrated power prior approach for incorporating real-world evidence in single-arm clinical studies. *Journal of Biopharmaceutical Statistics*, 2019; **29**, 731–748. https://doi.org/10.1080/10543406.2019.1657133.
+
+2. Chen WC, Wang C, Li H, Lu N, Tiwari R, Xu Y, Yue LQ. (2020), Propensity score-integrated composite likelihood approach for augmenting the control arm of a randomized controlled trial by incorporating real-world data. *Journal of Biopharmaceutical Statistics*, 2020; **30**, 508–520. https://doi.org/10.1080/10543406.2020.1730877.
+
+3. Wang C, Lu N, Chen WC, Li H, Tiwari R, Xu Y, Yue LQ. (2020), Propensity score-integrated composite likelihood approach for incorporating real-world evidence in single-arm clinical studies. *Journal of Biopharmaceutical Statistics*, 2020; **30**, 495–507. https://doi.org/10.1080/10543406.2019.1684309.
