@@ -7,24 +7,27 @@
 rwe_ps_match(dta_cur, dta_ext, ratio = 3, ps_fml = NULL, v_covs = "V1")
 }
 \arguments{
-\item{dta_cur}{current study dataframe}
+\item{dta_cur}{Current study data frame.}
 
-\item{dta_ext}{external data source dataframe}
+\item{dta_ext}{External data source data frame.}
 
-\item{ratio}{matching ratio}
+\item{ratio}{Matching ratio with default value 3 meaning 3:1 matching.}
 
-\item{ps_fml}{Propensity score formula. If null, all covariates will be
-included in the PS model in a linear form.}
+\item{ps_fml}{Propensity score (PS) formula. If \code{NULL}, all covariates
+will be included in the PS model in a linear form.}
 
-\item{v_covs}{Vector of column names corresponding to covariates}
+\item{v_covs}{Vector of column names corresponding to covariates.}
 }
 \value{
-A matrix with two columns. Column \code{pid}: id in dta_cur; Column
-    \code{match_id}: matched id from dta_ext.
+A matrix with two columns:
+\itemize{
+  \item{code{pid}}: ID in \code{dta_cur}.
+  \item{\code{match_id}}: matched ID from \code{dta_ext}.
+}
 }
 \description{
 Match patients in external data source with patients in current study based
-on PS using nearest neighbor method
+on PS using nearest neighbor method.
 }
 \examples{
 dta_cur <- ex_dta[which(ex_dta$Group == "current"), ]

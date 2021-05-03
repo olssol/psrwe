@@ -7,7 +7,8 @@
 rwe_ps_cl(data_withps, v_borrow = 0, v_outcome = "Y", ...)
 }
 \arguments{
-\item{data_withps}{A class \code{RWE_DWITHPS} list. See \code{\link{rwe_ps}}.}
+\item{data_withps}{A list of class \code{RWE_DWITHPS} that is generated using
+the \code{\link{rwe_ps}} function.}
 
 \item{v_borrow}{Vector of number of subjects to be borrowed from each stratum}
 
