@@ -17,3 +17,4 @@ to ensure integration is over the proper support.
 documentation files
 * Fix a bug in DESCRIPTION Suggests
 * Minor code formatting updates
+* Minor documentation updates
