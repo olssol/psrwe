@@ -11,4 +11,5 @@ to ensure integration is over the proper support.
 * Minor updates to `get_distance.R` (renamed from `psrwe_balance.R`).
 * Added a README file.
 * Switched to `Authors@R` in DESCRIPTION file.
+* Updated DESCRIPTION to point to repo.
 * Delete junk files from GitHub repo.

@@ -42,18 +42,11 @@ You can install the released version of `psrwe` from [CRAN](https://CRAN.R-proje
 install.packages("psrwe")
 ```
 
-And the **official** development version from [GitHub](https://github.com/) with:
+And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("olssol/psrwe")
-```
-
-A separate **unofficial** development version of the package is available from:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("graemeleehickey/psrwe")
 ```
 
 ## References
