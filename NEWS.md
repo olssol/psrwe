@@ -13,3 +13,7 @@ to ensure integration is over the proper support.
 * Switched to `Authors@R` in DESCRIPTION file.
 * Updated DESCRIPTION to point to repo.
 * Delete junk files from GitHub repo.
+* No longer export `tkExpRst`, `tkMakeLocal`, and `tkCallFun`, nor create .Rd
+documentation files
+* Fix a bug in DESCRIPTION Suggests
+* Minor code formatting updates
