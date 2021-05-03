@@ -38,6 +38,10 @@ studies.}
 \item{nstrata}{Number of PS strata to be created.}
 
 \item{...}{Additional parameters for calculating the propensity score.}
+
+\item{ps_method}{Method to calculate propensity scores. Can be set to
+\code{logistic} for logistic regression or \code{randomforest} for a
+random forest approach.}
 }
 \value{
 A list of class \code{RWE_DWITHPS} with items:

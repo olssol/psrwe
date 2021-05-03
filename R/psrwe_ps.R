@@ -16,7 +16,7 @@
 #'   studies.
 #' @param nstrata Number of PS strata to be created.
 #' @param ps_method Method to calculate propensity scores. Can be set to
-#'   {\code{logistic} for logistic regression or \code{randomforest} for a
+#'   \code{logistic} for logistic regression or \code{randomforest} for a
 #'   random forest approach.
 #' @param ... Additional parameters for calculating the propensity score.
 #'
