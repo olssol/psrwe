@@ -48,7 +48,15 @@ rwe_ps <- function(data,
                    ...) {
     
     dnames <- colnames(data)
-    stopifnot(v_grp %in% dnames)
+    
+    if (!(v_grp %in% dnames)) {
+        stop("The group parameter was not found in data")
+    }
+    
+    if (is_tibble(data)) {
+        warning("data should be a data.frame object, not a tibble")
+        data <- as.data.frame(data)
+    }
     
     # Generate formula
     if (is.null(ps_fml)) {

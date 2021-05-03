@@ -15,6 +15,8 @@ to ensure integration is over the proper support.
 * Delete junk files from GitHub repo.
 * No longer export `tkExpRst`, `tkMakeLocal`, and `tkCallFun`, nor create .Rd
 documentation files
-* Fix a bug in DESCRIPTION Suggests
+* Fixed a minor bug in DESCRIPTION Suggests
 * Minor code formatting updates
 * Minor documentation updates
+* Fixed a minor bug that occured if a tibble was passed to `rwe_ps()` instead of
+a data frame.
