@@ -7,10 +7,14 @@
 #' @param cov1 Vector (or matrix for \code{mhb}) of samples from the second
 #'     distribution
 #' @param metric Metrics of distances with options
-#' \describe{ \item{ovl}{Overlapping area}
-#'     \item{ksd}{Kullback-Leibler distance} \item{std}{Standardized difference
-#'     in mean} \item{abb}{Absolute difference in mean} \item{ley}{Levy
-#'     distance} \item{mhb}{Mahalanobis distance}
+#' \describe{
+#'  \item{ovl}{Overlapping area}
+#'  \item{ksd}{Kullback-Leibler distance}
+#'  \item{std}{Standardized difference in mean}
+#'  \item{abb}{Absolute difference in mean}
+#'  \item{ley}{Levy distance}
+#'  \item{mhb}{Mahalanobis distance}
+#'  \item{One minus Kolmogorov-Smirnov statistic}
 #' }
 #'
 #' @return A real value of the distance
@@ -26,18 +30,19 @@
 #'
 get_distance <- function(cov0, cov1,
                          metric = c("ovl", "ksd", "std", "abd",
-                                    "ley", "mhb")) {
+                                    "ley", "mhb", "omkss")) {
     metric <- match.arg(metric)
     switch(metric,
            std = {
                s <- sqrt((var(cov1) + var(cov0)) / 2)
                abs(mean(cov1) - mean(cov0)) / s
            },
-           abd = abs(mean(cov0) - mean(cov1)),
-           ovl = metric_ovl(cov0, cov1),
-           ksd = metric_ksd(cov0, cov1),
-           ley = metric_ley(cov0, cov1),
-           mhb = metric_mhb(cov0, cov1)
+           abd   = abs(mean(cov0) - mean(cov1)),
+           ovl   = metric_ovl(cov0, cov1),
+           ksd   = metric_ksd(cov0, cov1),
+           ley   = metric_ley(cov0, cov1),
+           mhb   = metric_mhb(cov0, cov1),
+           omkss = metric_omkss(cov0, cov1)
            )
 }
 
@@ -60,8 +65,11 @@ metric_ovl <- function(cov0, cov1) {
     return(sum(pt))
   }
 
-  mn <- min(cov) * 1.25;
-  mx <- max(cov) * 1.25;
+  mn <- min(cov);
+  mx <- max(cov);
+  md <- (mx - mn) * 0.25
+  mn <- mn - md
+  mx <- mx + md
 
   f1 <- approxfun(density(cov1, from = mn, to = mx,
                           bw = "nrd"));
@@ -84,7 +92,7 @@ metric_ksd <- function(cov0, cov1) {
     cov    <- c(cov0, cov1);
     cdf_1  <- ecdf(cov1);
     cdf_0  <- ecdf(cov0);
-    1/max(abs(cdf_1(cov) - cdf_0(cov)))
+    1 / max(abs(cdf_1(cov) - cdf_0(cov)))
 }
 
 ## Levy distance
@@ -107,7 +115,7 @@ metric_ley <- function(cov0, cov1) {
                      cdf_1(x) <= cdf_0(x + e) + e)
     }
 
-    1/e
+    1 / e
 }
 
 ## mahalanobis balance
@@ -125,5 +133,11 @@ metric_mhb <- function(cov0, cov1) {
   x1    <- colMeans(cov1)
 
   rst <- sum((t(x1 - x0) %*% sinv) * (x1 - x0))
-  1/ rst
+  1 / rst
+}
+
+## omkss: one minus Kolmogorov-Smirnov statistic
+metric_omkss <- function(cov0, cov1) {
+    1 - ks.test(cov0[!is.na(cov0)],
+                cov1[!is.na(cov0)])$statistic
 }
