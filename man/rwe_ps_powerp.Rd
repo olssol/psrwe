@@ -16,7 +16,8 @@ rwe_ps_powerp(
 )
 }
 \arguments{
-\item{data_withps}{A class \code{RWE_DWITHPS} list. See \code{\link{rwe_ps}}.}
+\item{data_withps}{A list of class \code{RWE_DWITHPS} that is generated using
+the \code{\link{rwe_ps}} function.}
 
 \item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}}
 

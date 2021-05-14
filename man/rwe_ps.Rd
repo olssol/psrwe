@@ -17,46 +17,51 @@ rwe_ps(
 )
 }
 \arguments{
-\item{data}{Dataframe with group assignment and covariates}
+\item{data}{Data frame with group assignment and covariates.}
 
-\item{ps_fml}{Propensity score formula. If null, all covariates will be
-included in the PS model in a linear form.}
+\item{ps_fml}{Propensity score (PS) formula. If \code{NULL}, all covariates
+will be included in the PS model in a linear form.}
 
-\item{v_covs}{Vector of column names corresponding to covariates}
+\item{v_covs}{Vector of column names corresponding to covariates.}
 
-\item{v_grp}{Column name corresponding to group assignment}
+\item{v_grp}{Column name corresponding to group assignment.}
 
-\item{cur_grp_level}{Group level for the current study. Default 1.}
+\item{cur_grp_level}{Group level for the current study. Default is
+\code{cur_grp_level = 1}.}
 
-\item{v_arm}{Column name corresponding treatment vs. control. Ignored for
-single arm studies. two-arm randomized studies.}
+\item{v_arm}{Column name corresponding treatment vs. control in two-arm
+randomized studies. Ignored for single arm studies.}
 
 \item{trt_arm_level}{Arm level for the treatment arm. Ignored for single-arm
 studies.}
 
-\item{nstrata}{Number of PS strata to be created}
+\item{nstrata}{Number of PS strata to be created.}
 
-\item{...}{Parameters to get propensity scores. \itemize{
-\item{ps_method}{\code{logistic} forlogistic regression or
-\code{randomforest} for randomforest) \item{...}{Parameters for
-\code{randomForest}}} }}
+\item{...}{Additional parameters for calculating the propensity score.}
+
+\item{ps_method}{Method to calculate propensity scores. Can be set to
+\code{logistic} for logistic regression or \code{randomforest} for a
+random forest approach.}
 }
 \value{
-A class \code{RWE_DWITHPS} list with items:
+A list of class \code{RWE_DWITHPS} with items:
 
 \itemize{
-\item{data}{Original data with column \code{_ps_} for estimated PS scores
-and \code{_strata_} for PS stratum added}
-\item{ps_fml}{PS formula for estimated PS scores}
-\item{nstrata}{Number of strata}
+  \item{data}{Original data with column \code{_ps_} for estimated PS scores
+              and \code{_strata_} for PS stratum added.}
+  \item{ps_fml}{PS formula for estimated PS scores.}
+  \item{nstrata}{Number of strata.}
 }
 }
 \description{
-Calculate propensity scores using logistic regression or random forest model
+Calculate propensity scores using logistic regression or random
+  forest model.
 }
 \examples{
-
-rwe_ps(ex_dta, v_covs = paste("V", 1:7, sep = ""), v_grp = "Group",
+data(ex_dta)
+rwe_ps(ex_dta,
+       v_covs = paste("V", 1:7, sep = ""),
+       v_grp = "Group",
        cur_grp_level = "current")
 
 }
