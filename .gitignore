@@ -4,3 +4,5 @@
 inst/doc
 *.so
 *.o
+*.DS_Store
+.gitconfig

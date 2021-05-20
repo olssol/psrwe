@@ -7,19 +7,20 @@
 \title{PS-Integrated Methods for Incorporating RWE in Clinical Studies}
 \description{
 This package provide R functions for conducting clinical studies with
-real-world evidence incorporated in the study design and analysis.
+real-world evidence (RWE) incorporated in the study design and analysis.
 }
 \section{PS-integrated power prior}{
 
 
 We extend the Bayesian power prior approach for a single-arm study (the
-current study) to leverage external real-world data. We use propensity score
-methodology to pre-select a subset of real-world data containing patients
-that are similar to those in the current study in terms of covariates, and to
-stratify the selected patients together with those in the current study into
-more homogeneous strata. The power prior approach is then applied in each
-stratum to obtain stratum-specific posterior distributions, which are
-combined to complete the Bayesian inference for the parameters of interest.
+current study) to leverage external real-world data (RWD). We use propensity
+score methodology to pre-select a subset of real-world data containing
+patients that are similar to those in the current study in terms of
+covariates, and to stratify the selected patients together with those in the
+current study into more homogeneous strata. The power prior approach is then
+applied in each stratum to obtain stratum-specific posterior distributions,
+which are combined to complete the Bayesian inference for the parameters of
+interest.
 }
 
 \section{PS-integrated composite likelihood}{
@@ -27,7 +28,7 @@ combined to complete the Bayesian inference for the parameters of interest.
 
 A propensity score-integrated composite likelihood (PSCL) approach is
 developed for cases in which the control arm of a two-arm randomized
-controlled trial (RCT) (treated vs control) is augmented with patients from
+controlled trial (RCT) (treated vs. control) is augmented with patients from
 real-world data (RWD) containing both clinical outcomes and covariates at the
 patient-level. The PSCL approach first estimates the propensity score for
 every patient as the probability of the patient being in the RCT rather than
@@ -41,18 +42,18 @@ population-level estimate of the parameter of interest.
 }
 
 \references{
-Chen, W.C., Wang, C., Li, H., Lu, N., Tiwari, R., Xu, Y. and Yue, L.Q., 2020.
-Propensity score-integrated composite likelihood approach for augmenting the
-control arm of a randomized controlled trial by incorporating real-world
-data. Journal of Biopharmaceutical Statistics, 30(3), pp.508-520.
+Chen WC, Wang C, Li H, Lu N, Tiwari R, Xu Y, Yue LQ. Propensity
+score-integrated composite likelihood approach for augmenting the control arm
+of a randomized controlled trial by incorporating real-world data.
+*Journal of Biopharmaceutical Statistics*. 2020; 30(3):508-520.
 
-Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., & Yue, L. Q.
-(2020). Propensity score-integrated composite likelihood approach for
-incorporating real-world evidence in single-arm clinical studies. Journal of
-biopharmaceutical statistics, 30(3), 495-507.
+Wang C, Lu N, Chen WC, Li H, Tiwari R, Xu Y, Yue LQ. Propensity
+score-integrated composite likelihood approach for incorporating real-world
+evidence in single-arm clinical studies.
+*Journal of Biopharmaceutical Statistics*. 2020; 30(3):495-507.
 
-Wang, C., Li, H., Chen, W. C., Lu, N., Tiwari, R., Xu, Y., & Yue, L. Q.
-(2019). Propensity score-integrated power prior approach for incorporating
-real-world evidence in single-arm clinical studies. Journal of
-biopharmaceutical statistics, 29(5), 731-748.
+Wang C, Li H, Chen WC, Lu N, Tiwari R, Xu Y, Yue LQ. Propensity
+score-integrated power prior approach for incorporating real-world evidence
+in single-arm clinical studies. *Journal of Biopharmaceutical Statistics*.
+2019; 29(5):731-748.
 }

@@ -16,7 +16,8 @@ rwe_ps_powerp(
 )
 }
 \arguments{
-\item{data_withps}{A class \code{RWE_DWITHPS} list. See \code{\link{rwe_ps}}.}
+\item{data_withps}{A list of class \code{RWE_DWITHPS} that is generated using
+the \code{\link{rwe_ps}} function.}
 
 \item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}}
 
@@ -46,8 +47,8 @@ approach
 }
 \examples{
 \donttest{
- dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:10, sep = ""),
-                  v_grp = "group", cur_grp_level = "current")
+ dta_ps <- rwe_ps(ex_dta, v_covs = paste("V", 1:7, sep = ""),
+                  v_grp = "Group", cur_grp_level = "current")
  ps_dist <- rwe_ps_dist(dta_ps, metric = "ovl")
  post_smps <- rwe_ps_powerp(dta_ps, outcome_type = "binary",
                             total_borrow = 30,

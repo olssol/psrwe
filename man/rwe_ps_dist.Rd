@@ -7,7 +7,8 @@
 rwe_ps_dist(data_withps, min_n0 = 10, trt_arm_level = NULL, ...)
 }
 \arguments{
-\item{data_withps}{A class \code{RWE_DWITHPS} list. See \code{\link{rwe_ps}}.}
+\item{data_withps}{A list of class \code{RWE_DWITHPS} that is generated using
+the \code{\link{rwe_ps}} function.}
 
 \item{min_n0}{threshold for number of external subjects, below which the
 external data in the current stratum will be ignored by setting the PS
@@ -16,31 +17,31 @@ distance to 0. Default value 10.}
 \item{trt_arm_level}{Arm level for the treatment arm. Ignored for single-arm
 studies.}
 
-\item{...}{Parameters for \code{get_distance}, e.g., \code{metric} with
-options such as overlapping area (\code{ovl}).}
+\item{...}{Additional parameters for \code{\link{get_distance}}. For example,
+\code{metric} with options such as overlapping area (\code{ovl}).}
 }
 \value{
-A class \code{RWE_PSDIST} dataframe with columns
+A data frame of class \code{RWE_PSDIST} with columns:
   \itemize{
-\item{Strata}{Index of stratum. 0 represents the overall information}
-\item{N0,N1}{Number of subjects in group 0 and 1}
-\item{N00, N10}{Number of arm 0 subjects in group 0 and 1, when arm exists}
-\item{N01, N11}{Number of arm 1 subjects in group 0 and 1, when arm exists}
-\item{Dist} Distance}
+    \item{Strata}{Index of stratum. 0 represents the overall information.}
+    \item{N0, N1}{Number of subjects in group 0 and 1.}
+    \item{N00, N10}{Number of arm 0 subjects in group 0 and 1, when arm
+                    exists.}
+    \item{N01, N11}{Number of arm 1 subjects in group 0 and 1, when arm 
+                    exists.}
+    \item{Dist}{Distance measure.}
+}
 }
 \description{
-Get number of subjects and the distances of PS distributions for each PS
-strata
+Get number of subjects and the distances of PS distributions for
+  each PS strata.
 }
 \examples{
-
 dta_ps <- rwe_ps(ex_dta,
                  v_covs = paste("V", 1:7, sep = ""),
                  v_grp = "Group",
                  cur_grp_level = "current")
 
-
 rwe_ps_dist(dta_ps, metric = "ovl")
-
 
 }

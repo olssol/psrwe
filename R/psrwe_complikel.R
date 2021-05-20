@@ -332,7 +332,7 @@ rwe_ps_cl2arm <- function(data_withps, v_arm = "Arm", trt_arm_level = 1,
 
     ## treatment effect
     mu  <- sum_trt$theta_by_stratum$Theta    - sum_ctl$theta_by_stratum$Theta
-    vs  <- sum_trt$theta_by_stratum$Variance - sum_ctl$theta_by_stratum$Variance
+    vs  <- sum_trt$theta_by_stratum$Variance + sum_ctl$theta_by_stratum$Variance
     nct <- sum_trt$theta_by_stratum$N1       + sum_ctl$theta_by_stratum$N1
 
     ws   <- nct / sum(nct)

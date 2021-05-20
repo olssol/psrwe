@@ -13,10 +13,11 @@ rwe_ps_cl2arm(
 )
 }
 \arguments{
-\item{data_withps}{A class \code{RWE_DWITHPS} list. See \code{\link{rwe_ps}}.}
+\item{data_withps}{A list of class \code{RWE_DWITHPS} that is generated using
+the \code{\link{rwe_ps}} function.}
 
-\item{v_arm}{Column name corresponding treatment vs. control. Ignored for
-single arm studies. two-arm randomized studies.}
+\item{v_arm}{Column name corresponding treatment vs. control in two-arm
+randomized studies. Ignored for single arm studies.}
 
 \item{trt_arm_level}{Arm level for the treatment arm. Ignored for single-arm
 studies.}
