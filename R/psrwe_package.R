@@ -17,7 +17,8 @@
 #' @importFrom parallel detectCores
 #' @importFrom cowplot plot_grid
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
-#'     rename filter select arrange ungroup is_tibble
+#'     rename filter select arrange ungroup
+#' @importFrom tibble is_tibble
 #'
 #' @description
 #'

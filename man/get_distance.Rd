@@ -4,7 +4,11 @@
 \alias{get_distance}
 \title{Distance between two distributions}
 \usage{
-get_distance(cov0, cov1, metric = c("ovl", "ksd", "std", "abd", "ley", "mhb"))
+get_distance(
+  cov0,
+  cov1,
+  metric = c("ovl", "ksd", "std", "abd", "ley", "mhb", "omkss")
+)
 }
 \arguments{
 \item{cov0}{Vector (or matrix for \code{metric = "mhb"}) of samples from the
@@ -21,6 +25,7 @@ second distribution.}
   \item{\code{abd}}{Absolute difference in means}
   \item{\code{ley}}{Levy distance}
   \item{\code{mhb}}{Mahalanobis distance}
+  \item{\code{omkss}}{One minus Kolmogorov-Smirnov statistic}
 }}
 }
 \value{
