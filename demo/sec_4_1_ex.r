@@ -4,16 +4,16 @@ data(ex_dta)
 
 ### Obtain PSs.
 dta_ps <- rwe_ps(ex_dta,
-                 v_covs = paste("V", 1:7, sep = ""),
-                 v_grp = "Group",
-                 cur_grp_level = "current",
-                 nstrata = 5)
+                 v_covs = paste("V", 1:7, sep = ""),
+                 v_grp = "Group",
+                 cur_grp_level = "current",
+                 nstrata = 5)
 
 ### Sample size.
-table(dta_ps$data$"_grp_")     # by data source
-table(dta_ps$data$"_strata_")  # by PS stratum
+table(dta_ps$data$"_grp_")     # by data source
+table(dta_ps$data$"_strata_")  # by PS stratum
 table(dta_ps$data$"_grp_",
-      dta_ps$data$"_strata_")  # by data source and PS stratum
+      dta_ps$data$"_strata_")  # by data source and PS stratum
 
 ### Balance assessment of PS stratification.
 plot(dta_ps, "balance")
@@ -26,10 +26,11 @@ ps_dist
 ### PSPP, single arm study, binary outcome.
 .msg <- capture.output({ suppressWarnings({
 post_smps <- rwe_ps_powerp(dta_ps,
-                           total_borrow  = 40,
-                           v_distance    = ps_dist$Dist[1:dta_ps$nstrata],
-                           outcome_type  = "binary",
-                           v_outcome     = "Y")
+                           total_borrow  = 40,
+                           v_distance    = ps_dist$Dist[1:dta_ps$nstrata],
+                           outcome_type  = "binary",
+                           v_outcome     = "Y",
+                           seed          = 1234)
 }) })
 
 ### PSPP results.
