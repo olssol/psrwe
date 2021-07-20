@@ -2,6 +2,9 @@
 suppressMessages(library(psrwe, quietly = TRUE))
 data(ex_dta)
 
+### First parts of Data.
+head(ex_dta)
+
 ### Obtain PSs.
 dta_ps <- rwe_ps(ex_dta,
                  v_covs = paste("V", 1:7, sep = ""),
