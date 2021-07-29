@@ -9,9 +9,9 @@ Example dataset of a randomized study.}
 \format{
 A data frame with the following variables:
 \itemize{
-  \item{Group}{0, 1}
-  \item{Arm}{0, 1}
-  \item{Y}{Continuous outcome}
+  \item{Group}{current, rwd}
+  \item{Arm}{control, treatment}
+  \item{Y_Con}{Continuous outcome}
   \item{V1-V7}{Covariates}
 }
 }

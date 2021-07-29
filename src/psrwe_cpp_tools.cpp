@@ -37,7 +37,7 @@ NumericVector c_match(NumericVector target, NumericVector candidate, int ratio) 
   NumericVector dist(candidate.size());
   NumericVector inx(candidate.size());
 
-  int i, j, k, start;
+  int i, j, start;
 
   // initialize index of candidates
   for (i = 0; i < inx.size(); i++) {

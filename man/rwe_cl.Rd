@@ -19,7 +19,7 @@ rwe_cl(
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
-\item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}}
+\item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}.}
 
 \item{equal_sd}{Boolean. whether sd is the same between the current study and
 external data source}

@@ -10,7 +10,10 @@ Example dataset of a single arm study.}
 A data frame with the following variables:
 \itemize{
   \item{Group}{current, rwd}
-  \item{Y}{Binary outcome}
+  \item{Y_Bin}{Binary outcome}
+  \item{Y_Con}{Continuous outcome}
+  \item{Y_Surv}{Survival outcome in days}
+  \item{Censor}{Censoring status}
   \item{V1-V7}{Covariates}
 }
 }
