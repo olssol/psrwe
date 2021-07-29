@@ -1,6 +1,6 @@
 #' @title Estimate propensity scores
 #'
-#' @description Calculate propensity scores using logistic regression or random
+#' @description Estimate propensity scores using logistic regression or random
 #'   forest model.
 #'
 #' @param data Data frame with group assignment and covariates.
@@ -57,7 +57,7 @@ rwe_ps_est <- function(data,
     ps_method <- match.arg(ps_method)
 
     ## Generate formula
-    if ( is.null(ps_fml) ) {
+    if (is.null(ps_fml)) {
         ps_fml <- as.formula(paste(v_grp, "~",
                                    paste(v_covs, collapse = "+"),
                                    sep = ""))
@@ -68,6 +68,9 @@ rwe_ps_est <- function(data,
     if (!(all(v_fml %in% dnames))) {
         stop("Group or covariate was not found in data")
     }
+
+    ## assign v_grp if ps_fml was used
+    v_grp <- v_fml[1]
 
     ## Arm
     if (!is.null(v_arm)) {

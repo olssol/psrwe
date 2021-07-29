@@ -52,7 +52,7 @@ A list of class \code{RWE_PS_DATA} with items:
 }
 }
 \description{
-Calculate propensity scores using logistic regression or random
+Estimate propensity scores using logistic regression or random
   forest model.
 }
 \examples{

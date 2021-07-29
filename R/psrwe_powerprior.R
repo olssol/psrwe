@@ -153,8 +153,9 @@ rwe_ps_powerp <- function(dta_psbor, v_outcome = "Y",
                  Treatment = rst_trt,
                  Effect    = rst_effect,
                  Borrow    = dta_psbor$Borrow,
-                 Method    = "ps_pp",
-                 is_rct    = is_rct)
+                 Total_borrow = dta_psbor$Total_borrow,
+                 Method       = "ps_pp",
+                 is_rct       = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
     rst
@@ -320,6 +321,51 @@ summary.RWE_PS_RST <- function(object, ...) {
     rst <- list(Overall = Overall)
 }
 
+#' @title Print estimation results
+#'
+#' @description Print summary information of outcome mean estimation results
+#'
+#' @param x A list of class \code{RWE_PS_RST} that is generated using the
+#'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_compl}}, or
+#'     \code{\link{rwe_ps_survkm}} function.
+#' @param ... Additional parameters
+#'
+#' @seealso  \code{\link{summary.RWE_PS_RST}}
+#'
+#'
+#' @method print RWE_PS_RST
+#'
+#'
+#' @export
+#'
+print.RWE_PS_RST <- function(x, ...) {
+
+    rst_sum <- summary(x, ...)$Overall
+
+    extra_1 <- ""
+    if ("ps_km" == x$Method) {
+        extra_1 <- paste(" based on the survival probability at time ",
+                         x$pred_tp, ",", sep = "")
+    }
+
+    if ("Effect" == rst_sum[1, "Type"]) {
+        extra_2 <- "treatment effect"
+    } else {
+        extra_2 <- "mean of the outcome"
+    }
+
+    ss <- paste("With a total of ", x$Total_borrow,
+                " subject borrowed from the RWD,",
+                extra_1, " the ", extra_2,
+                " is ",
+                sprintf("%5.3f", rst_sum[1, "Mean"]),
+                " with standard error ",
+                sprintf("%5.3f", rst_sum[1, "SD"]),
+                sep = "")
+
+    cat_paste(ss)
+}
+
 #' @title Plot  estimation results for power prior approach
 #'
 #' @description
@@ -342,7 +388,7 @@ plot.RWE_PS_RST <- function(x, ...) {
               for power prior analysis.")
     }
 
-    rst <- data.frame(Type  = "By Arm",
+    rst <- data.frame(Type  = "Arm Specific",
                       Arm   = "Arm-Control",
                       theta = x$Control$Overall_Samples)
 
@@ -359,8 +405,6 @@ plot.RWE_PS_RST <- function(x, ...) {
     rst_plt <- ggplot(data = rst, aes(x = theta)) +
         theme_bw() +
         labs(x = expression(theta), y = "Density")
-
-    browse()
 
     if (x$is_rct) {
         rst_plt <- rst_plt +

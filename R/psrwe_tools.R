@@ -588,7 +588,8 @@ get_ps_cl_km <- function(dta_psbor,
                  Treatment = rst_trt,
                  Effect    = rst_effect,
                  Borrow    = dta_psbor$Borrow,
-                 is_rct    = is_rct)
+                 Total_borrow = dta_psbor$Total_borrow,
+                 is_rct       = is_rct)
 }
 
 #' Summarize overall theta

@@ -25,7 +25,7 @@
 #'
 #' @export
 #'
-rwe_ps_cl <- function(dta_psbor, v_outcome = "Y",
+rwe_ps_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
                       ...) {
 
@@ -162,7 +162,7 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
                            continuous = sd(dta_cur),
                            binary     = sqrt(theta * (1 - theta) / ns1))
 
-        return(theta, sd_theta)
+        return(c(theta, sd_theta))
     }
 
     ## overall ps-cl
