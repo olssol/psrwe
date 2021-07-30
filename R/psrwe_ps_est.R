@@ -20,7 +20,7 @@
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
-#' @return A list of class \code{RWE_PS_DATA} with items:
+#' @return A list of class \code{RWE_PS_DAT} with items:
 #'
 #' \itemize{
 #'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
@@ -144,7 +144,7 @@ rwe_ps_est <- function(data,
 #'
 #' @inheritParams get_distance
 #'
-#' @param object A list of class \code{RWE_PS_DATA} that is generated using
+#' @param object A list of class \code{RWE_PS_DAT} that is generated using
 #'   the \code{\link{rwe_ps_est}} function.
 #' @param min_n0 threshold for number of external subjects, below which the
 #'   external data in the current stratum will be ignored by setting the PS
