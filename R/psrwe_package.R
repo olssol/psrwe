@@ -17,7 +17,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom cowplot plot_grid
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
-#'     rename filter select arrange ungroup n
+#'     rename filter select arrange ungroup n distinct
 #' @importFrom survival Surv survfit
 #'
 #' @description

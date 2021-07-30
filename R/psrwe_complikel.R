@@ -21,7 +21,7 @@
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_cl(ps_borrow, v_outcome = "Y_Con")}
+#' rst       <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")}
 #'
 #' @export
 #'
