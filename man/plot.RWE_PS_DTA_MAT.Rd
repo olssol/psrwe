@@ -10,7 +10,7 @@
 \item{x}{A list of class \code{RWE_PS_DTA_MAT} that is generated using
 the \code{\link{rwe_ps_match}} function.}
 
-\item{...}{Parameters for \code{plot.RWE_PS_DATA}}
+\item{...}{Parameters for \code{plot.RWE_PS_DAT}}
 }
 \description{
 S3 method for visualizing PS adjustment based on matching.

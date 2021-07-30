@@ -12,7 +12,7 @@
 )
 }
 \arguments{
-\item{object}{A list of class \code{RWE_PS_DATA} that is generated using
+\item{object}{A list of class \code{RWE_PS_DAT} that is generated using
 the \code{\link{rwe_ps_est}} function.}
 
 \item{metric}{Metric to use for calculating the distance with options:

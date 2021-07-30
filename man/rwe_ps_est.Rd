@@ -41,7 +41,7 @@ studies.}
 used in \code{randomForest} or \code{glm} .}
 }
 \value{
-A list of class \code{RWE_PS_DATA} with items:
+A list of class \code{RWE_PS_DAT} with items:
 
 \itemize{
   \item{data}{Original data with column \code{_ps_} for estimated PS scores
