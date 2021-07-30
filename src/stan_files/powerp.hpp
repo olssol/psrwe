@@ -36,7 +36,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_powerp");
-    reader.add_event(46, 44, "end", "model_powerp");
+    reader.add_event(51, 49, "end", "model_powerp");
     return reader;
 }
 
@@ -93,7 +93,7 @@ public:
             vals_i__ = context__.vals_i("N0");
             pos__ = 0;
             N0 = vals_i__[pos__++];
-            check_greater_or_equal(function__, "N0", N0, 1);
+            check_greater_or_equal(function__, "N0", N0, 0);
 
             current_statement_begin__ = 9;
             context__.validate_dims("data initialization", "YBAR0", "double", context__.to_vec());
@@ -149,9 +149,19 @@ public:
 
             // execute transformed data statements
             current_statement_begin__ = 24;
-            stan::math::assign(a0, (logical_lt(1, (A / N0)) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>((A / N0)) ));
-            current_statement_begin__ = 25;
-            stan::math::assign(sn0, (SD0 / stan::math::sqrt((N0 * 1.0))));
+            if (as_bool(logical_gt(N0, 0))) {
+
+                current_statement_begin__ = 25;
+                stan::math::assign(a0, (logical_lt(1, (A / N0)) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>((A / N0)) ));
+                current_statement_begin__ = 26;
+                stan::math::assign(sn0, (SD0 / stan::math::sqrt((N0 * 1.0))));
+            } else {
+
+                current_statement_begin__ = 28;
+                stan::math::assign(a0, 0);
+                current_statement_begin__ = 29;
+                stan::math::assign(sn0, 1);
+            }
 
             // validate transformed data
             current_statement_begin__ = 21;
@@ -164,9 +174,9 @@ public:
             // validate, set parameter ranges
             num_params_r__ = 0U;
             param_ranges_i__.clear();
-            current_statement_begin__ = 29;
+            current_statement_begin__ = 34;
             num_params_r__ += 1;
-            current_statement_begin__ = 30;
+            current_statement_begin__ = 35;
             num_params_r__ += 1;
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -189,7 +199,7 @@ public:
         std::vector<double> vals_r__;
         std::vector<int> vals_i__;
 
-        current_statement_begin__ = 29;
+        current_statement_begin__ = 34;
         if (!(context__.contains_r("theta")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable theta missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("theta");
@@ -203,7 +213,7 @@ public:
             stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable theta: ") + e.what()), current_statement_begin__, prog_reader__());
         }
 
-        current_statement_begin__ = 30;
+        current_statement_begin__ = 35;
         if (!(context__.contains_r("tau1")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable tau1 missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("tau1");
@@ -249,7 +259,7 @@ public:
             stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);
 
             // model parameters
-            current_statement_begin__ = 29;
+            current_statement_begin__ = 34;
             local_scalar_t__ theta;
             (void) theta;  // dummy to suppress unused var warning
             if (jacobian__)
@@ -257,7 +267,7 @@ public:
             else
                 theta = in__.scalar_constrain();
 
-            current_statement_begin__ = 30;
+            current_statement_begin__ = 35;
             local_scalar_t__ tau1;
             (void) tau1;  // dummy to suppress unused var warning
             if (jacobian__)
@@ -267,17 +277,17 @@ public:
 
             // model body
 
-            current_statement_begin__ = 35;
+            current_statement_begin__ = 40;
             lp_accum__.add(normal_log<propto__>(theta, 0, 1000));
-            current_statement_begin__ = 36;
+            current_statement_begin__ = 41;
             lp_accum__.add(cauchy_log<propto__>(tau1, 0, 2.5));
-            current_statement_begin__ = 39;
+            current_statement_begin__ = 44;
             if (as_bool(logical_gt(N0, 0))) {
 
-                current_statement_begin__ = 40;
+                current_statement_begin__ = 45;
                 lp_accum__.add((normal_log(YBAR0, theta, sn0) * a0));
             }
-            current_statement_begin__ = 43;
+            current_statement_begin__ = 48;
             lp_accum__.add(normal_log<propto__>(Y1, theta, tau1));
 
         } catch (const std::exception& e) {

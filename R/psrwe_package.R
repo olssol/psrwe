@@ -18,7 +18,7 @@
 #' @importFrom cowplot plot_grid
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
 #'     rename filter select arrange ungroup
-#' @importFrom tibble is_tibble
+#' @importFrom survival Surv survfit
 #'
 #' @description
 #'
@@ -83,7 +83,10 @@ NULL
 #' @format A data frame with the following variables:
 #' \itemize{
 #'   \item{Group}{current, rwd}
-#'   \item{Y}{Binary outcome}
+#'   \item{Y_Bin}{Binary outcome}
+#'   \item{Y_Con}{Continuous outcome}
+#'   \item{Y_Surv}{Survival outcome in days}
+#'   \item{Censor}{Censoring status}
 #'   \item{V1-V7}{Covariates}
 #' }
 "ex_dta"
@@ -99,9 +102,9 @@ NULL
 #'
 #' @format A data frame with the following variables:
 #' \itemize{
-#'   \item{Group}{0, 1}
-#'   \item{Arm}{0, 1}
-#'   \item{Y}{Continuous outcome}
+#'   \item{Group}{current, rwd}
+#'   \item{Arm}{control, treatment}
+#'   \item{Y_Con}{Continuous outcome}
 #'   \item{V1-V7}{Covariates}
 #' }
 "ex_dta_rct"

@@ -36,7 +36,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_powerps");
-    reader.add_event(75, 73, "end", "model_powerps");
+    reader.add_event(80, 78, "end", "model_powerps");
     return reader;
 }
 
@@ -97,7 +97,7 @@ public:
             vals_i__ = context__.vals_i("S");
             pos__ = 0;
             S = vals_i__[pos__++];
-            check_greater_or_equal(function__, "S", S, 2);
+            check_greater_or_equal(function__, "S", S, 1);
 
             current_statement_begin__ = 9;
             validate_non_negative_index("N0", "S", S);
@@ -111,7 +111,7 @@ public:
             }
             size_t N0_i_0_max__ = S;
             for (size_t i_0__ = 0; i_0__ < N0_i_0_max__; ++i_0__) {
-                check_greater_or_equal(function__, "N0[i_0__]", N0[i_0__], 1);
+                check_greater_or_equal(function__, "N0[i_0__]", N0[i_0__], 0);
             }
 
             current_statement_begin__ = 10;
@@ -414,22 +414,33 @@ public:
             for (int i = 1; i <= S; ++i) {
 
                 current_statement_begin__ = 47;
-                if (as_bool(logical_eq(0, FIXVS))) {
+                if (as_bool(logical_eq(0, get_base1(N0, i, "N0", 1)))) {
 
                     current_statement_begin__ = 48;
                     stan::model::assign(as, 
                                 stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                                (logical_lt(1, ((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<local_scalar_t__>(1) : stan::math::promote_scalar<local_scalar_t__>(((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                0, 
                                 "assigning variable as");
                 } else {
 
                     current_statement_begin__ = 50;
-                    stan::model::assign(as, 
-                                stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                                (logical_lt(1, ((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>(((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ), 
-                                "assigning variable as");
+                    if (as_bool(logical_eq(0, FIXVS))) {
+
+                        current_statement_begin__ = 51;
+                        stan::model::assign(as, 
+                                    stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
+                                    (logical_lt(1, ((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<local_scalar_t__>(1) : stan::math::promote_scalar<local_scalar_t__>(((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                    "assigning variable as");
+                    } else {
+
+                        current_statement_begin__ = 53;
+                        stan::model::assign(as, 
+                                    stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
+                                    (logical_lt(1, ((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>(((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                    "assigning variable as");
+                    }
                 }
-                current_statement_begin__ = 52;
+                current_statement_begin__ = 56;
                 stan::model::assign(sds, 
                             stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
                             (logical_eq(0, get_base1(as, i, "as", 1)) ? stan::math::promote_scalar<local_scalar_t__>(0) : stan::math::promote_scalar<local_scalar_t__>((get_base1(SD0, i, "SD0", 1) / stan::math::sqrt((get_base1(as, i, "as", 1) * get_base1(N0, i, "N0", 1))))) ), 
@@ -472,21 +483,21 @@ public:
 
             // model body
 
-            current_statement_begin__ = 58;
+            current_statement_begin__ = 62;
             if (as_bool(logical_gt(A, 0))) {
 
-                current_statement_begin__ = 59;
+                current_statement_begin__ = 63;
                 lp_accum__.add(normal_log(YBAR0, thetas, sds));
             } else {
 
-                current_statement_begin__ = 61;
+                current_statement_begin__ = 65;
                 lp_accum__.add(normal_log<propto__>(thetas, 0, 1000));
             }
-            current_statement_begin__ = 63;
+            current_statement_begin__ = 68;
             lp_accum__.add(dirichlet_log<propto__>(vs, RS));
-            current_statement_begin__ = 64;
+            current_statement_begin__ = 69;
             lp_accum__.add(cauchy_log<propto__>(taus, 0, 2.5));
-            current_statement_begin__ = 67;
+            current_statement_begin__ = 72;
             lp_accum__.add(normal_log<propto__>(Y1, stan::model::rvalue(thetas, stan::model::cons_list(stan::model::index_multi(INX1), stan::model::nil_index_list()), "thetas"), stan::model::rvalue(taus, stan::model::cons_list(stan::model::index_multi(INX1), stan::model::nil_index_list()), "taus")));
 
         } catch (const std::exception& e) {
@@ -612,22 +623,33 @@ public:
             for (int i = 1; i <= S; ++i) {
 
                 current_statement_begin__ = 47;
-                if (as_bool(logical_eq(0, FIXVS))) {
+                if (as_bool(logical_eq(0, get_base1(N0, i, "N0", 1)))) {
 
                     current_statement_begin__ = 48;
                     stan::model::assign(as, 
                                 stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                                (logical_lt(1, ((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<local_scalar_t__>(1) : stan::math::promote_scalar<local_scalar_t__>(((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                0, 
                                 "assigning variable as");
                 } else {
 
                     current_statement_begin__ = 50;
-                    stan::model::assign(as, 
-                                stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                                (logical_lt(1, ((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>(((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ), 
-                                "assigning variable as");
+                    if (as_bool(logical_eq(0, FIXVS))) {
+
+                        current_statement_begin__ = 51;
+                        stan::model::assign(as, 
+                                    stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
+                                    (logical_lt(1, ((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<local_scalar_t__>(1) : stan::math::promote_scalar<local_scalar_t__>(((A * get_base1(vs, i, "vs", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                    "assigning variable as");
+                    } else {
+
+                        current_statement_begin__ = 53;
+                        stan::model::assign(as, 
+                                    stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
+                                    (logical_lt(1, ((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ? stan::math::promote_scalar<double>(1) : stan::math::promote_scalar<double>(((A * get_base1(RS, i, "RS", 1)) / get_base1(N0, i, "N0", 1))) ), 
+                                    "assigning variable as");
+                    }
                 }
-                current_statement_begin__ = 52;
+                current_statement_begin__ = 56;
                 stan::model::assign(sds, 
                             stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
                             (logical_eq(0, get_base1(as, i, "as", 1)) ? stan::math::promote_scalar<local_scalar_t__>(0) : stan::math::promote_scalar<local_scalar_t__>((get_base1(SD0, i, "SD0", 1) / stan::math::sqrt((get_base1(as, i, "as", 1) * get_base1(N0, i, "N0", 1))))) ), 
@@ -665,18 +687,18 @@ public:
             }
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 71;
+            current_statement_begin__ = 76;
             double theta;
             (void) theta;  // dummy to suppress unused var warning
             stan::math::initialize(theta, DUMMY_VAR__);
             stan::math::fill(theta, DUMMY_VAR__);
 
             // generated quantities statements
-            current_statement_begin__ = 72;
+            current_statement_begin__ = 77;
             stan::math::assign(theta, multiply(WS1, thetas));
 
             // validate, write generated quantities
-            current_statement_begin__ = 71;
+            current_statement_begin__ = 76;
             vars__.push_back(theta);
 
         } catch (const std::exception& e) {

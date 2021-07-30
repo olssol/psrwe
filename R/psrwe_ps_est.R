@@ -1,0 +1,393 @@
+#' @title Estimate propensity scores
+#'
+#' @description Estimate propensity scores using logistic regression or random
+#'   forest model.
+#'
+#' @param data Data frame with group assignment and covariates.
+#' @param ps_fml Propensity score (PS) formula. If \code{NULL}, all covariates
+#'     will be included in the PS model in a linear form.
+#' @param ps_method Method for PS estimation. \code{logistic}: By logistic
+#'     regression; \code{radomforest}: By randomForest model.
+#' @param v_grp Column name corresponding to group assignment.
+#' @param cur_grp_level Group level for the current study. Default is
+#'     \code{cur_grp_level = 1}. Ignored for single arm studies.
+#' @param ctl_arm_level Arm level for the control arm. Ignored for single-arm
+#'     studies.
+#' @param nstrata Number of PS strata to be created.
+#' @param ps_method Method to calculate propensity scores. Can be set to
+#'     \code{logistic} for logistic regression or \code{randomforest} for a
+#'     random forest approach.
+#' @param ... Additional parameters for calculating the propensity score to be
+#'     used in \code{randomForest} or \code{glm} .
+#'
+#' @return A list of class \code{RWE_PS_DATA} with items:
+#'
+#' \itemize{
+#'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
+#'               and \code{_strata_} for PS stratum added.}
+#'   \item{ps_fml}{PS formula for estimated PS scores.}
+#'   \item{is_rct}{Whether the current study is a randomized study.}
+#'   \item{nstrata}{Number of strata.}
+#' }
+#'
+#' @examples
+#' data(ex_dta)
+#' rwe_ps_est(ex_dta,
+#'        v_covs = paste("V", 1:7, sep = ""),
+#'        v_grp = "Group",
+#'        cur_grp_level = "current")
+#'
+#' @export
+#'
+rwe_ps_est <- function(data,
+                       ps_fml        = NULL,
+                       ps_method     = c("logistic", "randomforest"),
+                       v_covs        = "V1",
+                       v_grp         = "Group",
+                       cur_grp_level = 1,
+                       v_arm         = NULL,
+                       ctl_arm_level = NULL,
+                       nstrata       = 5, ...) {
+
+    if (!identical("data.frame", class(data))) {
+        warning("data should be a data.frame object")
+    }
+
+    data      <- as.data.frame(data)
+    ps_method <- match.arg(ps_method)
+
+    ## Generate formula
+    if (is.null(ps_fml)) {
+        ps_fml <- as.formula(paste(v_grp, "~",
+                                   paste(v_covs, collapse = "+"),
+                                   sep = ""))
+    }
+
+    dnames <- colnames(data)
+    v_fml  <- all.vars(ps_fml)
+    if (!(all(v_fml %in% dnames))) {
+        stop("Group or covariate was not found in data")
+    }
+
+    ## assign v_grp if ps_fml was used
+    v_grp <- v_fml[1]
+
+    ## Arm
+    if (!is.null(v_arm)) {
+        if (!(v_arm %in% dnames))
+            stop("Arm was not found in data")
+
+        is_rct <- TRUE
+    } else {
+        is_rct <- FALSE
+    }
+
+    # Current study index will be kept in the results
+    d1_inx   <- cur_grp_level == data[[v_grp]]
+    keep_inx <- which(d1_inx)
+    if (0 == length(keep_inx))
+        stop("No current study subjects found in data")
+
+    # For two-arm studies only
+    if (!is.null(v_arm)) {
+        d1_inx <- d1_inx & ctl_arm_level == data[[v_arm]]
+    }
+
+    # Get propensity scores
+    all_ps <- get_ps(data, ps_fml = ps_fml, ps_method = ps_method, ...)
+
+    # Add groups (0/1), arms (0/1), ps to data
+    data[["_ps_"]]  <- all_ps
+
+    grp <- rep(1, nrow(data))
+    grp[which(data[[v_grp]] != cur_grp_level)] <- 0
+    data[["_grp_"]] <- grp
+
+    arm <- rep(0, nrow(data))
+    if (is_rct) {
+        arm[which(data[[v_arm]] != ctl_arm_level)] <- 1
+    }
+    data[["_arm_"]]  <- arm
+
+    # Stratification
+    if (nstrata > 0) {
+        d1_ps   <- all_ps[which(d1_inx)]
+        strata  <- rwe_cut(d1_ps, all_ps,
+                           breaks   = nstrata,
+                           keep_inx = keep_inx)
+
+        data[["_strata_"]] <- factor(strata,
+                                     levels = c(1:nstrata),
+                                     labels = paste("Stratum", 1:nstrata))
+    }
+
+    # Add new ID
+    data <- data %>%
+        arrange(`_grp_`, `_arm_`, `_strata_`) %>%
+        mutate(`_id_` = 1:n())
+
+    # Outputx
+    rst <- list(data      = data,
+                ps_fml    = ps_fml,
+                ps_method = ps_method,
+                is_rct    = is_rct,
+                nstrata   = nstrata)
+
+    class(rst) <- get_rwe_class("DWITHPS")
+    return(rst)
+}
+
+#' @title Summarize PS estimation and stratification results
+#'
+#' @description Get number of subjects and the distances of PS distributions for
+#'   each PS stratum.
+#'
+#' @inheritParams get_distance
+#'
+#' @param object A list of class \code{RWE_PS_DATA} that is generated using
+#'   the \code{\link{rwe_ps_est}} function.
+#' @param min_n0 threshold for number of external subjects, below which the
+#'   external data in the current stratum will be ignored by setting the PS
+#'   distance to 0. Default value 10.
+#' @param ... Additional parameters.
+#'
+#' @return A list with columns:
+#'   \itemize{
+#'     \item{Summary}{A data frame with Stratum, number of subjects in RWD,
+#'     current study, number of subjects in control and treatment arms for RCT
+#'     studies, and distance in PS distributions.}
+#'
+#'     \item{Overall}{A data frame with overall number of not-trimmed subjects
+#'     in RWD, number of patients in current study, number of subjects in
+#'     control and treatment arms for RCT studies, and distance in PS
+#'     distributions.}
+#'
+#'     \item{N}{Vector of total number of total RWD patients, number of trimmed
+#'     RWD patients, and total number of current study patients.}
+#'
+#'     \item{ps_fml}{PS model.}
+#'     \item{Distance_metric}{Metric used for calculating the distance.}
+#' }
+#'
+#' @method summary RWE_PS_DTA
+#'
+#' @examples
+#' dta_ps <- rwe_ps_est(ex_dta,
+#'                      v_covs = paste("V", 1:7, sep = ""),
+#'                      v_grp = "Group",
+#'                      cur_grp_level = "current")
+#'
+#' summary(dta_ps, metric = "ovl")
+#'
+#' @export
+#'
+summary.RWE_PS_DTA <- function(object,
+                                metric = c("ovl", "ksd", "std", "abd",
+                                           "ley", "mhb", "omkss"),
+                                min_n0 = 10, ...) {
+
+    f_narm <- function(inx) {
+      if (is_rct) {
+          n0  <- length(which(0 == dataps[inx, "_arm_"]))
+          n1  <- length(which(1 == dataps[inx, "_arm_"]))
+          rst <- c(length(inx), n0, n1)
+      } else {
+          rst <- length(inx)
+      }
+      rst
+    }
+
+    metric  <- match.arg(metric)
+    dataps  <- object$data
+    nstrata <- object$nstrata
+    is_rct  <- object$is_rct
+    strata  <- levels(dataps[["_strata_"]])
+
+    if (is_rct) {
+        col_n  <- c("N_RWD",     "N_RWD_CTL", "N_RWD_TRT",
+                    "N_Current", "N_Cur_CTL", "N_Cur_TRT",
+                    "Distance")
+    } else {
+        col_n  <- c("N_RWD", "N_Current", "Distance")
+    }
+
+    n_trim    <- length(which(is.na(dataps[["_strata_"]])))
+    n_rwd     <- length(which(0 == dataps[["_grp_"]]))
+    n_current <- nrow(dataps) - n_rwd
+
+    rst <- NULL
+    for (i in strata) {
+        inx_ps0 <- i == dataps[["_strata_"]] & 0 == dataps[["_grp_"]]
+        inx_ps1 <- i == dataps[["_strata_"]] & 1 == dataps[["_grp_"]]
+        n0_01   <- f_narm(which(inx_ps0))
+        n1_01   <- f_narm(which(inx_ps1))
+
+        if (is_rct) {
+            inx_ps0 <- inx_ps0 & 0 == dataps[["_arm_"]]
+            inx_ps1 <- inx_ps1 & 0 == dataps[["_arm_"]]
+        }
+
+        ps0 <- dataps[which(inx_ps0), "_ps_"]
+        ps1 <- dataps[which(inx_ps1), "_ps_"]
+
+        if (0 == length(ps0) | 0 == length(ps1)) {
+            warning(paste("No samples in", i))
+        }
+
+        if (any(is.na(c(ps0, ps1)))) {
+            warning(paste("NA found in propensity scores in ", i))
+        }
+
+        if (length(ps0) < min_n0) {
+            warning(paste("Not enough data in the external data in ",
+                          i, ". External data ignored.",
+                          sep = ""))
+
+            cur_dist <- 0
+        } else {
+            cur_dist <- get_distance(ps0, ps1, metric)
+        }
+
+        rst <- rbind(rst, c(n0_01, n1_01, cur_dist))
+    }
+    colnames(rst) <- col_n
+
+    ## overall
+    inx_tot_ps0 <- which(0 == dataps[["_grp_"]] &
+                         !is.na(dataps[["_strata_"]]))
+    inx_tot_ps1 <- which(1 == dataps[["_grp_"]])
+    n0_tot_01   <- f_narm(inx_tot_ps0)
+    n1_tot_01   <- f_narm(inx_tot_ps1)
+
+    ps0         <- dataps[inx_tot_ps0, "_ps_"]
+    ps1         <- dataps[inx_tot_ps1, "_ps_"]
+    all_dist    <- get_distance(ps0, ps1, metric)
+
+    rst_overall           <- rbind(c(n0_tot_01, n1_tot_01, all_dist))
+    colnames(rst_overall) <- col_n
+
+    # Return
+    rst <- list(Summary         = cbind(data.frame(Stratum = strata),
+                                        data.frame(rst)),
+                Overall         = cbind(data.frame(Stratum = "Overall"),
+                                        rst_overall),
+                N               = c(RWD     = n_rwd,
+                                    Current = n_current,
+                                    Trimmed = n_trim),
+                ps_fml          = object$ps_fml,
+                Distance_metric = metric)
+
+    invisible(rst)
+}
+
+#' @title Print PS estimation results
+#'
+#' @description Print summary information of PS estimation results
+#'
+#' @param x A list of class \code{RWE_PS_DTA} that is generated using
+#'   the \code{\link{rwe_ps_est}} function.
+#' @param ... Parameters for \code{summery.RWE_PS_DTA}
+#'
+#' @seealso  \code{\link{summary.RWE_PS_DTA}}
+#'
+#'
+#' @method print RWE_PS_DTA
+#'
+#'
+#' @export
+#'
+print.RWE_PS_DTA <- function(x, ...) {
+    rst_sum <- summary(x, ...)
+
+    ## overall summary
+    cat_ps_dta(x, rst_sum)
+
+    ## summary table
+    cat("\n")
+    ss <- paste("The following table summarizes the number of subjects ",
+                "in each stratum, and the ",
+                "distance in PS distributions ", "calculated by ",
+                get_rwe_class(rst_sum$Distance_metric), ":", sep = "")
+
+    cat_paste(ss)
+
+    print(rst_sum$Summary)
+}
+
+
+#' Plot PS distributions
+#'
+#' S3 method for visualizing PS adjustment
+#'
+#' @param x Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}
+#' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
+#'     \item{balance}{Covariate balance plot}}
+#' @param ... Additional parameter for the plot
+#'
+#' @method plot RWE_PS_DTA
+#'
+#' @export
+#'
+plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance"), ...) {
+    type <- match.arg(plot_type)
+    switch(type,
+           ps      = plot_ps(x, ...),
+           balance = plot_balance(x, ...))
+}
+
+
+#' Create strata
+#'
+#' Cut a sequence of numbers into bins.
+#'
+#' @description
+#'
+#' The cut points are chosen such that there will with equal numbers in each bin
+#' for \code{x}. By default, values of \code{y} that are outside the range of
+#' \code{x} will be excluded from the bins, unless they are in the
+#' \code{keep_inx}.
+#'
+#' @param x Vector of values based on which cut points will be determined
+#' @param y Vector of values to be cut, default to be the same as \code{x}
+#' @param breaks Number of cut points
+#' @param keep_inx Indices of y that will be categorized as 1 or the largest bin
+#'     even if their values are out of range of x, i.e. the y's that will not be
+#'     trimmed
+#'
+#' @return A vector of stratum assignment for \code{y}. The y's that are outside
+#'     the range of \code{x} and not in \code{keep_inx} are assigned \code{NA}
+#'     in the result.
+#'
+#' @examples
+#'
+#' x <- rnorm(100,  mean = 0, sd = 1)
+#' y <- rnorm(1000, mean = 1, sd = 2)
+#' rwe_cut(x, y, breaks = 5)
+#'
+#' @export
+#'
+#'
+rwe_cut <- function(x, y = x, breaks = 5, keep_inx = NULL) {
+    cuts    <- quantile(x, seq(0, 1, length = breaks + 1))
+    cuts[1] <- cuts[1] - 1e-100
+
+    rst     <- rep(NA, length(y))
+    for (i in 2:length(cuts)) {
+        inx      <- which(y > cuts[i - 1] & y <= cuts[i])
+        rst[inx] <- i - 1
+    }
+
+    if (!is.null(keep_inx)) {
+        inx <- which(y[keep_inx] <= cuts[1])
+        if (0 < length(inx)) {
+            rst[keep_inx[inx]] <- 1
+        }
+
+        inx <- which(y[keep_inx] > cuts[length(cuts)])
+        if (0 < length(inx)) {
+            rst[keep_inx[inx]] <- length(cuts) - 1
+        }
+    }
+
+    rst
+}

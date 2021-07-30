@@ -3,10 +3,10 @@
 //  Power parameter As follows
 //
 data {
-  int<lower = 2> S;
+  int<lower = 1> S;
 
   //existing data
-  int<lower = 1>  N0[S];
+  int<lower = 0>  N0[S];
   real            YBAR0[S];
   real<lower = 0> SD0[S];
 
@@ -44,10 +44,14 @@ transformed parameters {
   real<lower = 0> sds[S];
 
   for (i in 1:S) {
-    if (0 == FIXVS) {
-      as[i]  = 1 < A * vs[i] / N0[i] ? 1 : A * vs[i] / N0[i];
+    if (0 == N0[i]) {
+      as[i] = 0;
     } else {
-      as[i]  = 1 < A * RS[i] / N0[i] ? 1 : A * RS[i] / N0[i];
+      if (0 == FIXVS) {
+        as[i]  = 1 < A * vs[i] / N0[i] ? 1 : A * vs[i] / N0[i];
+      } else {
+        as[i]  = 1 < A * RS[i] / N0[i] ? 1 : A * RS[i] / N0[i];
+      }
     }
     sds[i] = 0 == as[i] ? 0 : SD0[i] / sqrt(as[i] * N0[i]);
   }
@@ -60,6 +64,7 @@ model {
   } else {
     thetas ~ normal(0, 1000);
   }
+
   vs      ~ dirichlet(RS);
   taus    ~ cauchy(0, 2.5);
 

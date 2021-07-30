@@ -5,7 +5,7 @@
 
 data {
   //existing data
-  int<lower = 1>  N0;
+  int<lower = 0>  N0;
   real            YBAR0;
   real<lower = 0> SD0;
 
@@ -21,8 +21,13 @@ transformed data {
   real<lower = 0> a0;
   real<lower = 0> sn0;
 
-  a0  = 1 < A/N0 ? 1 : A/N0;
-  sn0 = SD0/sqrt(N0*1.0);
+  if (N0 > 0) {
+    a0  = 1 < A/N0 ? 1 : A/N0;
+    sn0 = SD0/sqrt(N0*1.0);
+  } else {
+    a0  = 0;
+    sn0 = 1;
+  }
 }
 
 parameters {

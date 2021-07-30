@@ -27,6 +27,7 @@
 #' get_distance(x, y, "abd")
 #'
 #' @export
+#'
 get_distance <- function(cov0, cov1,
                          metric = c("ovl", "ksd", "std", "abd",
                                     "ley", "mhb", "omkss")) {
