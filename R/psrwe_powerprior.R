@@ -371,7 +371,7 @@ print.RWE_PS_RST <- function(x, ...) {
 #' @description
 #'
 #'
-#' @param object A list of class \code{RWE_PS_RST} that is generated using the
+#' @param x A list of class \code{RWE_PS_RST} that is generated using the
 #'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_compl}}, or
 #'     \code{\link{rwe_ps_survkm}} function.
 #' @param ... Additional parameters.

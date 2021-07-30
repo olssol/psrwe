@@ -6,8 +6,8 @@
 #'
 #' @inheritParams rwe_ps_powerp
 #'
-#' @param v_event Column name corresponding to event time
-#' @param v_censored Column name corresponding to censored status
+#' @param v_time Column name corresponding to event time
+#' @param v_event Column name corresponding to censored status
 #' @param pred_tp Time of interest (e.g., 1 year)
 #'
 #' @param ... Additional Parameters.
@@ -126,7 +126,7 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp, ...) {
 #' @param dta_cur Matrix of time and event from a PS stratum in current study
 #' @param dta_ext Matrix of time and event from a PS stratum in external data source
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tps Time points to be estimated
+#' @param pred_tp Time points to be estimated
 #'
 #' @return Estimation of survival probabilities at time \code{pred_tps}
 #'

@@ -27,10 +27,14 @@ will be included in the PS model in a linear form.}
 \code{logistic} for logistic regression or \code{randomforest} for a
 random forest approach.}
 
+\item{v_covs}{Column names corresponding to covariates.}
+
 \item{v_grp}{Column name corresponding to group assignment.}
 
 \item{cur_grp_level}{Group level for the current study. Default is
 \code{cur_grp_level = 1}. Ignored for single arm studies.}
+
+\item{v_arm}{Column name corresponding to arm assignment.}
 
 \item{ctl_arm_level}{Arm level for the control arm. Ignored for single-arm
 studies.}

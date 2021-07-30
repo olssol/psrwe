@@ -8,9 +8,11 @@
 #'     will be included in the PS model in a linear form.
 #' @param ps_method Method for PS estimation. \code{logistic}: By logistic
 #'     regression; \code{radomforest}: By randomForest model.
+#' @param v_covs Column names corresponding to covariates.
 #' @param v_grp Column name corresponding to group assignment.
 #' @param cur_grp_level Group level for the current study. Default is
 #'     \code{cur_grp_level = 1}. Ignored for single arm studies.
+#' @param v_arm Column name corresponding to arm assignment.
 #' @param ctl_arm_level Arm level for the control arm. Ignored for single-arm
 #'     studies.
 #' @param nstrata Number of PS strata to be created.
@@ -319,7 +321,7 @@ print.RWE_PS_DTA <- function(x, ...) {
 #'
 #' S3 method for visualizing PS adjustment
 #'
-#' @param x Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}
+#' @param x Class \code{RWE_DWITHPS} created by \code{rwe_ps_*} functions
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
 #'     \item{balance}{Covariate balance plot}}
 #' @param ... Additional parameter for the plot

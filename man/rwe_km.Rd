@@ -13,7 +13,7 @@ rwe_km(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1)
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
-\item{pred_tps}{Time points to be estimated}
+\item{pred_tp}{Time points to be estimated}
 }
 \value{
 Estimation of survival probabilities at time \code{pred_tps}
