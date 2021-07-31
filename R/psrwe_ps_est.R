@@ -317,9 +317,9 @@ print.RWE_PS_DTA <- function(x, ...) {
 }
 
 
-#' Plot PS distributions
+#' @title Plot PS distributions
 #'
-#' S3 method for visualizing PS adjustment
+#' @description S3 method for visualizing PS adjustment
 #'
 #' @param x Class \code{RWE_DWITHPS} created by \code{rwe_ps_*} functions
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
@@ -338,11 +338,10 @@ plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance"), ...) {
 }
 
 
-#' Create strata
-#'
-#' Cut a sequence of numbers into bins.
+#' @title Create strata
 #'
 #' @description
+#' Cut a sequence of numbers into bins.
 #'
 #' The cut points are chosen such that there will with equal numbers in each bin
 #' for \code{x}. By default, values of \code{y} that are outside the range of
