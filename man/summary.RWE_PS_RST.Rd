@@ -17,5 +17,5 @@
 A list with data frames for the borrowing and estimation results.
 }
 \description{
-
+S3 method summarizing overall estimation results
 }

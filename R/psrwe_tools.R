@@ -444,8 +444,6 @@ plot_balance <- function(data.withps,
 
 #' @title Get strata by covariates
 #'
-#' @export
-#'
 #' @noRd
 #'
 get_strata <- function(data, strata_covs  = NULL) {

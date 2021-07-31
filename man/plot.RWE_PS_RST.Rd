@@ -2,7 +2,7 @@
 % Please edit documentation in R/psrwe_powerprior.R
 \name{plot.RWE_PS_RST}
 \alias{plot.RWE_PS_RST}
-\title{Plot  estimation results for power prior approach}
+\title{Plot estimation results for power prior approach}
 \usage{
 \method{plot}{RWE_PS_RST}(x, ...)
 }
@@ -14,5 +14,5 @@
 \item{...}{Additional parameters.}
 }
 \description{
-
+S3 method plotting estimation results
 }

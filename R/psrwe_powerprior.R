@@ -288,7 +288,7 @@ get_post_theta <- function(thetas, weights) {
 
 #' @title Summarize overall estimation results
 #'
-#' @description
+#' @description S3 method summarizing overall estimation results
 #'
 #'
 #' @param object A list of class \code{RWE_PS_RST} that is generated using the
@@ -366,9 +366,9 @@ print.RWE_PS_RST <- function(x, ...) {
     cat_paste(ss)
 }
 
-#' @title Plot  estimation results for power prior approach
+#' @title Plot estimation results for power prior approach
 #'
-#' @description
+#' @description S3 method plotting estimation results
 #'
 #'
 #' @param x A list of class \code{RWE_PS_RST} that is generated using the
