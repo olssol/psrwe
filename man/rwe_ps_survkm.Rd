@@ -12,7 +12,7 @@ rwe_ps_survkm(dta_psbor, v_time = "time", v_event = "event", pred_tp = 1, ...)
 
 \item{v_time}{Column name corresponding to event time}
 
-\item{v_event}{Column name corresponding to censored status}
+\item{v_event}{Column name corresponding to event status}
 
 \item{pred_tp}{Time of interest (e.g., 1 year)}
 

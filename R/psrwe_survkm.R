@@ -7,7 +7,7 @@
 #' @inheritParams rwe_ps_powerp
 #'
 #' @param v_time Column name corresponding to event time
-#' @param v_event Column name corresponding to censored status
+#' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
 #'
 #' @param ... Additional Parameters.
