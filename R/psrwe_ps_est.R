@@ -247,7 +247,7 @@ summary.RWE_PS_DTA <- function(object,
 
             cur_dist <- 0
         } else {
-            cur_dist <- get_distance(ps0, ps1, metric)
+            cur_dist <- get_distance(ps0, ps1, metric[1])
         }
 
         rst <- rbind(rst, c(n0_01, n1_01, cur_dist))
@@ -263,7 +263,7 @@ summary.RWE_PS_DTA <- function(object,
 
     ps0         <- dataps[inx_tot_ps0, "_ps_"]
     ps1         <- dataps[inx_tot_ps1, "_ps_"]
-    all_dist    <- get_distance(ps0, ps1, metric)
+    all_dist    <- get_distance(ps0, ps1, metric[1])
 
     rst_overall           <- rbind(c(n0_tot_01, n1_tot_01, all_dist))
     colnames(rst_overall) <- col_n
@@ -277,7 +277,7 @@ summary.RWE_PS_DTA <- function(object,
                                     Current = n_current,
                                     Trimmed = n_trim),
                 ps_fml          = object$ps_fml,
-                Distance_metric = metric)
+                Distance_metric = metric[1])
 
     invisible(rst)
 }

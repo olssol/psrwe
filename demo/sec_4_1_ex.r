@@ -6,42 +6,37 @@ data(ex_dta)
 head(ex_dta)
 
 ### Obtain PSs.
-dta_ps <- rwe_ps(ex_dta,
-                 v_covs = paste("V", 1:7, sep = ""),
-                 v_grp = "Group",
-                 cur_grp_level = "current",
-                 nstrata = 5)
+dta_ps_single <- rwe_ps_est(ex_dta,
+                     v_covs = paste("V", 1:7, sep = ""),
+                     v_grp = "Group", cur_grp_level = "current",
+                     ps_method = "logistic", nstrata = 5)
 
 ### Sample size.
-table(dta_ps$data$"_grp_")     # by data source
-table(dta_ps$data$"_strata_")  # by PS stratum
-table(dta_ps$data$"_grp_",
-      dta_ps$data$"_strata_")  # by data source and PS stratum
+table(dta_ps_single$data$"_grp_")     # by data source
+table(dta_ps_single$data$"_strata_")  # by PS stratum
+table(dta_ps_single$data$"_grp_",
+      dta_ps_single$data$"_strata_")  # by data source and PS stratum
 
 ### Balance assessment of PS stratification.
-plot(dta_ps, "balance")
-plot(dta_ps, "ps")
+plot(dta_ps_single, "balance")
+plot(dta_ps_single, "ps")
 
 ### Obtain discounting parameters.
-ps_dist <- rwe_ps_dist(dta_ps)
-ps_dist
+ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30,
+                               method = "distance", metric = "ovl")
+ps_bor_single
 
 ### PSPP, single arm study, binary outcome.
 .msg <- capture.output({ suppressWarnings({
-post_smps <- rwe_ps_powerp(dta_ps,
-                           total_borrow = 40,
-                           v_distance   = ps_dist$Dist[1:dta_ps$nstrata],
-                           outcome_type = "binary",
-                           v_outcome    = "Y",
-                           seed         = 1234)
+rst_pp <- rwe_ps_powerp(ps_bor_single,
+                        outcome_type = "binary",
+                        v_outcome    = "Y_Bin",
+                        seed         = 1234)
 }) })
-
-### PSPP results.
-summary(post_smps)
+rst_pp
 
 ### PSCL, single arm study, binary outcome.
-ps_borrow <- rwe_ps_borrow(total_borrow = 40, ps_dist)
-ps_borrow
-rst_cl <- rwe_ps_cl(dta_ps, v_borrow = ps_borrow, v_outcome = "Y")
-summary(rst_cl)
-
+rst_cl <- rwe_ps_compl(ps_bor_single,
+                       outcome_type = "binary",
+                       v_outcome    = "Y_Bin")
+rst_cl
