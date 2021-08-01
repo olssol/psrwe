@@ -86,7 +86,7 @@ NULL
 #'   \item{Y_Bin}{Binary outcome}
 #'   \item{Y_Con}{Continuous outcome}
 #'   \item{Y_Surv}{Survival outcome in days}
-#'   \item{Censor}{Censoring status}
+#'   \item{Status}{Event status (0=alive, 1=dead)}
 #'   \item{V1-V7}{Covariates}
 #' }
 "ex_dta"

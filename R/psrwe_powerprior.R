@@ -354,6 +354,11 @@ print.RWE_PS_RST <- function(x, ...) {
         extra_2 <- "mean of the outcome"
     }
 
+    extra_3 <- ""
+    if ("ps_pp" == x$Method) {
+        extra_3 <- "PS: MCMC discrepancy may occur due to different random seed and rstan version."
+    }
+
     ss <- paste("With a total of ", x$Total_borrow,
                 " subject borrowed from the RWD,",
                 extra_1, " the ", extra_2,
@@ -361,6 +366,7 @@ print.RWE_PS_RST <- function(x, ...) {
                 sprintf("%5.3f", rst_sum[1, "Mean"]),
                 " with standard error ",
                 sprintf("%5.3f", rst_sum[1, "SD"]),
+                ". ", extra_3,
                 sep = "")
 
     cat_paste(ss)

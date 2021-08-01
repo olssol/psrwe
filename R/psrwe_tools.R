@@ -465,10 +465,12 @@ get_strata <- function(data, strata_covs  = NULL) {
         }
         strata$label  <- factor(s_label)
 
-        data <- data %>%
-            left_join(strata) %>%
-            mutate(`_strata_` = label) %>%
-            select(-label)
+        suppressMessages(
+            data <- data %>%
+                left_join(strata) %>%
+                mutate(`_strata_` = label) %>%
+                select(-label)
+        )
     }
 
     return(list(data    = data,

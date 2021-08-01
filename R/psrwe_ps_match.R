@@ -213,6 +213,7 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
 
     ## summary table
     cat_paste("The following table summarizes the number of subjects in each stratum:")
+    cat("\n")
 
     print(rst_sum$Summary)
 }

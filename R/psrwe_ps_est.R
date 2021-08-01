@@ -312,6 +312,7 @@ print.RWE_PS_DTA <- function(x, ...) {
                 get_rwe_class(rst_sum$Distance_metric), ":", sep = "")
 
     cat_paste(ss)
+    cat("\n")
 
     print(rst_sum$Summary)
 }

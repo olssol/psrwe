@@ -87,14 +87,14 @@ rwe_ps_borrow <- function(dtaps, total_borrow,
 print.RWE_PS_BOR <- function(x, ...) {
     ss <- paste("A total of ",
                 x$Total_borrow,
-                " subjects will be borrowed from the RWD.",
+                " subjects will be borrowed from the RWD. ",
                 "The number ",
                 x$Total_borrow,
                 " is split proportional to ",
                 get_rwe_class(x$Borrow_method),
                 " in each stratum. The following table summarizes the number of subjects ",
                 "to be borrowed ",
-                "and the weight parameter in each stratum. ",
+                "and the weight parameter in each stratum:",
                 sep = "")
     cat_paste(ss)
     cat("\n")
