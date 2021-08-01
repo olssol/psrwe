@@ -28,11 +28,13 @@ adjustment. Estimation of propensity scores can be done by using the function
 
 ```{r, eval=T, echo=TRUE}
 data(ex_dta)
-dta_ps <- rwe_ps(ex_dta,
-                 v_covs = paste("V", 1:7, sep = ""),
-                 v_grp = "Group",
-                 cur_grp_level = "current",
-                 nstrata = 5)
+dta_ps <- rwe_ps_est(ex_dta,
+                     v_covs = paste("V", 1:7, sep = ""),
+                     v_grp = "Group",
+                     cur_grp_level = "current",
+                     nstrata = 5,
+                     ps_method = "logistic")
+dta_ps
 ```
 
 It is extremely important to evaluate the propensity score adjustment results.
@@ -41,11 +43,11 @@ distributions and propensity score distributions based on propensity score
 stratification.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
-plot(dta_ps, "balance")
+plot(dta_ps, plot_type = "balance")
 ```
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
-plot(dta_ps, "ps")
+plot(dta_ps, plot_type = "ps")
 ```
 
 # PS-integrated power prior approach for single arm studies
@@ -61,24 +63,15 @@ which are combined to complete the Bayesian inference for the parameters of
 interest.
 
 ```{r, eval=T, echo=TRUE}
-ps_dist   <- rwe_ps_dist(dta_ps)
-post_smps <- rwe_ps_powerp(dta_ps,
-                           total_borrow = 40,
-                           v_distance   = ps_dist$Dist[1:dta_ps$nstrata],
-                           outcome_type = "binary",
-                           v_outcome    = "Y")
-
-```
-
-The mixing of posterior samples should be checked to ensure the convergence
-of the posterior sampling.
-```{r, echo=TRUE, fig.width=6, fig.height=5}
-traceplot(post_smps$stan_rst, pars = c("theta", "thetas"))
+ps_bor <- rwe_ps_borrow(dta_ps, total_borrow = 40,
+                        method = "distance")
+rst_pp <- rwe_ps_powerp(ps_bor, v_outcome = "Y_Bin",
+                        outcome_type = "binary")
 ```
 
 Results can be further summarized as:
 ```{r, eval=T, echo=TRUE}
-summary(post_smps)
+summary(rst_pp)
 ```
 
 # PS-integrated composite likelihood approach for single arm studies
@@ -93,8 +86,8 @@ stratum-specific estimates are then combined to obtain an overall
 population-level estimate of the parameter of interest.
 
 ```{r, eval=T, echo=TRUE}
-ps_borrow <- rwe_ps_borrow(total_borrow = 40, ps_dist)
-rst_cl    <- rwe_ps_cl(dta_ps, v_borrow = ps_borrow, v_outcome = "Y")
+rst_cl <- rwe_ps_compl(ps_bor, v_outcome = "Y_Bin",
+                       outcome_type = "binary")
 summary(rst_cl)
 ```
 
@@ -109,20 +102,19 @@ the external data source. An example is given below.
 
 ```{r, eval=T, echo=TRUE}
 data(ex_dta_rct)
-dta_ps_2arm <- rwe_ps(ex_dta_rct,
-                      v_covs = paste("V", 1:7, sep = ""),
-                      v_grp = "Group",
-                      cur_grp_level = "current",
-                      nstrata = 5)
+dta_ps_rct <- rwe_ps_est(ex_dta_rct, v_covs = paste("V", 1:7, sep = ""),
+                         v_grp = "Group", cur_grp_level = "current",
+                         v_arm = "Arm", ctl_arm_level = "control")
+dta_ps_rct
 
-rst_2arm <- rwe_ps_cl2arm(dta_ps_2arm,
-                          v_arm = "Arm",
-                          trt_arm_level = 1,
-                          outcome_type = "continuous",
-                          v_outcome = "Y",
-                          total_borrow = 40)
+ps_bor_rct <- rwe_ps_borrow(dta_ps_rct, total_borrow = 30,
+                            method = "distance")
+ps_bor_rct
 
-print(rst_2arm)
+rst_cl_rct <- rwe_ps_compl(ps_bor_rct, v_outcome = "Y_Con",
+                           outcome_type = "binary")
+
+rst_cl_rct$Effect
 ```
 
 
