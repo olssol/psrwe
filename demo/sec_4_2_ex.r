@@ -36,4 +36,6 @@ rst_cl_rct <- rwe_ps_compl(ps_bor_rct,
 
 ### Results.
 rst_cl_rct$Effect
+rst_cl_rct$Treatment
+rst_cl_rct$Control
 
