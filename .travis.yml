@@ -33,7 +33,7 @@ before_install:
 script:
   - Rscript -e "sessionInfo()"
   - R CMD build --no-build-vignettes --no-manual --no-resave-data .
-  - R CMD check --as-cran --no-manual --ignore-vignettes ../psrwe_*.tar.gz
+  - R CMD check --as-cran --no-manual --ignore-vignettes ./psrwe_*.tar.gz
 
 notifications:
   email:
