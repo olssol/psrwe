@@ -5,6 +5,7 @@ warnings_are_errors: true
 branches:
   only:
     - master
+    - ci
 
 ### For Linux
 os:
