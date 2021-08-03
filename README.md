@@ -9,6 +9,7 @@
 status](https://www.r-pkg.org/badges/version/psrwe)](https://CRAN.R-project.org/package=psrwe)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Download](https://cranlogs.r-pkg.org/badges/psrwe)](https://cran.r-project.org/package=psrwe)
 [![Build
 Status](https://travis-ci.org/snoweye/psrwe.png)](https://travis-ci.org/snoweye/psrwe)
 [![Appveyor
