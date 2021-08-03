@@ -4,7 +4,12 @@
 \alias{rwe_ps_borrow}
 \title{Get number of subjects borrowed from each statum}
 \usage{
-rwe_ps_borrow(dtaps, total_borrow, method = c("distance", "inverse_distance"))
+rwe_ps_borrow(
+  dtaps,
+  total_borrow,
+  method = c("distance", "inverse_distance"),
+  metric = "ovl"
+)
 }
 \arguments{
 \item{dtaps}{A class \code{RWE_PS_DTA} or \code{RWE_PS_DTA_MAT} object.}
