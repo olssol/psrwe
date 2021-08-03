@@ -26,9 +26,14 @@ before_install:
   - sudo apt-get install r-cran-randomforest
   - sudo apt-get install r-cran-cowplot
 
-r_packages:
+# r_packages:
 
-r_check_args: --as-cran
+# r_check_args: --as-cran --no-manual --ignore-vignettes
+
+script:
+  - Rscript -e "sessionInfo()"
+  - R CMD build --no-build-vignettes --no-manual --no-resave-data .
+  - R CMD check --as-cran --no-manual --ignore-vignettes ../psrwe_*.tar.gz
 
 notifications:
   email:
