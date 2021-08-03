@@ -1,0 +1,44 @@
+language: R
+sudo: required
+
+branches:
+  only:
+    #- master
+    - ci
+
+### For Linux
+os:
+  - linux
+
+env:
+  global:
+    - CRAN: https://cran.rstudio.com
+    - _R_CHECK_FORCE_SUGGESTS_=FALSE
+
+before_install:
+  #- sudo apt-get update -q
+  - sudo apt-get install r-cran-rstan
+  - sudo apt-get install r-cran-dplyr
+  - sudo apt-get install r-cran-ggplot2
+  - sudo apt-get install r-cran-knitr
+  - sudo apt-get install r-cran-rmarkdown
+  - sudo apt-get install r-cran-randomforest
+  - sudo apt-get install r-cran-cowplot
+  - sudo apt-get install r-cran-remotes
+
+# r_packages:
+
+# r_check_args: --as-cran --no-manual --ignore-vignettes
+
+script:
+  - Rscript -e "sessionInfo()"
+  - R CMD build --no-build-vignettes --no-manual --no-resave-data .
+  - R CMD check --as-cran --no-manual --ignore-vignettes ./psrwe_*.tar.gz
+
+after_failure:
+
+notifications:
+  email:
+    on_success: no
+    on_failure: no
+
