@@ -1,0 +1,41 @@
+language: R
+sudo: required
+warnings_are_errors: true
+
+branches:
+  only:
+    - master
+
+### For Linux
+os:
+  - linux
+
+env:
+  global:
+    - CRAN: https://cran.rstudio.com
+    - _R_CHECK_FORCE_SUGGESTS_=FALSE
+
+before_install:
+  - sudo apt-get update -q
+
+r_packages:
+  - BH
+  - rstan
+  - Rcpp
+  - RcppEigen
+  - StanHeaders
+  - cowplot
+  - dplyr
+  - ggplot2
+  - randomForest
+  - tibble
+  - knitr
+  - rmarkdown
+
+r_check_args: --as-cran
+
+notifications:
+  email:
+    on_success: no
+    on_failure: no
+
