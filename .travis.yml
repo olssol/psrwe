@@ -1,6 +1,5 @@
 language: R
 sudo: required
-warnings_are_errors: true
 
 branches:
   only:
@@ -25,6 +24,7 @@ before_install:
   - sudo apt-get install r-cran-rmarkdown
   - sudo apt-get install r-cran-randomforest
   - sudo apt-get install r-cran-cowplot
+  - sudo apt-get install r-cran-remotes
 
 # r_packages:
 
@@ -34,6 +34,8 @@ script:
   - Rscript -e "sessionInfo()"
   - R CMD build --no-build-vignettes --no-manual --no-resave-data .
   - R CMD check --as-cran --no-manual --ignore-vignettes ./psrwe_*.tar.gz
+
+after_failure:
 
 notifications:
   email:
