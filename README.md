@@ -9,6 +9,10 @@
 status](https://www.r-pkg.org/badges/version/psrwe)](https://CRAN.R-project.org/package=psrwe)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Build
+Status](https://travis-ci.org/snoweye/psrwe.png)](https://travis-ci.org/snoweye/psrwe)
+[![Appveyor
+Build status](https://ci.appveyor.com/api/projects/status/lnta05dn3ex9v641?svg=true)](https://ci.appveyor.com/project/snoweye/psrwe)
 <!-- badges: end -->
 
 High-quality real-world data can be transformed into scientific

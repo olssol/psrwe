@@ -4,7 +4,7 @@ warnings_are_errors: true
 
 branches:
   only:
-    - master
+    #- master
     - ci
 
 ### For Linux
@@ -17,13 +17,13 @@ env:
     - _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 before_install:
-  - sudo apt-get update -q
+  #- sudo apt-get update -q
   - sudo apt-get install r-cran-rstan
   - sudo apt-get install r-cran-dplyr
   - sudo apt-get install r-cran-ggplot2
   - sudo apt-get install r-cran-knitr
   - sudo apt-get install r-cran-rmarkdown
-  - sudo apt-get install r-cran-randomForest
+  - sudo apt-get install r-cran-randomforest
   - sudo apt-get install r-cran-cowplot
 
 r_packages:
