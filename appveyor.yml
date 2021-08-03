@@ -25,6 +25,7 @@ environment:
     R_ARCH: x64
 
 build_script:
+  - Rscript -e "install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/rstan_2.21.2.zip')"
   - travis-tool.sh install_deps
 #  - R CMD build --no-build-vignettes --no-manual --no-resave-data .
 #  - R CMD INSTALL psrwe*.tar.gz
