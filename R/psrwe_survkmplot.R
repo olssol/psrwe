@@ -24,7 +24,7 @@
 #'        cur_grp_level = "current")
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
 #' rst       <- rwe_ps_survkmplot(ps_borrow, v_time = "Y_time",
-#'                                v_event = "Status")}
+#'                                v_event = "Status")
 #'
 #' @export
 #'
