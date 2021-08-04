@@ -28,7 +28,7 @@
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
 #' rst       <- rwe_ps_survkm(ps_borrow,
 #'                            v_time = "Y_Surv",
-#'                            v_event = "Status")}
+#'                            v_event = "Status")
 #'
 #' @export
 #'
