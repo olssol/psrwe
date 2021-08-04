@@ -21,7 +21,7 @@ rwe_ps_survkm(dta_psbor, v_time = "time", v_event = "event", pred_tp = 1, ...)
 \value{
 A data frame with class name \code{RWE_PS_RST}. It contains the
     composite estimation of the mean for each stratum as well as the
-    jackknife estimation for each subject. The results should be further
+    jackknife estimation. The results should be further
     summarized by its S3 method \code{summary}.
 }
 \description{
@@ -37,6 +37,8 @@ dta_ps <- rwe_ps_est(ex_dta,
        v_grp = "Group",
        cur_grp_level = "current")
 ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-rst       <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")}
+rst       <- rwe_ps_survkm(ps_borrow,
+                           v_time = "Y_Surv",
+                           v_event = "Status")}
 
 }
