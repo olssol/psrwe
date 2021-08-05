@@ -165,6 +165,7 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
         rst <- rst[inx, ]
     }
 
+    rst <- matrix(rst, ncol = 2)
     rst
 }
 
@@ -190,8 +191,8 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                     Arm     = a,
                                     Stratum = "Overall",
                                     N       = nrow(cur_d),
-                                    Mean    = est[1],
-                                    SD      = est[2]))
+                                    Mean    = est[, 1],
+                                    SD      = est[, 2]))
 
             for (s in levels(dta[["_strata_"]])) {
                 cur_s <- cur_d %>%
@@ -208,8 +209,8 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                         Arm     = a,
                                         Stratum = s,
                                         N       = nrow(cur_s),
-                                        Mean    = est[1],
-                                        SD      = est[2]))
+                                        Mean    = est[, 1],
+                                        SD      = est[, 2]))
             }
         }
     }

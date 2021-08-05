@@ -40,15 +40,16 @@ rwe_ps_survkmplot <- function(dta_psbor,
     stopifnot(all(c(v_event, v_time) %in%
                   colnames(dta_psbor$data)))
 
-    pred_tp <- sort(unique(v_time))
+    pred_tp <- sort(unique(c(0, dta_psbor$data[[v_time]])))
 
     ## observed
     rst_obs <- get_km_observed(dta_psbor$data, v_time, v_event, pred_tp)
 
     ## call estimation
-    rst <- get_ps_cl_kmplot(dta_psbor, v_event = v_event, v_time = v_time,
-                            f_stratum = get_surv_stratum, pred_tp = pred_tp,
-                            ...)
+    rst <- get_ps_cl_km(dta_psbor, v_event = v_event, v_time = v_time,
+                        f_stratum = get_surv_stratum, pred_tp = pred_tp,
+                        f_overall_est = get_overall_est_km,
+                        ...)
 
     ## return
     rst$Observed <- rst_obs
@@ -59,73 +60,41 @@ rwe_ps_survkmplot <- function(dta_psbor,
 }
 
 
-#' Get estimates for survival at all distinctive time points
-#'
-#'
+#' @title Plot KM at all time points
 #'
 #' @noRd
-#'
-get_ps_cl_kmplot <- function(dta_psbor,
-                             v_outcome  = NULL,
-                             v_event    = NULL,
-                             v_time     = NULL,
-                             f_stratum  = get_cl_stratum,
-                             ...) {
-### TBD
+plot_survkm <- function(dta_pskmp,
+                        xlab = "Time",
+                        ylab = "Surv. Prob.",
+                        ylim = c(0, 1),
+                        ...) {
+
+    stopifnot(inherits(dta_pskmp,
+                       what = get_rwe_class("ANARSTPLT")))
 
     ## prepare data
-    is_rct  <- dta_psbor$is_rct
-    data    <- dta_psbor$data
-    data    <- data[!is.na(data[["_strata_"]]), ]
+    is_rct <- dta_pskmp$is_rct
+    x      <- dta_pskmp$pred_tp
 
-    strata  <- levels(data[["_strata_"]])
-    nstrata <- length(strata)
-    borrow  <- dta_psbor$Borrow$N_Borrow
-
-    ## estimate
-    ctl_theta <- NULL
-    trt_theta <- NULL
-
-    for (i in seq_len(nstrata)) {
-        cur_01  <- get_cur_d(data,
-                             strata[i],
-                             c(v_outcome, v_time, v_event))
-
-        cur_d1  <- cur_01$cur_d1
-        cur_d0  <- cur_01$cur_d0
-        cur_d1t <- cur_01$cur_d1t
-
-        ## control with borrowing
-        cur_ctl   <- f_stratum(cur_d1, cur_d0, n_borrow = borrow[i], ...)
-        ctl_theta <- rbind(ctl_theta, cur_ctl)
-        if (is_rct) {
-            cur_trt   <- f_stratum(cur_d1t, ...)
-            trt_theta <- rbind(trt_theta, cur_trt)
-        }
-    }
-
-    ## summary
-    rst_trt    <- NULL
-    rst_effect <- NULL
-    if (is_rct) {
-        rst_trt    <- get_overall_est(trt_theta[, 1],
-                                      trt_theta[, 2],
-                                      dta_psbor$Borrow$N_Cur_TRT)
-        rst_effect <- get_overall_est(trt_theta[, 1] - ctl_theta[, 1],
-                                      sqrt(trt_theta[, 2] + ctl_theta[, 2]),
-                                      dta_psbor$Borrow$N_Current)
-        n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
+    ## check arguments
+    args <- list(...)
+    if ("xlim" %in% names(args)) {
+      xlim <- args['xlim']
     } else {
-        n_ctl      <- dta_psbor$Borrow$N_Current
+      xlim <- range(x)
     }
-    rst_ctl <- get_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
 
-    ## return
-    rst <-  list(Control   = rst_ctl,
-                 Treatment = rst_trt,
-                 Effect    = rst_effect,
-                 Borrow    = dta_psbor$Borrow,
-                 Total_borrow = dta_psbor$Total_borrow,
-                 is_rct       = is_rct)
+    if (is_rct) {
+      ## TBD
+    } else {
+      y <- dta_pskmp$Control$Overall$Mean
+      tmp.dta <- data.frame(x = x, y = y) 
+      rst <- ggplot() +
+             geom_step(data = tmp.dta, mapping = aes(x = x, y = y)) +
+             scale_y_continuous(limits = ylim) +
+             scale_x_continuous(limits = xlim) +
+             labs(x = xlab, y = ylab)
+    }
+
+    return(rst)
 }
-
