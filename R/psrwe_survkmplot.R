@@ -23,8 +23,10 @@
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_survkmplot(ps_borrow, v_time = "Y_time",
-#'                                v_event = "Status")
+#' rst_km_allt <- rwe_ps_survkmplot(ps_borrow, v_time = "Y_time",
+#'                                  v_event = "Status")
+#' plot_survkm(rst_km_allt,, ylim = c(0.4, 1))
+#' plot
 #'
 #' @export
 #'
@@ -60,12 +62,48 @@ rwe_ps_survkmplot <- function(dta_psbor,
 }
 
 
-#' @title Plot KM at all time points
+#' @title S3 method to print RWE_PS_RST_PLOT
+#'
+#' @method print RWE_PS_RST_PLOT
+#'
+#' @export
+#'
+print.RWE_PS_RST_PLOT <- function(x, ...) {
+  cat("This is a RWE_PS_RST_PLOT object. Use str() to see details.\n")
+  invisible()
+}
+
+#' @title S3 method to summary RWE_PS_RST_PLOT
+#'
+#' @method summary RWE_PS_RST_PLOT
 #'
 #' @noRd
+#'
+summary.RWE_PS_RST_PLOT <- function(object, ...) {
+  cat("This is a RWE_PS_RST_PLOT object. Use str() to see details.\n")
+  invisible()
+}
+
+
+#' @title Plot KM at all time points
+#'
+#' @param dta_pskmp data
+#' @param conf.int confidence interval
+#' @param conf.type confidence type (log as default)
+#' @param xlab xlab
+#' @param ylab ylab
+#' @param ylim ylim
+#' @param ... Additional Parameters.
+#'
+#' @return A KM plot.
+#'
+#' @export
+#'
 plot_survkm <- function(dta_pskmp,
+                        conf.int = 0.95,
+                        conf.type = c("log"),
                         xlab = "Time",
-                        ylab = "Surv. Prob.",
+                        ylab = "Survival Probability",
                         ylim = c(0, 1),
                         ...) {
 
