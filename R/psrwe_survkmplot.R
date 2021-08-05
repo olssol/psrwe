@@ -77,7 +77,7 @@ print.RWE_PS_RST_PLOT <- function(x, ...) {
 #'
 #' @method summary RWE_PS_RST_PLOT
 #'
-#' @noRd
+#' @export
 #'
 summary.RWE_PS_RST_PLOT <- function(object, ...) {
   cat("This is a RWE_PS_RST_PLOT object. Use str() to see details.\n")
