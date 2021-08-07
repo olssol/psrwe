@@ -443,6 +443,84 @@ plot_balance <- function(data.withps,
     do.call(plot_grid, rst)
 }
 
+
+#' @title Plot the absolute standardized difference in means of baseline variables
+#'
+#' @noRd
+plot_astd <- function(data.withps,
+                      metric = c("std", "ostd"),
+                      ...) {
+
+    v.cov <- all.vars(data.withps$ps_fml)[-1]
+
+    ## check arguments
+    d.metric <- match.arg(metric)
+    if (d.metric == "std") {
+        xlab <- "Absolute Standardized Difference"
+        xintercept <- c(0.2, 0.4)
+    } else {
+        xlab <- "Standardized Difference"
+        xintercept <- c(-0.4, -0.2, 0.2, 0.4)
+    }
+
+    ## remove stratification covs
+    if (!is.null(data.withps$strata_covs)) {
+        s_cov_inx <- which(v.cov %in% data.withps$strata_covs)
+        v.cov     <- v.cov[-s_cov_inx]
+    }
+
+    ## prepare data
+    dtaps        <- data.withps$data
+    dtaps$Strata <- dtaps[["_strata_"]]
+    dtaps$Group  <- dtaps[["_grp_"]]
+    strata       <- levels(dtaps[["_strata_"]])
+
+    dta_asd <- data.frame()
+    for (v in v.cov) {
+        ## original data without any trimming
+        cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0])
+        cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1])
+        std.all <- get_distance(cov0, cov1, metric = d.metric)
+        dta_asd <- rbind(dta_asd,
+                         data.frame(v.cov = v,
+                                    Design = "Original",
+                                    asd = std.all))
+
+        ## PS stratified data with trimming
+        std.ws <- NULL
+        for (s in strata) {
+            cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            std.s <- get_distance(cov0, cov1, metric = d.metric)
+            std.ws <- c(std.ws, std.s)
+        }
+        std.ws <- mean(std.ws)
+        dta_asd <- rbind(dta_asd,
+                         data.frame(v.cov = v,
+                                    Design = "PS",
+                                    asd = std.ws))
+    }
+
+    ## plot
+    rst <- ggplot(dta_asd,
+                  aes(x = asd, y = v.cov, shape = Design, color = Design)) +
+           geom_point() +
+           geom_vline(xintercept = 0, linetype = 2) +
+           geom_vline(xintercept = xintercept, linetype = 3) +
+           labs(x = xlab, y = "Variables") +
+           theme_bw() +
+           theme(strip.background = element_blank(),
+                 panel.border = element_rect(colour = "black"),
+                 panel.spacing = unit(0, "lines"))
+
+    return(rst)
+}
+
+
 #' @title Get strata by covariates
 #'
 #' @noRd
