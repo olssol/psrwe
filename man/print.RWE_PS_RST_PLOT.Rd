@@ -6,6 +6,11 @@
 \usage{
 \method{print}{RWE_PS_RST_PLOT}(x, ...)
 }
+\arguments{
+\item{x}{data of RWE_PS_RST_PLOT class}
+
+\item{...}{Additional Parameters.}
+}
 \description{
 S3 method to print RWE_PS_RST_PLOT
 }

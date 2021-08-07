@@ -6,6 +6,11 @@
 \usage{
 \method{summary}{RWE_PS_RST_PLOT}(object, ...)
 }
+\arguments{
+\item{object}{data of RWE_PS_RST_PLOT class}
+
+\item{...}{Additional Parameters.}
+}
 \description{
 S3 method to summary RWE_PS_RST_PLOT
 }

@@ -35,8 +35,6 @@
 rwe_ps_survkmplot <- function(dta_psbor,
                               v_time     = "time",
                               v_event    = "event",
-                              conf_int = 0.95,
-                              conf_type = c("log-log", "plain"),
                               ...) {
 
     ## check
@@ -67,6 +65,10 @@ rwe_ps_survkmplot <- function(dta_psbor,
 
 #' @title S3 method to print RWE_PS_RST_PLOT
 #'
+#' @param x data of RWE_PS_RST_PLOT class
+#'
+#' @param ... Additional Parameters.
+#'
 #' @method print RWE_PS_RST_PLOT
 #'
 #' @export
@@ -78,6 +80,10 @@ print.RWE_PS_RST_PLOT <- function(x, ...) {
 
 
 #' @title S3 method to summary RWE_PS_RST_PLOT
+#'
+#' @param object data of RWE_PS_RST_PLOT class
+#'
+#' @param ... Additional Parameters.
 #'
 #' @method summary RWE_PS_RST_PLOT
 #'
@@ -132,7 +138,6 @@ rwe_ps_survkmci <- function(dta_pskmp,
 #' @param dta_pskmp data of RWE_PS_RST_PLOT class
 #' @param xlab xlab
 #' @param ylab ylab
-#' @param ylim ylim
 #' @param ... Additional Parameters.
 #'
 #' @return A KM plot.

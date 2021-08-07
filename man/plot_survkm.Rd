@@ -14,8 +14,6 @@ plot_survkm(dta_pskmp, xlab = "Time", ylab = "Survival Probability", ...)
 \item{ylab}{ylab}
 
 \item{...}{Additional Parameters.}
-
-\item{ylim}{ylim}
 }
 \value{
 A KM plot.
