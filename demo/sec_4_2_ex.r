@@ -12,17 +12,11 @@ dta_ps_rct <- rwe_ps_est(ex_dta_rct,
                          v_arm = "Arm", ctl_arm_level = "control",
                          ps_method = "logistic", nstrata = 5)
 
-### Sample size.
-table(dta_ps_rct$data$"Arm")       # by arm
-table(dta_ps_rct$data$"_grp_")     # by data source
-table(dta_ps_rct$data$"_strata_")  # by PS stratum
-table(dta_ps_rct$data$"Arm",
-      dta_ps_rct$data$"_strata_",
-      dta_ps_rct$data$"_grp_")     # by arm, PS stratum, data source
-
 ### Balance assessment of PS stratification.
 plot(dta_ps_rct, "balance")
 plot(dta_ps_rct, "ps")
+plot(dta_ps_rct, "astd")
+plot(dta_ps_rct, "astd", metric = "ostd")
 
 ### Obtain discounting parameters.
 ps_bor_rct <- rwe_ps_borrow(dta_ps_rct, total_borrow = 30,

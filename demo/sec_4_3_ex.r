@@ -11,9 +11,6 @@ dta_ps_single <- rwe_ps_est(ex_dta,
                      v_grp = "Group", cur_grp_level = "current",
                      ps_method = "logistic", nstrata = 5)
 
-### Sample size.
-### See "sec_4_1_ex" for details.
-
 ### Balance assessment of PS stratification.
 ### See "sec_4_1_ex" for details.
 

@@ -10,11 +10,12 @@
 #' \describe{
 #'   \item{\code{ovl}}{Overlapping area} (default)
 #'   \item{\code{ksd}}{Kullback-Leibler distance}
-#'   \item{\code{std}}{Standardized difference in means}
+#'   \item{\code{std}}{Absolute standardized difference in means}
 #'   \item{\code{abd}}{Absolute difference in means}
 #'   \item{\code{ley}}{Levy distance}
 #'   \item{\code{mhb}}{Mahalanobis distance}
 #'   \item{\code{omkss}}{One minus Kolmogorov-Smirnov statistic}
+#'   \item{\code{ostd}}{Standardized difference in means}
 #' }
 #'
 #' @return A real value of the distance.
@@ -30,7 +31,7 @@
 #'
 get_distance <- function(cov0, cov1,
                          metric = c("ovl", "ksd", "std", "abd",
-                                    "ley", "mhb", "omkss")) {
+                                    "ley", "mhb", "omkss", "ostd")) {
     metric <- match.arg(metric)
     switch(metric,
            std = {
@@ -42,7 +43,11 @@ get_distance <- function(cov0, cov1,
            ksd   = metric_ksd(cov0, cov1),
            ley   = metric_ley(cov0, cov1),
            mhb   = metric_mhb(cov0, cov1),
-           omkss = metric_omkss(cov0, cov1)
+           omkss = metric_omkss(cov0, cov1),
+           ostd = {
+               s <- sqrt((var(cov1) + var(cov0)) / 2)
+               (mean(cov1) - mean(cov0)) / s
+           }
            )
 }
 

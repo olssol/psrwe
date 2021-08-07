@@ -324,18 +324,20 @@ print.RWE_PS_DTA <- function(x, ...) {
 #'
 #' @param x Class \code{RWE_DWITHPS} created by \code{rwe_ps_*} functions
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
-#'     \item{balance}{Covariate balance plot}}
+#'     \item{balance}{Covariate balance plot}
+#'     \item{astd}{Absolute standardized difference in means}}
 #' @param ... Additional parameter for the plot
 #'
 #' @method plot RWE_PS_DTA
 #'
 #' @export
 #'
-plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance"), ...) {
+plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance", "astd"), ...) {
     type <- match.arg(plot_type)
     switch(type,
            ps      = plot_ps(x, ...),
-           balance = plot_balance(x, ...))
+           balance = plot_balance(x, ...),
+           astd    = plot_astd(x, ...))
 }
 
 
