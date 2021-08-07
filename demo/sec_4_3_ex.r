@@ -33,5 +33,5 @@ rst_km
 rst_km_allt <- rwe_ps_survkmplot(ps_bor_single,
                                  v_time    = "Y_Surv",
                                  v_event   = "Status")
-plot_survkm(rst_km_allt, ylim = c(0.4, 1))
-
+rst_km_ci <- rwe_ps_survkmci(rst_km_allt)
+plot_survkm(rst_km_ci)
