@@ -28,3 +28,10 @@ rst_km <- rwe_ps_survkm(ps_bor_single,
                         v_event   = "Status",
                         pred_tp  = 365)
 rst_km
+
+### Plot PSKM
+rst_km_allt <- rwe_ps_survkmplot(ps_bor_single,
+                                 v_time    = "Y_Surv",
+                                 v_event   = "Status")
+rst_km_ci <- rwe_ps_survkmci(rst_km_allt)
+plot_survkm(rst_km_ci)

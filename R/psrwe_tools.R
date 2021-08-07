@@ -10,6 +10,7 @@ get_rwe_class <- function(c.str) {
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
          ANARST    = "RWE_PS_RST",
+         ANARSTPLT = "RWE_PS_RST_PLOT",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",
@@ -530,10 +531,11 @@ get_jk_sd <- function(overall_mean, jk_all) {
 #' @noRd
 #'
 get_ps_cl_km <- function(dta_psbor,
-                         v_outcome  = NULL,
-                         v_event    = NULL,
-                         v_time     = NULL,
-                         f_stratum  = get_cl_stratum,
+                         v_outcome     = NULL,
+                         v_event       = NULL,
+                         v_time        = NULL,
+                         f_stratum     = get_cl_stratum,
+                         f_overall_est = get_overall_est,
                          ...) {
 
     ## prepare data
@@ -571,17 +573,17 @@ get_ps_cl_km <- function(dta_psbor,
     rst_trt    <- NULL
     rst_effect <- NULL
     if (is_rct) {
-        rst_trt    <- get_overall_est(trt_theta[, 1],
-                                      trt_theta[, 2],
-                                      dta_psbor$Borrow$N_Cur_TRT)
-        rst_effect <- get_overall_est(trt_theta[, 1] - ctl_theta[, 1],
-                                      sqrt(trt_theta[, 2] + ctl_theta[, 2]),
-                                      dta_psbor$Borrow$N_Current)
+        rst_trt    <- f_overall_est(trt_theta[, 1],
+                                    trt_theta[, 2],
+                                    dta_psbor$Borrow$N_Cur_TRT)
+        rst_effect <- f_overall_est(trt_theta[, 1] - ctl_theta[, 1],
+                                    sqrt(trt_theta[, 2] + ctl_theta[, 2]),
+                                    dta_psbor$Borrow$N_Current)
         n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
     } else {
         n_ctl      <- dta_psbor$Borrow$N_Current
     }
-    rst_ctl <- get_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
+    rst_ctl <- f_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
 
     ## return
     rst <-  list(Control   = rst_ctl,
@@ -606,4 +608,22 @@ get_overall_est <- function(theta, sds, weights) {
                                   SD   = sds),
          Overall_Estimate = c(Mean = overall,
                               SD   = sd_overall))
+}
+
+#' Summarize overall theta for km at all time points
+#'
+#'
+#' @noRd
+#'
+get_overall_est_km <- function(theta, sds, weights) {
+    ws         <- weights / sum(weights)
+    theta <- matrix(theta, ncol = length(ws))
+    sds <- matrix(sds, ncol = length(ws))
+    overall    <- as.vector(theta %*% ws)
+    sd_overall <- as.vector(sqrt(sds^2 %*% ws^2))
+
+    list(Stratum_Estimate = list(Mean = theta,
+                                 SD   = sds),
+         Overall_Estimate = list(Mean = overall,
+                                 SD   = sd_overall))
 }
