@@ -4,30 +4,18 @@
 \alias{plot_survkm}
 \title{Plot KM at all time points}
 \usage{
-plot_survkm(
-  dta_pskmp,
-  conf.int = 0.95,
-  conf.type = c("log"),
-  xlab = "Time",
-  ylab = "Survival Probability",
-  ylim = c(0, 1),
-  ...
-)
+plot_survkm(dta_pskmp, xlab = "Time", ylab = "Survival Probability", ...)
 }
 \arguments{
-\item{dta_pskmp}{data}
-
-\item{conf.int}{confidence interval}
-
-\item{conf.type}{confidence type (log as default)}
+\item{dta_pskmp}{data of RWE_PS_RST_PLOT class}
 
 \item{xlab}{xlab}
 
 \item{ylab}{ylab}
 
-\item{ylim}{ylim}
-
 \item{...}{Additional Parameters.}
+
+\item{ylim}{ylim}
 }
 \value{
 A KM plot.
