@@ -8,9 +8,11 @@
 #'     will be included in the PS model in a linear form.
 #' @param ps_method Method for PS estimation. \code{logistic}: By logistic
 #'     regression; \code{radomforest}: By randomForest model.
+#' @param v_covs Column names corresponding to covariates.
 #' @param v_grp Column name corresponding to group assignment.
 #' @param cur_grp_level Group level for the current study. Default is
 #'     \code{cur_grp_level = 1}. Ignored for single arm studies.
+#' @param v_arm Column name corresponding to arm assignment.
 #' @param ctl_arm_level Arm level for the control arm. Ignored for single-arm
 #'     studies.
 #' @param nstrata Number of PS strata to be created.
@@ -20,7 +22,7 @@
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
-#' @return A list of class \code{RWE_PS_DATA} with items:
+#' @return A list of class \code{RWE_PS_DAT} with items:
 #'
 #' \itemize{
 #'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
@@ -144,7 +146,7 @@ rwe_ps_est <- function(data,
 #'
 #' @inheritParams get_distance
 #'
-#' @param object A list of class \code{RWE_PS_DATA} that is generated using
+#' @param object A list of class \code{RWE_PS_DAT} that is generated using
 #'   the \code{\link{rwe_ps_est}} function.
 #' @param min_n0 threshold for number of external subjects, below which the
 #'   external data in the current stratum will be ignored by setting the PS
@@ -245,7 +247,7 @@ summary.RWE_PS_DTA <- function(object,
 
             cur_dist <- 0
         } else {
-            cur_dist <- get_distance(ps0, ps1, metric)
+            cur_dist <- get_distance(ps0, ps1, metric[1])
         }
 
         rst <- rbind(rst, c(n0_01, n1_01, cur_dist))
@@ -261,7 +263,7 @@ summary.RWE_PS_DTA <- function(object,
 
     ps0         <- dataps[inx_tot_ps0, "_ps_"]
     ps1         <- dataps[inx_tot_ps1, "_ps_"]
-    all_dist    <- get_distance(ps0, ps1, metric)
+    all_dist    <- get_distance(ps0, ps1, metric[1])
 
     rst_overall           <- rbind(c(n0_tot_01, n1_tot_01, all_dist))
     colnames(rst_overall) <- col_n
@@ -275,7 +277,7 @@ summary.RWE_PS_DTA <- function(object,
                                     Current = n_current,
                                     Trimmed = n_trim),
                 ps_fml          = object$ps_fml,
-                Distance_metric = metric)
+                Distance_metric = metric[1])
 
     invisible(rst)
 }
@@ -310,37 +312,39 @@ print.RWE_PS_DTA <- function(x, ...) {
                 get_rwe_class(rst_sum$Distance_metric), ":", sep = "")
 
     cat_paste(ss)
+    cat("\n")
 
     print(rst_sum$Summary)
 }
 
 
-#' Plot PS distributions
+#' @title Plot PS distributions
 #'
-#' S3 method for visualizing PS adjustment
+#' @description S3 method for visualizing PS adjustment
 #'
-#' @param x Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}
+#' @param x Class \code{RWE_DWITHPS} created by \code{rwe_ps_*} functions
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
-#'     \item{balance}{Covariate balance plot}}
+#'     \item{balance}{Covariate balance plot}
+#'     \item{astd}{Absolute standardized difference in means}}
 #' @param ... Additional parameter for the plot
 #'
 #' @method plot RWE_PS_DTA
 #'
 #' @export
 #'
-plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance"), ...) {
+plot.RWE_PS_DTA <- function(x, plot_type = c("ps", "balance", "astd"), ...) {
     type <- match.arg(plot_type)
     switch(type,
            ps      = plot_ps(x, ...),
-           balance = plot_balance(x, ...))
+           balance = plot_balance(x, ...),
+           astd    = plot_astd(x, ...))
 }
 
 
-#' Create strata
-#'
-#' Cut a sequence of numbers into bins.
+#' @title Create strata
 #'
 #' @description
+#' Cut a sequence of numbers into bins.
 #'
 #' The cut points are chosen such that there will with equal numbers in each bin
 #' for \code{x}. By default, values of \code{y} that are outside the range of

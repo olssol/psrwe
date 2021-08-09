@@ -4,3 +4,6 @@
 ^.*\.*history$
 ^.*\.DS_Store$
 ^README\.Rmd$
+
+^\.travis\.yml$
+^appveyor.yml$

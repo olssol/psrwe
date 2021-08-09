@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{object}{A list of class \code{RWE_PS_RST} that is generated using the
-\code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_cl}}, or
+\code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_compl}}, or
 \code{\link{rwe_ps_survkm}} function.}
 
 \item{...}{Additional parameters.}
@@ -17,5 +17,5 @@
 A list with data frames for the borrowing and estimation results.
 }
 \description{
-
+S3 method summarizing overall estimation results
 }

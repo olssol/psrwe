@@ -4,13 +4,14 @@
 \alias{plot.RWE_PS_DTA}
 \title{Plot PS distributions}
 \usage{
-\method{plot}{RWE_PS_DTA}(x, plot_type = c("ps", "balance"), ...)
+\method{plot}{RWE_PS_DTA}(x, plot_type = c("ps", "balance", "astd"), ...)
 }
 \arguments{
-\item{x}{Class \code{RWE_DWITHPS} created by \code{\link{rwe_ps}}}
+\item{x}{Class \code{RWE_DWITHPS} created by \code{rwe_ps_*} functions}
 
 \item{plot_type}{Types of plots. \itemize{\item{ps}{PS density plot}
-\item{balance}{Covariate balance plot}}}
+\item{balance}{Covariate balance plot}
+\item{astd}{Absolute standardized difference in means}}}
 
 \item{...}{Additional parameter for the plot}
 }

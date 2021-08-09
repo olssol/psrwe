@@ -4,7 +4,12 @@
 \alias{rwe_ps_borrow}
 \title{Get number of subjects borrowed from each statum}
 \usage{
-rwe_ps_borrow(dtaps, total_borrow, method = c("distance", "inverse_distance"))
+rwe_ps_borrow(
+  dtaps,
+  total_borrow,
+  method = c("distance", "inverse_distance"),
+  metric = "ovl"
+)
 }
 \arguments{
 \item{dtaps}{A class \code{RWE_PS_DTA} or \code{RWE_PS_DTA_MAT} object.}
@@ -15,6 +20,8 @@ rwe_ps_borrow(dtaps, total_borrow, method = c("distance", "inverse_distance"))
 \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
 "distance"}) or inverse distance (\code{method = "inverse"}). Ignored for
 class \code{RWE_PS_DTA_MAT} object.}
+
+\item{metric}{Method to calculat distance, default \code{"ovl"}.}
 }
 \value{
 A class \code{RWE_PS_BORR} list. It appends the following items to

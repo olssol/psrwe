@@ -3,7 +3,7 @@
 #' @description Match patients in external data source with patients in current
 #'     study based on PS using nearest neighbor method.
 #'
-#' @param dta_ps A list of class \code{RWE_PS_DATA} that is generated using the
+#' @param dta_ps A list of class \code{RWE_PS_DAT} that is generated using the
 #'     \code{\link{rwe_ps_est}} function
 #' @param ratio Matching ratio (RWD : Current) with default value 3 meaning 3:1
 #'     matching.
@@ -213,6 +213,7 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
 
     ## summary table
     cat_paste("The following table summarizes the number of subjects in each stratum:")
+    cat("\n")
 
     print(rst_sum$Summary)
 }
@@ -225,7 +226,7 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
 #' @param x A list of class \code{RWE_PS_DTA_MAT} that is generated using
 #'   the \code{\link{rwe_ps_match}} function.
 #'
-#' @param ... Parameters for \code{plot.RWE_PS_DATA}
+#' @param ... Parameters for \code{plot.RWE_PS_DAT}
 #'
 #' @seealso  \code{\link{plot.RWE_PS_DTA}}
 #'

@@ -288,11 +288,11 @@ get_post_theta <- function(thetas, weights) {
 
 #' @title Summarize overall estimation results
 #'
-#' @description
+#' @description S3 method summarizing overall estimation results
 #'
 #'
 #' @param object A list of class \code{RWE_PS_RST} that is generated using the
-#'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_cl}}, or
+#'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_compl}}, or
 #'     \code{\link{rwe_ps_survkm}} function.
 #' @param ... Additional parameters.
 #'
@@ -354,6 +354,11 @@ print.RWE_PS_RST <- function(x, ...) {
         extra_2 <- "mean of the outcome"
     }
 
+    extra_3 <- ""
+    if ("ps_pp" == x$Method) {
+        extra_3 <- "PS: MCMC discrepancy may occur due to different random seed and rstan version."
+    }
+
     ss <- paste("With a total of ", x$Total_borrow,
                 " subject borrowed from the RWD,",
                 extra_1, " the ", extra_2,
@@ -361,18 +366,19 @@ print.RWE_PS_RST <- function(x, ...) {
                 sprintf("%5.3f", rst_sum[1, "Mean"]),
                 " with standard error ",
                 sprintf("%5.3f", rst_sum[1, "SD"]),
+                ". ", extra_3,
                 sep = "")
 
     cat_paste(ss)
 }
 
-#' @title Plot  estimation results for power prior approach
+#' @title Plot estimation results for power prior approach
 #'
-#' @description
+#' @description S3 method plotting estimation results
 #'
 #'
-#' @param object A list of class \code{RWE_PS_RST} that is generated using the
-#'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_cl}}, or
+#' @param x A list of class \code{RWE_PS_RST} that is generated using the
+#'     \code{\link{rwe_ps_powerp}}, \code{\link{rwe_ps_compl}}, or
 #'     \code{\link{rwe_ps_survkm}} function.
 #' @param ... Additional parameters.
 #'

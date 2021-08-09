@@ -9,7 +9,7 @@
 #' @import methods
 #' @import ggplot2
 #' @importFrom stats approxfun as.formula binomial cov density ecdf glm
-#'     integrate optim predict quantile sd var
+#'     integrate optim predict quantile sd var ks.test qnorm
 #' @importFrom rstan sampling extract stanc rstan_options traceplot stan_rhat
 #' @importFrom randomForest randomForest
 #' @importFrom grDevices colors
@@ -17,7 +17,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom cowplot plot_grid
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
-#'     rename filter select arrange ungroup
+#'     rename filter select arrange ungroup n distinct left_join if_else
 #' @importFrom survival Surv survfit
 #'
 #' @description
@@ -86,7 +86,7 @@ NULL
 #'   \item{Y_Bin}{Binary outcome}
 #'   \item{Y_Con}{Continuous outcome}
 #'   \item{Y_Surv}{Survival outcome in days}
-#'   \item{Censor}{Censoring status}
+#'   \item{Status}{Event status (0=alive, 1=dead)}
 #'   \item{V1-V7}{Covariates}
 #' }
 "ex_dta"

@@ -10,6 +10,7 @@ get_rwe_class <- function(c.str) {
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
          ANARST    = "RWE_PS_RST",
+         ANARSTPLT = "RWE_PS_RST_PLOT",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",
@@ -442,9 +443,85 @@ plot_balance <- function(data.withps,
     do.call(plot_grid, rst)
 }
 
-#' @title Get strata by covariates
+
+#' @title Plot the absolute standardized difference in means of baseline variables
 #'
-#' @export
+#' @noRd
+plot_astd <- function(data.withps,
+                      metric = c("std", "ostd"),
+                      ...) {
+
+    v.cov <- all.vars(data.withps$ps_fml)[-1]
+
+    ## check arguments
+    d.metric <- match.arg(metric)
+    if (d.metric == "std") {
+        xlab <- "Absolute Standardized Difference"
+        xintercept <- c(0.2, 0.4)
+    } else {
+        xlab <- "Standardized Difference"
+        xintercept <- c(-0.4, -0.2, 0.2, 0.4)
+    }
+
+    ## remove stratification covs
+    if (!is.null(data.withps$strata_covs)) {
+        s_cov_inx <- which(v.cov %in% data.withps$strata_covs)
+        v.cov     <- v.cov[-s_cov_inx]
+    }
+
+    ## prepare data
+    dtaps        <- data.withps$data
+    dtaps$Strata <- dtaps[["_strata_"]]
+    dtaps$Group  <- dtaps[["_grp_"]]
+    strata       <- levels(dtaps[["_strata_"]])
+
+    dta_asd <- data.frame()
+    for (v in v.cov) {
+        ## original data without any trimming
+        cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0])
+        cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1])
+        std.all <- get_distance(cov0, cov1, metric = d.metric)
+        dta_asd <- rbind(dta_asd,
+                         data.frame(v.cov = v,
+                                    Design = "Original",
+                                    asd = std.all))
+
+        ## PS stratified data with trimming
+        std.ws <- NULL
+        for (s in strata) {
+            cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            std.s <- get_distance(cov0, cov1, metric = d.metric)
+            std.ws <- c(std.ws, std.s)
+        }
+        std.ws <- mean(std.ws)
+        dta_asd <- rbind(dta_asd,
+                         data.frame(v.cov = v,
+                                    Design = "PS",
+                                    asd = std.ws))
+    }
+
+    ## plot
+    rst <- ggplot(dta_asd,
+                  aes(x = asd, y = v.cov, shape = Design, color = Design)) +
+           geom_point() +
+           geom_vline(xintercept = 0, linetype = 2) +
+           geom_vline(xintercept = xintercept, linetype = 3) +
+           labs(x = xlab, y = "Variables") +
+           theme_bw() +
+           theme(strip.background = element_blank(),
+                 panel.border = element_rect(colour = "black"),
+                 panel.spacing = unit(0, "lines"))
+
+    return(rst)
+}
+
+
+#' @title Get strata by covariates
 #'
 #' @noRd
 #'
@@ -467,10 +544,12 @@ get_strata <- function(data, strata_covs  = NULL) {
         }
         strata$label  <- factor(s_label)
 
-        data <- data %>%
-            left_join(strata) %>%
-            mutate(`_strata_` = label) %>%
-            select(-label)
+        suppressMessages(
+            data <- data %>%
+                left_join(strata) %>%
+                mutate(`_strata_` = label) %>%
+                select(-label)
+        )
     }
 
     return(list(data    = data,
@@ -530,10 +609,11 @@ get_jk_sd <- function(overall_mean, jk_all) {
 #' @noRd
 #'
 get_ps_cl_km <- function(dta_psbor,
-                         v_outcome  = NULL,
-                         v_event    = NULL,
-                         v_time     = NULL,
-                         f_stratum  = get_cl_stratum,
+                         v_outcome     = NULL,
+                         v_event       = NULL,
+                         v_time        = NULL,
+                         f_stratum     = get_cl_stratum,
+                         f_overall_est = get_overall_est,
                          ...) {
 
     ## prepare data
@@ -571,17 +651,17 @@ get_ps_cl_km <- function(dta_psbor,
     rst_trt    <- NULL
     rst_effect <- NULL
     if (is_rct) {
-        rst_trt    <- get_overall_est(trt_theta[, 1],
-                                      trt_theta[, 2],
-                                      dta_psbor$Borrow$N_Cur_TRT)
-        rst_effect <- get_overall_est(trt_theta[, 1] - ctl_theta[, 1],
-                                      sqrt(trt_theta[, 2] + ctl_theta[, 2]),
-                                      dta_psbor$Borrow$N_Current)
+        rst_trt    <- f_overall_est(trt_theta[, 1],
+                                    trt_theta[, 2],
+                                    dta_psbor$Borrow$N_Cur_TRT)
+        rst_effect <- f_overall_est(trt_theta[, 1] - ctl_theta[, 1],
+                                    sqrt(trt_theta[, 2] + ctl_theta[, 2]),
+                                    dta_psbor$Borrow$N_Current)
         n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
     } else {
         n_ctl      <- dta_psbor$Borrow$N_Current
     }
-    rst_ctl <- get_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
+    rst_ctl <- f_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
 
     ## return
     rst <-  list(Control   = rst_ctl,
@@ -606,4 +686,22 @@ get_overall_est <- function(theta, sds, weights) {
                                   SD   = sds),
          Overall_Estimate = c(Mean = overall,
                               SD   = sd_overall))
+}
+
+#' Summarize overall theta for km at all time points
+#'
+#'
+#' @noRd
+#'
+get_overall_est_km <- function(theta, sds, weights) {
+    ws         <- weights / sum(weights)
+    theta <- matrix(theta, ncol = length(ws))
+    sds <- matrix(sds, ncol = length(ws))
+    overall    <- as.vector(theta %*% ws)
+    sd_overall <- as.vector(sqrt(sds^2 %*% ws^2))
+
+    list(Stratum_Estimate = list(Mean = theta,
+                                 SD   = sds),
+         Overall_Estimate = list(Mean = overall,
+                                 SD   = sd_overall))
 }

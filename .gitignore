@@ -6,3 +6,12 @@ inst/doc
 *.o
 *.DS_Store
 .gitconfig
+
+
+*.mod
+*.log
+*.status
+*~
+*.swp
+*.orig
+

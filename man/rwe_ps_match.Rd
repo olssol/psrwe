@@ -7,7 +7,7 @@
 rwe_ps_match(dta_ps, ratio = 3, strata_covs = NULL, caliper = 1, seed = NULL)
 }
 \arguments{
-\item{dta_ps}{A list of class \code{RWE_PS_DATA} that is generated using the
+\item{dta_ps}{A list of class \code{RWE_PS_DAT} that is generated using the
 \code{\link{rwe_ps_est}} function}
 
 \item{ratio}{Matching ratio (RWD : Current) with default value 3 meaning 3:1

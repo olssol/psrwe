@@ -6,15 +6,15 @@
 #'
 #' @inheritParams rwe_ps_powerp
 #'
-#' @param v_event Column name corresponding to event time
-#' @param v_censored Column name corresponding to censored status
+#' @param v_time Column name corresponding to event time
+#' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
 #'
 #' @param ... Additional Parameters.
 #'
 #' @return A data frame with class name \code{RWE_PS_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
-#'     jackknife estimation for each subject. The results should be further
+#'     jackknife estimation. The results should be further
 #'     summarized by its S3 method \code{summary}.
 #'
 #'
@@ -26,7 +26,9 @@
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_cl(ps_borrow, v_outcome = "Y_Con")}
+#' rst       <- rwe_ps_survkm(ps_borrow,
+#'                            v_time = "Y_Surv",
+#'                            v_event = "Status")
 #'
 #' @export
 #'
@@ -126,7 +128,7 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp, ...) {
 #' @param dta_cur Matrix of time and event from a PS stratum in current study
 #' @param dta_ext Matrix of time and event from a PS stratum in external data source
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tps Time points to be estimated
+#' @param pred_tp Time points to be estimated
 #'
 #' @return Estimation of survival probabilities at time \code{pred_tps}
 #'
@@ -163,6 +165,7 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
         rst <- rst[inx, ]
     }
 
+    rst <- matrix(rst, ncol = 2)
     rst
 }
 
@@ -188,8 +191,8 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                     Arm     = a,
                                     Stratum = "Overall",
                                     N       = nrow(cur_d),
-                                    Mean    = est[1],
-                                    SD      = est[2]))
+                                    Mean    = est[, 1],
+                                    SD      = est[, 2]))
 
             for (s in levels(dta[["_strata_"]])) {
                 cur_s <- cur_d %>%
@@ -206,8 +209,8 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                         Arm     = a,
                                         Stratum = s,
                                         N       = nrow(cur_s),
-                                        Mean    = est[1],
-                                        SD      = est[2]))
+                                        Mean    = est[, 1],
+                                        SD      = est[, 2]))
             }
         }
     }

@@ -10,6 +10,7 @@
 #'     \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
 #'     "distance"}) or inverse distance (\code{method = "inverse"}). Ignored for
 #'     class \code{RWE_PS_DTA_MAT} object.
+#' @param metric Method to calculat distance, default \code{"ovl"}.
 #'
 #' @return A class \code{RWE_PS_BORR} list. It appends the following items to
 #'     the \code{dtaps}:
@@ -36,14 +37,15 @@
 #'
 #'
 rwe_ps_borrow <- function(dtaps, total_borrow,
-                          method = c("distance", "inverse_distance")) {
+                          method = c("distance", "inverse_distance"),
+                          metric = "ovl") {
 
     is_ps       <- inherits(dtaps, what = get_rwe_class("DWITHPS"))
     is_ps_match <- inherits(dtaps, what = get_rwe_class("DPSMATCH"))
     stopifnot(is_ps | is_ps_match)
 
     method  <- match.arg(method)
-    rst_sum <- summary(dtaps)
+    rst_sum <- summary(dtaps, metric = metric)
     ns0     <- rst_sum$Summary$N_RWD
     rs      <- rst_sum$Summary$Distance
 
@@ -87,14 +89,14 @@ rwe_ps_borrow <- function(dtaps, total_borrow,
 print.RWE_PS_BOR <- function(x, ...) {
     ss <- paste("A total of ",
                 x$Total_borrow,
-                " subjects will be borrowed from the RWD.",
+                " subjects will be borrowed from the RWD. ",
                 "The number ",
                 x$Total_borrow,
                 " is split proportional to ",
                 get_rwe_class(x$Borrow_method),
                 " in each stratum. The following table summarizes the number of subjects ",
                 "to be borrowed ",
-                "and the weight parameter in each stratum. ",
+                "and the weight parameter in each stratum:",
                 sep = "")
     cat_paste(ss)
     cat("\n")
