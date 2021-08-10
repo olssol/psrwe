@@ -314,7 +314,10 @@ print.RWE_PS_DTA <- function(x, ...) {
     cat_paste(ss)
     cat("\n")
 
-    print(rst_sum$Summary)
+    ## number of patients
+    tbl_summary           <- rst_sum$Summary
+    tbl_summary$N_RWD_TRT <- NULL
+    print(tbl_summary)
 }
 
 

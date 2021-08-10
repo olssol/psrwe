@@ -178,7 +178,8 @@ get_observed <- function(data, v_covs) {
                   Mean   = mean(Y),
                   StdErr = sd(Y))
 
-    rbind(rst1, rst2)
+    rst <- data.frame(rbind(rst1, rst2))
+    rst
 }
 
 #' @title Generate frequency table for factor columns

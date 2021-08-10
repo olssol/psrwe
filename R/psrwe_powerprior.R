@@ -281,8 +281,8 @@ get_post_theta <- function(thetas, weights) {
          Overall_Samples  = overall,
          Stratum_Estimate = cbind(Mean   = means,
                                   StdErr = sds),
-         Overall_Estimate = c(Mean   = mean_overall,
-                              StdErr = sd_overall))
+         Overall_Estimate = cbind(Mean   = mean_overall,
+                                  StdErr = sd_overall))
 }
 
 
