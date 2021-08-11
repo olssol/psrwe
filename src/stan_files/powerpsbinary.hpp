@@ -95,7 +95,7 @@ public:
             vals_i__ = context__.vals_i("S");
             pos__ = 0;
             S = vals_i__[pos__++];
-            check_greater_or_equal(function__, "S", S, 2);
+            check_greater_or_equal(function__, "S", S, 1);
 
             current_statement_begin__ = 9;
             validate_non_negative_index("N0", "S", S);

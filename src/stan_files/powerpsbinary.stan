@@ -3,7 +3,7 @@
 //  Power parameter As follows dirichlet
 //
 data {
-  int<lower = 2> S;
+  int<lower = 1> S;
 
   //existing data
   int<lower = 0> N0[S];

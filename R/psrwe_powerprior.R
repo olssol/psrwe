@@ -235,8 +235,8 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                           TN1   = length(ctl_y1),
                           Y1    = ctl_y1,
                           INX1  = ctl_inx1,
-                          YBAR1 = as.numeric(ctl_stan_d[, "YBAR1"]),
-                          YSUM1 = as.numeric(ctl_stan_d[, "YSUM1"]))
+                          YBAR1 = as.array(ctl_stan_d[, "YBAR1"]),
+                          YSUM1 = as.array(ctl_stan_d[, "YSUM1"]))
 
     trt_lst_data <- NULL
     if (is_rct) {
@@ -251,8 +251,8 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                               TN1   = length(trt_y1),
                               Y1    = trt_y1,
                               INX1  = trt_inx1,
-                              YBAR1 = as.numeric(trt_stan_d[, "YBAR1"]),
-                              YSUM1 = as.numeric(trt_stan_d[, "YSUM1"]))
+                              YBAR1 = as.array(trt_stan_d[, "YBAR1"]),
+                              YSUM1 = as.array(trt_stan_d[, "YSUM1"]))
     }
 
 
