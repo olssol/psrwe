@@ -8,7 +8,7 @@ rwe_ps_borrow(
   dtaps,
   total_borrow,
   method = c("distance", "inverse_distance"),
-  metric = "ovl"
+  ...
 )
 }
 \arguments{
@@ -18,10 +18,10 @@ rwe_ps_borrow(
 
 \item{method}{Method to split \code{total_borrow} for a class
 \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
-"distance"}) or inverse distance (\code{method = "inverse"}). Ignored for
-class \code{RWE_PS_DTA_MAT} object.}
+"distance"}) or inverse distance (\code{method = "inverse_distance"}).
+Ignored for class \code{RWE_PS_DTA_MAT} object.}
 
-\item{metric}{Method to calculat distance, default \code{"ovl"}.}
+\item{...}{Additional parameters for \code{\link{summary.RWE_PS_DTA}}.}
 }
 \value{
 A class \code{RWE_PS_BORR} list. It appends the following items to

@@ -226,12 +226,12 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
 
     ctl_lst_data  <- list(S     = nstrata,
                           A     = dta_psbor$Total_borrow,
-                          RS    = dta_psbor$Borrow$Proportion,
+                          RS    = as.array(dta_psbor$Borrow$Proportion),
                           FIXVS = as.numeric(prior_type == "fixed"),
-                          N0    = ctl_stan_d[, "N0"],
-                          N1    = ctl_stan_d[, "N1"],
-                          YBAR0 = ctl_stan_d[, "YBAR0"],
-                          SD0   = ctl_stan_d[, "SD0"],
+                          N0    = as.array(ctl_stan_d[, "N0"]),
+                          N1    = as.array(ctl_stan_d[, "N1"]),
+                          YBAR0 = as.array(ctl_stan_d[, "YBAR0"]),
+                          SD0   = as.array(ctl_stan_d[, "SD0"]),
                           TN1   = length(ctl_y1),
                           Y1    = ctl_y1,
                           INX1  = ctl_inx1,
@@ -242,12 +242,12 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
     if (is_rct) {
         trt_lst_data  <- list(S     = nstrata,
                               A     = 0,
-                              RS    = dta_psbor$Borrow$Proportion,
+                              RS    = as.array(dta_psbor$Borrow$Proportion),
                               FIXVS = as.numeric("fixed" == "fixed"),
-                              N0    = trt_stan_d[, "N0"],
-                              N1    = trt_stan_d[, "N1"],
-                              YBAR0 = trt_stan_d[, "YBAR0"],
-                              SD0   = trt_stan_d[, "SD0"],
+                              N0    = as.array(trt_stan_d[, "N0"]),
+                              N1    = as.array(trt_stan_d[, "N1"]),
+                              YBAR0 = as.array(trt_stan_d[, "YBAR0"]),
+                              SD0   = as.array(trt_stan_d[, "SD0"]),
                               TN1   = length(trt_y1),
                               Y1    = trt_y1,
                               INX1  = trt_inx1,
@@ -279,10 +279,10 @@ get_post_theta <- function(thetas, weights) {
 
     list(Stratum_Samples  = samples,
          Overall_Samples  = overall,
-         Stratum_Estimate = cbind(Mean = means,
-                                  SD   = sds),
-         Overall_Estimate = c(Mean = mean_overall,
-                              SD   = sd_overall))
+         Stratum_Estimate = cbind(Mean   = means,
+                                  StdErr = sds),
+         Overall_Estimate = cbind(Mean   = mean_overall,
+                                  StdErr = sd_overall))
 }
 
 
@@ -314,9 +314,15 @@ summary.RWE_PS_RST <- function(object, ...) {
         type <- "Control"
     }
 
-    Overall <- data.frame(Type = type,
-                          Mean = object[[type]]$Overall_Estimate["Mean"],
-                          SD   = object[[type]]$Overall_Estimate["SD"])
+    dtype <- object[[type]]$Overall_Estimate
+    if ("ps_km" == object$Method) {
+        dtype <- data.frame(dtype) %>%
+            filter(object$pred_tp == T)
+    }
+
+    Overall <- data.frame(Type   = type,
+                          Mean   = dtype[1, "Mean"],
+                          StdErr = dtype[1, "StdErr"])
 
     rst <- list(Overall = Overall)
 }
@@ -356,7 +362,8 @@ print.RWE_PS_RST <- function(x, ...) {
 
     extra_3 <- ""
     if ("ps_pp" == x$Method) {
-        extra_3 <- "PS: MCMC discrepancy may occur due to different random seed and rstan version."
+        ## extra_3 <- "PS: MCMC discrepancy may occur due to different random
+        ## seed and rstan version."
     }
 
     ss <- paste("With a total of ", x$Total_borrow,
@@ -365,7 +372,7 @@ print.RWE_PS_RST <- function(x, ...) {
                 " is ",
                 sprintf("%5.3f", rst_sum[1, "Mean"]),
                 " with standard error ",
-                sprintf("%5.3f", rst_sum[1, "SD"]),
+                sprintf("%5.3f", rst_sum[1, "StdErr"]),
                 ". ", extra_3,
                 sep = "")
 
@@ -389,39 +396,13 @@ print.RWE_PS_RST <- function(x, ...) {
 #' @export
 #'
 plot.RWE_PS_RST <- function(x, ...) {
-    if ("ps_pp" != x$Method ) {
-        stop("This method is currently only available
-              for power prior analysis.")
-    }
+    rst <- switch(x$Method,
+                  ps_pp = plot_pp_rst(x, ...),
+                  ps_km = plot_km_rst(x, ...),
+                  ps_cl = {
+                      stop("This method is currently unavailable
+                            for composite likelihood analysis.")
+                  })
 
-    rst <- data.frame(Type  = "Arm Specific",
-                      Arm   = "Arm-Control",
-                      theta = x$Control$Overall_Samples)
-
-    if (x$is_rct) {
-        rst <- rbind(rst,
-                     data.frame(Type  = "Arm Specific",
-                                Arm   = "Arm-Treatment",
-                                theta = x$Treatment$Overall_Samples),
-                     data.frame(Type  = "Treatment Effect",
-                                Arm   = "Effect",
-                                theta = x$Effect$Overall_Samples))
-    }
-
-    rst_plt <- ggplot(data = rst, aes(x = theta)) +
-        theme_bw() +
-        labs(x = expression(theta), y = "Density")
-
-    if (x$is_rct) {
-        rst_plt <- rst_plt +
-            stat_density(aes(group = Arm, color = Arm),
-                         position  = "identity",
-                         geom      = "line", adjust = 1.2) +
-            facet_wrap(~ Type, scales = "free")
-    } else {
-        rst_plt <- rst_plt +
-            stat_density(geom = "line", adjust = 1.2)
-    }
-
-    rst_plt
+    rst
 }

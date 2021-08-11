@@ -29,3 +29,16 @@ Estimate the mean of a survival outcome at a given time point based on
 PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
 method. Applies to the case when there is only one external data source.
 }
+\examples{
+\donttest{
+data(ex_dta)
+dta_ps <- rwe_ps_est(ex_dta,
+       v_covs = paste("V", 1:7, sep = ""),
+       v_grp = "Group",
+       cur_grp_level = "current")
+ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
+rst       <- rwe_ps_survkm(ps_borrow,
+                           v_time = "Y_Surv",
+                           v_event = "Status")}
+
+}
