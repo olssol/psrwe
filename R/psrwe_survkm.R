@@ -28,7 +28,7 @@
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
 #' rst       <- rwe_ps_survkm(ps_borrow,
 #'                            v_time = "Y_Surv",
-#'                            v_event = "Status")
+#'                            v_event = "Status")}
 #'
 #' @export
 #'
@@ -47,12 +47,17 @@ rwe_ps_survkm <- function(dta_psbor,
 
     stopifnot(is.numeric(pred_tp) & 1 == length(pred_tp))
 
+    ## all time points
+    data    <- dta_psbor$data
+    obs_tps <- data[which(1 == data[[v_event]]), v_time]
+    all_tps <- sort(unique(c(pred_tp, obs_tps)))
+
     ## observed
-    rst_obs <- get_km_observed(dta_psbor$data, v_time, v_event, pred_tp)
+    rst_obs <- get_km_observed(data, v_time, v_event, all_tps)
 
     ## call estimation
     rst <- get_ps_cl_km(dta_psbor, v_event = v_event, v_time = v_time,
-                        f_stratum = get_surv_stratum, pred_tp = pred_tp,
+                        f_stratum = get_surv_stratum, pred_tp = all_tps,
                         ...)
 
     ## return
@@ -126,7 +131,8 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp, ...) {
 #'
 #'
 #' @param dta_cur Matrix of time and event from a PS stratum in current study
-#' @param dta_ext Matrix of time and event from a PS stratum in external data source
+#' @param dta_ext Matrix of time and event from a PS stratum in external data
+#'     source
 #' @param n_borrow Number of subjects to be borrowed
 #' @param pred_tp Time points to be estimated
 #'
@@ -149,22 +155,23 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
     }
 
     colnames(cur_data) <- c("time", "event")
-    cur_data  <- data.frame(cur_data)
+    cur_data <- data.frame(cur_data)
     cur_surv <- survfit(Surv(time, event) ~ 1,
                         data    = cur_data,
                         weights = cur_weights)
 
     rst <- summary(cur_surv, time = pred_tp)
-    rst <- cbind(rst$surv, rst$std.err)
+    rst <- cbind(rst$surv, rst$std.err, pred_tp)
 
     if (nrow(rst) < length(pred_tp)) {
-        inx <- 1:nrow(rst)
+        inx <- seq_len(nrow(rst))
         inx <- c(inx,
                  rep(nrow(rst), length(pred_tp) - nrow(rst)))
 
         rst <- rst[inx, ]
     }
 
+    colnames(rst) <- c("Mean", "StdErr", "T")
     rst
 }
 
@@ -173,7 +180,6 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
 #' @noRd
 #'
 get_km_observed <- function(dta, v_time, v_event, pred_tp) {
-
     rst <- NULL
     for (g in unique(dta[["_grp_"]])) {
         for (a in unique(dta[["_arm_"]])) {
@@ -190,8 +196,9 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                     Arm     = a,
                                     Stratum = "Overall",
                                     N       = nrow(cur_d),
-                                    Mean    = est[1],
-                                    SD      = est[2]))
+                                    Mean    = est[, 1],
+                                    StdErr  = est[, 2],
+                                    T       = est[, 3]))
 
             for (s in levels(dta[["_strata_"]])) {
                 cur_s <- cur_d %>%
@@ -208,8 +215,9 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                         Arm     = a,
                                         Stratum = s,
                                         N       = nrow(cur_s),
-                                        Mean    = est[1],
-                                        SD      = est[2]))
+                                        Mean    = est[, 1],
+                                        StdErr  = est[, 2],
+                                        T       = est[, 3]))
             }
         }
     }

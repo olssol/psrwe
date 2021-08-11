@@ -11,9 +11,6 @@ dta_ps_single <- rwe_ps_est(ex_dta,
                      v_grp = "Group", cur_grp_level = "current",
                      ps_method = "logistic", nstrata = 5)
 
-### Sample size.
-### See "sec_4_1_ex" for details.
-
 ### Balance assessment of PS stratification.
 ### See "sec_4_1_ex" for details.
 
@@ -28,3 +25,10 @@ rst_km <- rwe_ps_survkm(ps_bor_single,
                         v_event   = "Status",
                         pred_tp  = 365)
 rst_km
+
+### Plot PSKM
+rst_km_allt <- rwe_ps_survkmplot(ps_bor_single,
+                                 v_time    = "Y_Surv",
+                                 v_event   = "Status")
+rst_km_ci <- rwe_ps_survkmci(rst_km_allt)
+plot_survkm(rst_km_ci)
