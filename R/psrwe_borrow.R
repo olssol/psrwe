@@ -4,12 +4,12 @@
 #' number of subjects to be borrowed from the external data source to each
 #' stratum
 #'
-#' @param total_borrow Total number of subjects to be borrowed
 #' @param dtaps  A class \code{RWE_PS_DTA} or \code{RWE_PS_DTA_MAT} object.
+#' @param total_borrow Total number of subjects to be borrowed
 #' @param method Method to split \code{total_borrow} for a class
 #'     \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
-#'     "distance"}) or inverse distance (\code{method = "inverse"}). Ignored for
-#'     class \code{RWE_PS_DTA_MAT} object.
+#'     "distance"}) or inverse distance (\code{method = "inverse_distance"}).
+#'     Ignored for class \code{RWE_PS_DTA_MAT} object.
 #' @param ... Additional parameters for \code{\link{summary.RWE_PS_DTA}}.
 #'
 #' @return A class \code{RWE_PS_BORR} list. It appends the following items to
