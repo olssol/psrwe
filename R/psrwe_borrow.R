@@ -56,7 +56,10 @@ rwe_ps_borrow <- function(dtaps, total_borrow,
     }
 
     if (is_ps_match) {
-        method <- "n_current"
+        args <- list(...)
+        if (!("metric" %in% names(args))) {
+          method <- "n_current"
+        }
     }
 
     borrow  <- get_aborrow(total_borrow, ns0, ns1, rs, m_lambda = method)
