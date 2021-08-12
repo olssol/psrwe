@@ -19,11 +19,9 @@ dta_ps_match
 plot(dta_ps_match, "balance")
 plot(dta_ps_match, "ps")
 plot(dta_ps_match, "diff")
+# plot(dta_ps_match, "diff", metric = "astd")
 
 ### Obtain discounting parameters.
-# ps_bor_match_ovl <- rwe_ps_borrow(dta_ps_match, total_borrow = 30,
-#                                   metric = "ovl")
-# ps_bor_match_ovl
 ps_bor_match <- rwe_ps_borrow(dta_ps_match, total_borrow = 30)
 ps_bor_match
 
@@ -32,4 +30,13 @@ rst_cl <- rwe_ps_compl(ps_bor_match,
                        outcome_type = "binary",
                        v_outcome    = "Y_Bin")
 rst_cl
+
+### Use optmatch with caliper
+dta_ps_match_opt <- rwe_ps_match(dta_ps_single, ratio = 2, strata_covs = "V2",
+                                 mat_method = "optm", caliper = 0.5)
+ps_bor_match_opt <- rwe_ps_borrow(dta_ps_match_opt, total_borrow = 30)
+rst_cl_opt <- rwe_ps_compl(ps_bor_match_opt,
+                           outcome_type = "binary",
+                           v_outcome    = "Y_Bin")
+rst_cl_opt
 
