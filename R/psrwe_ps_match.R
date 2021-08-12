@@ -107,7 +107,7 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #'     the \code{\link{rwe_ps_match}} function.
 #'
 #' @param ... Additional parameters.
-
+#'
 #' @return A list with columns:
 #'   \itemize{
 #'
