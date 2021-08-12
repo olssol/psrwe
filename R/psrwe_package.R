@@ -20,6 +20,7 @@
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
 #'     rename filter select arrange ungroup n distinct left_join if_else
 #' @importFrom survival Surv survfit
+#' @importFrom optmatch match_on caliper pairmatch
 #'
 #' @description
 #'
