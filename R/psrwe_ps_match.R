@@ -150,18 +150,17 @@ summary.RWE_PS_DTA_MAT <- function(object, ...) {
     rst_sum <- summary.RWE_PS_DTA(object, ...)
 
     ## adjust rst_sum
-    args <- list(...)
-    if (!("metric" %in% names(args))) { 
-        rst_sum$Distance_metric  <- NULL
-        rst_sum$Summary$Distance <- NULL
-        rst_sum$Overall$Distance <- NULL
-    } else {
-        ## TODO: The distance needs to be based on matched samples either
+    rst_sum$Distance_metric  <- NULL
+    rst_sum$Summary$Distance <- NULL
+    rst_sum$Overall$Distance <- NULL
+    rst_sum$ratio            <- object$ratio
+
+    ## TODO: The distance may base on matched samples
+    # if ("metric" %in% names(list(...))) { 
         # rst_sum$Summary$Distance <- update_distance(object, ...)
         ## or
         # rst_sum <- update_distance(object, ...)
-    }
-    rst_sum$ratio            <- object$ratio
+    # }
 
     ## check matching ratio
     match_n   <- object$data %>%
