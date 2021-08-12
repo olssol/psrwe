@@ -40,8 +40,14 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
-    if (!is.null(seed))
-        old_seed <- set.seed(seed)
+    ## save the seed from global if any then set random seed
+    old_seed <- NULL
+    if (!is.null(seed)) {
+        if (exists(".Random.seed", envir = .GlobalEnv)) {
+            old_seed <- get(".Random.seed", envir = .GlobalEnv)
+        }
+        set.seed(seed)
+    }
 
     ## check stratification factors
     data   <- dta_ps$data
@@ -93,9 +99,15 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     data[which(0 == data[["_grp_"]] &
                is.na(data[["_matchid_"]])), "_strata_"] <- NA
 
-    ## reset seed
-    if (!is.null(seed))
-        set.seed(old_seed)
+    ## reset the orignal seed back to the global or
+    ## remove the one set within this session earlier.
+    if (!is.null(seed)) {
+        if (!is.null(old_seed)) {
+            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+        } else {
+            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
+        }
+    }
 
     ## result
     rst             <- dta_ps
@@ -150,9 +162,17 @@ summary.RWE_PS_DTA_MAT <- function(object, ...) {
     rst_sum <- summary.RWE_PS_DTA(object, ...)
 
     ## adjust rst_sum
-    rst_sum$Distance_metric  <- NULL
-    rst_sum$Summary$Distance <- NULL
-    rst_sum$Overall$Distance <- NULL
+    args <- list(...)
+    if (!("metric" %in% names(args))) { 
+        rst_sum$Distance_metric  <- NULL
+        rst_sum$Summary$Distance <- NULL
+        rst_sum$Overall$Distance <- NULL
+    } else {
+        ## TODO: The distance needs to be based on matched samples either
+        # rst_sum$Summary$Distance <- update_distance(object, ...)
+        ## or
+        # rst_sum <- update_distance(object, ...)
+    }
     rst_sum$ratio            <- object$ratio
 
     ## check matching ratio

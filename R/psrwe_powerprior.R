@@ -101,9 +101,14 @@ rwe_ps_powerp <- function(dta_psbor, v_outcome = "Y",
     prior_type <- match.arg(prior_type)
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
 
-    ## set random seed
-    if (!is.null(seed))
-        old_seed <- set.seed(seed)
+    ## save the seed from global if any then set random seed
+    old_seed <- NULL
+    if (!is.null(seed)) {
+        if (exists(".Random.seed", envir = .GlobalEnv)) {
+            old_seed <- get(".Random.seed", envir = .GlobalEnv)
+        }
+        set.seed(seed)
+    }
 
     ## observed
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
@@ -141,9 +146,15 @@ rwe_ps_powerp <- function(dta_psbor, v_outcome = "Y",
     }
     rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
 
-    ## reset random seed
-    if (!is.null(seed))
-        set.seed(old_seed)
+    ## reset the orignal seed back to the global or
+    ## remove the one set within this session earlier.
+    if (!is.null(seed)) {
+        if (!is.null(old_seed)) {
+            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+        } else {
+            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
+        }
+    }
 
     ## return
     rst <-  list(stan_rst = list(ctl_post = ctl_post,
@@ -235,8 +246,8 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                           TN1   = length(ctl_y1),
                           Y1    = ctl_y1,
                           INX1  = ctl_inx1,
-                          YBAR1 = as.numeric(ctl_stan_d[, "YBAR1"]),
-                          YSUM1 = as.numeric(ctl_stan_d[, "YSUM1"]))
+                          YBAR1 = as.array(ctl_stan_d[, "YBAR1"]),
+                          YSUM1 = as.array(ctl_stan_d[, "YSUM1"]))
 
     trt_lst_data <- NULL
     if (is_rct) {
@@ -251,8 +262,8 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                               TN1   = length(trt_y1),
                               Y1    = trt_y1,
                               INX1  = trt_inx1,
-                              YBAR1 = as.numeric(trt_stan_d[, "YBAR1"]),
-                              YSUM1 = as.numeric(trt_stan_d[, "YSUM1"]))
+                              YBAR1 = as.array(trt_stan_d[, "YBAR1"]),
+                              YSUM1 = as.array(trt_stan_d[, "YSUM1"]))
     }
 
 
