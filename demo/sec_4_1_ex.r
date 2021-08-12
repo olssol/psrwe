@@ -15,6 +15,7 @@ dta_ps_single <- rwe_ps_est(ex_dta,
 plot(dta_ps_single, "balance")
 plot(dta_ps_single, "ps")
 plot(dta_ps_single, "diff")
+# plot(dta_ps_single, "diff", metric = "astd")
 
 ### Obtain discounting parameters.
 ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30)
