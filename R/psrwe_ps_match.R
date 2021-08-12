@@ -45,8 +45,14 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     mat_method <- match.arg(mat_method)
 
-    if (!is.null(seed))
-        old_seed <- set.seed(seed)
+    ## save the seed from global if any then set random seed
+    old_seed <- NULL
+    if (!is.null(seed)) {
+        if (exists(".Random.seed", envir = .GlobalEnv)) {
+            old_seed <- get(".Random.seed", envir = .GlobalEnv)
+        }
+        set.seed(seed)
+    }
 
     ## check stratification factors
     data   <- dta_ps$data
@@ -70,9 +76,15 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
                    optm = get_match_optm(data, ratio, caliper)
                    )
 
-    ## reset seed
-    if (!is.null(seed))
-        set.seed(old_seed)
+    ## reset the orignal seed back to the global or
+    ## remove the one set within this session earlier.
+    if (!is.null(seed)) {
+        if (!is.null(old_seed)) {
+            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+        } else {
+            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
+        }
+    }
 
     ## result
     rst             <- dta_ps
