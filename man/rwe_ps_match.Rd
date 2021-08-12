@@ -4,20 +4,30 @@
 \alias{rwe_ps_match}
 \title{PS matching}
 \usage{
-rwe_ps_match(dta_ps, ratio = 3, strata_covs = NULL, caliper = 1, seed = NULL)
+rwe_ps_match(
+  dta_ps,
+  ratio = 3,
+  strata_covs = NULL,
+  caliper = 1,
+  seed = NULL,
+  mat_method = c("nnwor", "optm")
+)
 }
 \arguments{
 \item{dta_ps}{A list of class \code{RWE_PS_DAT} that is generated using the
-\code{\link{rwe_ps_est}} function}
+\code{\link{rwe_ps_est}} function.}
 
 \item{ratio}{Matching ratio (RWD : Current) with default value 3 meaning 3:1
 matching.}
 
-\item{strata_covs}{Stratification covariates for matching}
+\item{strata_covs}{Stratification covariates for matching.}
 
-\item{caliper}{PS matching caliper width. Default 1.}
+\item{caliper}{PS matching caliper width. Default 1. This specifies a
+width (euclidean distance) on the probability scale.}
 
 \item{seed}{Random seed.}
+
+\item{mat_method}{matching algorithm for PS matching.}
 }
 \value{
 A list of class \code{RWE_PS_DTA_MAT} with items:

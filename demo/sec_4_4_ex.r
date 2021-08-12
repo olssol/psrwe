@@ -16,8 +16,7 @@ dta_ps_single <- rwe_ps_est(ex_dta,
 
 ### Obtain discounting parameters.
 ### See "sec_4_1_ex" for details.
-ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30,
-                               method = "distance", metric = "ovl")
+ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30)
 
 ### PSKM, single arm study, time-to-event outcome.
 rst_km <- rwe_ps_survkm(ps_bor_single,
