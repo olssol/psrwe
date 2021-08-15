@@ -8,6 +8,7 @@
 #' @import Rcpp
 #' @import methods
 #' @import ggplot2
+#' @import knitr
 #' @importFrom stats approxfun as.formula binomial cov density ecdf glm
 #'     integrate optim predict quantile sd var ks.test qnorm
 #' @importFrom rstan sampling extract stanc rstan_options traceplot stan_rhat
@@ -19,6 +20,7 @@
 #' @importFrom dplyr %>% group_by_ group_by summarize mutate count mutate_if
 #'     rename filter select arrange ungroup n distinct left_join if_else
 #' @importFrom survival Surv survfit
+#' @importFrom optmatch match_on caliper pairmatch
 #'
 #' @description
 #'

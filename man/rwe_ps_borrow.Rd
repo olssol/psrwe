@@ -18,8 +18,8 @@ rwe_ps_borrow(
 
 \item{method}{Method to split \code{total_borrow} for a class
 \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
-"distance"}) or inverse distance (\code{method = "inverse"}). Ignored for
-class \code{RWE_PS_DTA_MAT} object.}
+"distance"}) or inverse distance (\code{method = "inverse_distance"}).
+Ignored for class \code{RWE_PS_DTA_MAT} object.}
 
 \item{...}{Additional parameters for \code{\link{summary.RWE_PS_DTA}}.}
 }
