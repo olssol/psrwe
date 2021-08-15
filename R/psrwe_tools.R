@@ -65,7 +65,7 @@ get_ps <- function(dta,
 
 #' @title Get number of subjects borrowed
 #'
-#' @param total_borrow integer. Target number of subjects to be borrowed.
+#' @param total_borrow integer. Target number of subjects to be borroqwed.
 #' @param ns0 vector. Number of subjects in historical data (control) arm for
 #'   each stratum.
 #' @param rs vector. Similarity measure; for example, overlapping coefficient
@@ -81,7 +81,8 @@ get_ps <- function(dta,
 get_aborrow <- function(total_borrow, ns0, ns1, rs,
                         m_lambda = c("distance",
                                      "inverse_distance",
-                                     "n_current")) {
+                                     "n_current"),
+                        ...) {
 
     m_lambda   <- match.arg(m_lambda)
     proportion <- switch(m_lambda,
@@ -824,4 +825,104 @@ plot_km_rst <- function(x,
         theme_bw()
 
     rst_plt
+}
+
+## ------------------------------------------------------------
+##
+##                MATCHING METHODS
+##
+## ------------------------------------------------------------
+
+#' @title optmatch method
+#'
+#' @noRd
+#'
+get_match_optm <- function(data, ratio, caliper, ...) {
+    ## prepare data
+    dta_sub <- data.frame(gid = data[["_grp_"]],
+                          psv = data[["_ps_"]],
+                          sid = data[["_strata_"]])
+
+    ## build distance matrix by stratum and within caliper distance
+    mat_dm <- match_on(gid ~ psv + strata(sid), data = dta_sub,
+                       method = "euclidean")
+    mat_dm <- mat_dm + caliper(mat_dm, width = caliper)
+
+    ## optmatch
+    pm <- pairmatch(mat_dm, data = dta_sub, controls = ratio)
+
+    ## match
+    id_matched <- !is.na(pm)
+    to_match   <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    for (i in seq_len(nrow(to_match))) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_match <- data[id_matched &
+                          pm == pm[cur_id] &
+                          data$"_id_" != cur_id, ]
+
+        cur_matchn <- min(nrow(cur_match), ratio)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
+}
+
+
+#' @title Nearest neighbor without replacement matching method by CG
+#'
+#' @noRd
+#'
+get_match_nnwor <- function(data, ratio, caliper, ...) {
+    ## match
+    to_match <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    ## random order nearest neighbor match
+    to_match_id <- sample(nrow(to_match))
+    for (i in to_match_id) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_stra  <- to_match[i, "_strata_"]
+        cur_ps    <- to_match[i, "_ps_"]
+
+        cur_match <- data %>%
+            filter(0        == `_grp_`    &
+                   cur_stra == `_strata_` &
+                   is.na(`_matchid_`)) %>%
+            mutate(dif_ps = abs(`_ps_` - cur_ps)) %>%
+            filter(dif_ps <= caliper) %>%
+            arrange(dif_ps)
+
+        cur_matchn <- min(nrow(cur_match), ratio)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
 }

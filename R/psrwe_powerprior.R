@@ -148,12 +148,10 @@ rwe_ps_powerp <- function(dta_psbor, v_outcome = "Y",
 
     ## reset the orignal seed back to the global or
     ## remove the one set within this session earlier.
-    if (!is.null(seed)) {
-        if (!is.null(old_seed)) {
-            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
-        } else {
-            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
-        }
+    if (!is.null(old_seed)) {
+        invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+    } else {
+        invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
     }
 
     ## return
