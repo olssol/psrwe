@@ -783,21 +783,41 @@ plot_pp_rst <- function(x) {
 plot_km_rst <- function(x,
                         xlab = "Time",
                         ylab = "Survival Probability",
+                        add.ci = TRUE,
+                        add.stratum = FALSE,
                         ...) {
 
     ## prepare data
-    rst <- cbind(Arm = "Arm-Control",
+    rst <- cbind(Arm = "Arm-Control Overall",
                  x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Arm-Treatment",
+                     cbind(Arm   = "Arm-Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 
+    ## add stratum
+    if (add.stratum) {
+        name.v <- c("Mean", "StdErr", "T")
+        name.s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
+        rst <- rbind(rst,
+                     cbind(Arm = paste("Arm-Control ", name.s, sep = ""),
+                           x$Control$Stratum_Estimate[, name.v]))
+
+        if (x$is_rct) {
+            name.s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
+            rst <- rbind(rst,
+                         cbind(Arm = paste("Arm-Treatment ", name.s, sep = ""),
+                               x$Treatment$Stratum_Estimate[, name.v]))
+        }
+    }
+
     ## CI
-    ci  <- get_km_ci(rst[, 2], rst[, 3], ...)
-    rst <- cbind(rst, ci)
+    if (add.ci) {
+      ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
+      rst <- cbind(rst, ci)
+    }
 
     ## check arguments
     args <- list(...)
@@ -816,12 +836,16 @@ plot_km_rst <- function(x,
     ## plot
     rst_plt <- ggplot(data = rst) +
         geom_step(aes(x = T, y = Mean,  col = Arm)) +
-        geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
-        geom_step(aes(x = T, y = upper, col = Arm), linetype = 3) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
         theme_bw()
+
+    if (add.ci) {
+      rst_plt <- rst_plt +
+          geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
+          geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)
+    }
 
     rst_plt
 }
