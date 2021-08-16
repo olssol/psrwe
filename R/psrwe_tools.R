@@ -65,7 +65,7 @@ get_ps <- function(dta,
 
 #' @title Get number of subjects borrowed
 #'
-#' @param total_borrow integer. Target number of subjects to be borrowed.
+#' @param total_borrow integer. Target number of subjects to be borroqwed.
 #' @param ns0 vector. Number of subjects in historical data (control) arm for
 #'   each stratum.
 #' @param rs vector. Similarity measure; for example, overlapping coefficient
@@ -81,7 +81,8 @@ get_ps <- function(dta,
 get_aborrow <- function(total_borrow, ns0, ns1, rs,
                         m_lambda = c("distance",
                                      "inverse_distance",
-                                     "n_current")) {
+                                     "n_current"),
+                        ...) {
 
     m_lambda   <- match.arg(m_lambda)
     proportion <- switch(m_lambda,
@@ -449,6 +450,7 @@ plot_balance <- function(data.withps,
 #' @noRd
 plot_astd <- function(data.withps,
                       metric = c("std", "astd"),
+                      avg.only = FALSE,
                       ...) {
 
     v.cov <- all.vars(data.withps$ps_fml)[-1]
@@ -496,12 +498,23 @@ plot_astd <- function(data.withps,
                                           dtaps$Strata == s &
                                           !is.na(dtaps$Strata)])
             std.s <- get_distance(cov0, cov1, metric = d.metric)
-            dta_asd <- rbind(dta_asd,
-                             data.frame(v.cov = v,
-                                        Group = s,
-                                        asd   = std.s))
+
+            if (!avg.only) {
+                dta_asd <- rbind(dta_asd,
+                                 data.frame(v.cov = v,
+                                            Group = s,
+                                            asd   = std.s))
+	    }
+
+            std.ws <- c(std.ws, std.s)
         }
 
+        if (avg.only) {
+            dta_asd <- rbind(dta_asd,
+                             data.frame(v.cov = v,
+                                        Group = "Averaged",
+                                        asd   = mean(std.ws)))
+        }
     }
 
     ## plot
@@ -723,7 +736,6 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
     ci <- switch(conf_type,
                  log_log = {
                      log_S        <- log(S)
-                     log_log_S    <- log(-log_S)
                      se_log_log_S <- S_se / S / log_S
                      A <- cbind(-z_alphad2 * se_log_log_S,
                                 z_alphad2 * se_log_log_S)
@@ -783,21 +795,41 @@ plot_pp_rst <- function(x) {
 plot_km_rst <- function(x,
                         xlab = "Time",
                         ylab = "Survival Probability",
+                        add.ci = TRUE,
+                        add.stratum = FALSE,
                         ...) {
 
     ## prepare data
-    rst <- cbind(Arm = "Arm-Control",
+    rst <- cbind(Arm = "Arm-Control Overall",
                  x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Arm-Treatment",
+                     cbind(Arm   = "Arm-Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 
+    ## add stratum
+    if (add.stratum) {
+        name.v <- c("Mean", "StdErr", "T")
+        name.s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
+        rst <- rbind(rst,
+                     cbind(Arm = paste("Arm-Control ", name.s, sep = ""),
+                           x$Control$Stratum_Estimate[, name.v]))
+
+        if (x$is_rct) {
+            name.s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
+            rst <- rbind(rst,
+                         cbind(Arm = paste("Arm-Treatment ", name.s, sep = ""),
+                               x$Treatment$Stratum_Estimate[, name.v]))
+        }
+    }
+
     ## CI
-    ci  <- get_km_ci(rst[, 2], rst[, 3], ...)
-    rst <- cbind(rst, ci)
+    if (add.ci) {
+      ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
+      rst <- cbind(rst, ci)
+    }
 
     ## check arguments
     args <- list(...)
@@ -814,14 +846,120 @@ plot_km_rst <- function(x,
     }
 
     ## plot
+    # lt.a <- rep(2, length(rst$Arm))
+    # lt.a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
-        geom_step(aes(x = T, y = Mean,  col = Arm)) +
-        geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
-        geom_step(aes(x = T, y = upper, col = Arm), linetype = 3) +
+        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
         theme_bw()
 
+    if (add.ci) {
+      rst_plt <- rst_plt +
+          geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
+          geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)
+    }
+
     rst_plt
+}
+
+## ------------------------------------------------------------
+##
+##                MATCHING METHODS
+##
+## ------------------------------------------------------------
+
+#' @title optmatch method
+#'
+#' @noRd
+#'
+get_match_optm <- function(data, ratio, caliper, ...) {
+    ## prepare data
+    dta_sub <- data.frame(gid = data[["_grp_"]],
+                          psv = data[["_ps_"]],
+                          sid = data[["_strata_"]])
+
+    ## build distance matrix by stratum and within caliper distance
+    mat_dm <- match_on(gid ~ psv + strata(sid), data = dta_sub,
+                       method = "euclidean")
+    mat_dm <- mat_dm + caliper(mat_dm, width = caliper)
+
+    ## optmatch
+    pm <- pairmatch(mat_dm, data = dta_sub, controls = ratio)
+
+    ## match
+    id_matched <- !is.na(pm)
+    to_match   <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    for (i in seq_len(nrow(to_match))) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_match <- data[id_matched &
+                          pm == pm[cur_id] &
+                          data$"_id_" != cur_id, ]
+
+        cur_matchn <- nrow(cur_match)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
+}
+
+
+#' @title Nearest neighbor without replacement matching method by CG
+#'
+#' @noRd
+#'
+get_match_nnwor <- function(data, ratio, caliper, ...) {
+    ## match
+    to_match <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    ## random order nearest neighbor match
+    to_match_id <- sample(nrow(to_match))
+    for (i in to_match_id) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_stra  <- to_match[i, "_strata_"]
+        cur_ps    <- to_match[i, "_ps_"]
+
+        cur_match <- data %>%
+            filter(0        == `_grp_`    &
+                   cur_stra == `_strata_` &
+                   is.na(`_matchid_`)) %>%
+            mutate(dif_ps = abs(`_ps_` - cur_ps)) %>%
+            filter(dif_ps <= caliper) %>%
+            arrange(dif_ps)
+
+        cur_matchn <- min(nrow(cur_match), ratio)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
 }

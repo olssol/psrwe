@@ -11,7 +11,8 @@
 #' @param caliper PS matching caliper width. Default 1. This specifies a
 #'     width (euclidean distance) on the probability scale.
 #' @param seed Random seed.
-#' @param mat_method matching algorithm for PS matching.
+#' @param method matching algorithm for PS matching.
+#' @param ... Additional parameters for matching
 #'
 #' @return A list of class \code{RWE_PS_DTA_MAT} with items:
 #'
@@ -39,11 +40,11 @@
 #'
 rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
                          caliper = 1, seed = NULL,
-                         mat_method = c("nnwor", "optm")) {
+                         method = c("nnwor", "optm"), ...) {
 
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
-    mat_method <- match.arg(mat_method)
+    mat_method <- match.arg(method)
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -72,8 +73,8 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     ## start matching
     data <- switch(mat_method,
-                   nnwor = get_match_nnwor(data, ratio, caliper),
-                   optm = get_match_optm(data, ratio, caliper)
+                   nnwor = get_match_nnwor(data, ratio, caliper, ...),
+                   optm  = get_match_optm(data, ratio, caliper, ...)
                    )
 
     ## reset the orignal seed back to the global or
@@ -146,7 +147,7 @@ summary.RWE_PS_DTA_MAT <- function(object, ...) {
     rst_sum$ratio            <- object$ratio
 
     ## TODO: The distance may base on matched samples
-    # if ("metric" %in% names(list(...))) { 
+    # if ("metric" %in% names(list(...))) {
         # rst_sum$Summary$Distance <- update_distance(object, ...)
         ## or
         # rst_sum <- update_distance(object, ...)
@@ -233,99 +234,4 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
 #'
 plot.RWE_PS_DTA_MAT <- function(x, ...) {
     plot.RWE_PS_DTA(x, ...)
-}
-
-
-#' @title Nearest neighbor without replacement matching method by CG
-#'
-#' @noRd
-#'
-get_match_nnwor <- function(data, ratio, caliper) {
-    ## match
-    to_match <- data %>%
-        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
-
-    data[["_matchn_"]]   <- NA
-    data[["_matchid_"]]  <- NA
-
-    ## random order nearest neighbor match
-    to_match_id <- sample(nrow(to_match))
-    for (i in to_match_id) {
-        cur_id    <- to_match[i, "_id_"]
-        cur_stra  <- to_match[i, "_strata_"]
-        cur_ps    <- to_match[i, "_ps_"]
-
-        cur_match <- data %>%
-            filter(0        == `_grp_`    &
-                   cur_stra == `_strata_` &
-                   is.na(`_matchid_`)) %>%
-            mutate(dif_ps = abs(`_ps_` - cur_ps)) %>%
-            filter(dif_ps <= caliper) %>%
-            arrange(dif_ps)
-
-        cur_matchn <- min(nrow(cur_match), ratio)
-
-        ## update
-        data[cur_id, "_matchn_"] <- cur_matchn
-        if (cur_matchn > 0) {
-            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
-            data[cur_matchid, "_matchid_"] <- cur_id
-        }
-    }
-
-    data[which(0 == data[["_grp_"]] &
-               is.na(data[["_matchid_"]])), "_strata_"] <- NA
-
-    return(data)
-}
-
-
-#' @title optmatch method
-#'
-#' @noRd
-#'
-get_match_optm <- function(data, ratio, caliper) {
-    ## prepare data
-    dta_sub <- data.frame(gid = data[["_grp_"]],
-                          psv = data[["_ps_"]],
-                          sid = data[["_strata_"]])
-
-    ## build distance matrix by stratum and within caliper distance
-    mat_dm <- match_on(gid ~ psv + strata(sid), data = dta_sub,
-                       method = "euclidean")
-    mat_dm <- mat_dm + caliper(mat_dm, width = caliper)
-
-    ## optmatch
-    pm <- pairmatch(mat_dm, data = dta_sub, controls = ratio)
-    id.matched <- !is.na(pm)
-
-
-    ## match
-    to_match <- data %>%
-        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
-
-    data[["_matchn_"]]   <- NA
-    data[["_matchid_"]]  <- NA
-
-    for (i in 1:nrow(to_match)) {
-        cur_id    <- to_match[i, "_id_"]
-
-        cur_match <- data[id.matched &
-                          pm == pm[cur_id] &
-                          data$"_id" != cur_id,]
-
-        cur_matchn <- min(nrow(cur_match), ratio)
-
-        ## update
-        data[cur_id, "_matchn_"] <- cur_matchn
-        if (cur_matchn > 0) {
-            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
-            data[cur_matchid, "_matchid_"] <- cur_id
-        }
-    }
-
-    data[which(0 == data[["_grp_"]] &
-               is.na(data[["_matchid_"]])), "_strata_"] <- NA
-
-    return(data)
 }

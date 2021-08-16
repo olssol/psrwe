@@ -10,7 +10,8 @@ rwe_ps_match(
   strata_covs = NULL,
   caliper = 1,
   seed = NULL,
-  mat_method = c("nnwor", "optm")
+  method = c("nnwor", "optm"),
+  ...
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ width (euclidean distance) on the probability scale.}
 
 \item{seed}{Random seed.}
 
-\item{mat_method}{matching algorithm for PS matching.}
+\item{method}{matching algorithm for PS matching.}
+
+\item{...}{Additional parameters for matching}
 }
 \value{
 A list of class \code{RWE_PS_DTA_MAT} with items:
