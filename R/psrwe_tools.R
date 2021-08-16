@@ -450,6 +450,7 @@ plot_balance <- function(data.withps,
 #' @noRd
 plot_astd <- function(data.withps,
                       metric = c("std", "astd"),
+                      add.average = FALSE,
                       ...) {
 
     v.cov <- all.vars(data.withps$ps_fml)[-1]
@@ -501,8 +502,16 @@ plot_astd <- function(data.withps,
                              data.frame(v.cov = v,
                                         Group = s,
                                         asd   = std.s))
+
+            std.ws <- c(std.ws, std.s)
         }
 
+        if (add.average) {
+            dta_asd <- rbind(dta_asd,
+                             data.frame(v.cov = v,
+                                        Group = "Averaged",
+                                        asd   = mean(std.ws)))
+        }
     }
 
     ## plot
