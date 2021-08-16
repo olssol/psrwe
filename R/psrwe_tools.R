@@ -10,7 +10,6 @@ get_rwe_class <- function(c.str) {
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
          ANARST    = "RWE_PS_RST",
-         ANARSTPLT = "RWE_PS_RST_PLOT",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",
@@ -66,7 +65,7 @@ get_ps <- function(dta,
 
 #' @title Get number of subjects borrowed
 #'
-#' @param total_borrow integer. Target number of subjects to be borrowed.
+#' @param total_borrow integer. Target number of subjects to be borroqwed.
 #' @param ns0 vector. Number of subjects in historical data (control) arm for
 #'   each stratum.
 #' @param rs vector. Similarity measure; for example, overlapping coefficient
@@ -82,7 +81,8 @@ get_ps <- function(dta,
 get_aborrow <- function(total_borrow, ns0, ns1, rs,
                         m_lambda = c("distance",
                                      "inverse_distance",
-                                     "n_current")) {
+                                     "n_current"),
+                        ...) {
 
     m_lambda   <- match.arg(m_lambda)
     proportion <- switch(m_lambda,
@@ -167,18 +167,19 @@ get_observed <- function(data, v_covs) {
 
     rst1 <- data %>%
         group_by(Group, Arm, Stratum) %>%
-        summarize(N    = n(),
-                  Mean = mean(Y),
-                  SD   = sd(Y))
+        summarize(N      = n(),
+                  Mean   = mean(Y),
+                  StdErr = sd(Y))
 
     rst2 <- data %>%
         mutate(Stratum = "Overall") %>%
         group_by(Group, Arm, Stratum) %>%
-        summarize(N    = n(),
-                  Mean = mean(Y),
-                  SD   = sd(Y))
+        summarize(N      = n(),
+                  Mean   = mean(Y),
+                  StdErr = sd(Y))
 
-    rbind(rst1, rst2)
+    rst <- data.frame(rbind(rst1, rst2))
+    rst
 }
 
 #' @title Generate frequency table for factor columns
@@ -400,7 +401,6 @@ plot_balance <- function(data.withps,
         label.cov <- v.cov
     }
 
-
     nstrata      <- data.withps$nstrata
     dtaps        <- data.withps$data
     dtaps$Strata <- dtaps[["_strata_"]]
@@ -442,6 +442,84 @@ plot_balance <- function(data.withps,
                         1 + legend.width * length(v.cov))
     do.call(plot_grid, rst)
 }
+
+
+#' @title Plot the absolute standardized difference in means of baseline
+#'     variables
+#'
+#' @noRd
+plot_astd <- function(data.withps,
+                      metric = c("std", "astd"),
+                      ...) {
+
+    v.cov <- all.vars(data.withps$ps_fml)[-1]
+
+    ## check arguments
+    d.metric <- match.arg(metric)
+    if (d.metric == "astd") {
+        xlab       <- "Absolute Standardized Difference"
+        xintercept <- c(0.2, 0.4)
+    } else {
+        xlab       <- "Standardized Difference"
+        xintercept <- c(-0.4, -0.2, 0.2, 0.4)
+    }
+
+    ## remove stratification covs
+    if (!is.null(data.withps$strata_covs)) {
+        s_cov_inx <- which(v.cov %in% data.withps$strata_covs)
+        v.cov     <- v.cov[-s_cov_inx]
+    }
+
+    ## prepare data
+    dtaps        <- data.withps$data
+    dtaps$Strata <- dtaps[["_strata_"]]
+    dtaps$Group  <- dtaps[["_grp_"]]
+    strata       <- levels(dtaps[["_strata_"]])
+
+    dta_asd <- data.frame()
+    for (v in v.cov) {
+        ## original data without any trimming
+        cov0    <- as.numeric(dtaps[[v]][dtaps$Group == 0])
+        cov1    <- as.numeric(dtaps[[v]][dtaps$Group == 1])
+        std.all <- get_distance(cov0, cov1, metric = d.metric)
+        dta_asd <- rbind(dta_asd,
+                         data.frame(v.cov = v,
+                                    Group = "Observed",
+                                    asd   = std.all))
+
+        ## PS stratified data with trimming
+        std.ws <- NULL
+        for (s in strata) {
+            cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1 &
+                                          dtaps$Strata == s &
+                                          !is.na(dtaps$Strata)])
+            std.s <- get_distance(cov0, cov1, metric = d.metric)
+            dta_asd <- rbind(dta_asd,
+                             data.frame(v.cov = v,
+                                        Group = s,
+                                        asd   = std.s))
+        }
+
+    }
+
+    ## plot
+    rst <- ggplot(dta_asd,
+                  aes(x = asd, y = v.cov, shape = Group, color = Group)) +
+           geom_point() +
+           geom_vline(xintercept = 0, linetype = 2) +
+           geom_vline(xintercept = xintercept, linetype = 3) +
+           labs(x = xlab, y = "Variables") +
+           theme_bw() +
+           theme(strip.background = element_blank(),
+                 panel.border = element_rect(colour = "black"),
+                 panel.spacing = unit(0, "lines"))
+
+    return(rst)
+}
+
 
 #' @title Get strata by covariates
 #'
@@ -573,17 +651,14 @@ get_ps_cl_km <- function(dta_psbor,
     rst_trt    <- NULL
     rst_effect <- NULL
     if (is_rct) {
-        rst_trt    <- f_overall_est(trt_theta[, 1],
-                                    trt_theta[, 2],
-                                    dta_psbor$Borrow$N_Cur_TRT)
-        rst_effect <- f_overall_est(trt_theta[, 1] - ctl_theta[, 1],
-                                    sqrt(trt_theta[, 2] + ctl_theta[, 2]),
-                                    dta_psbor$Borrow$N_Current)
+        rst_trt    <- f_overall_est(trt_theta, dta_psbor$Borrow$N_Cur_TRT)
+        rst_effect <- f_overall_est(trt_theta, dta_psbor$Borrow$N_Current,
+                                    ctl_theta)
         n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
     } else {
         n_ctl      <- dta_psbor$Borrow$N_Current
     }
-    rst_ctl <- f_overall_est(ctl_theta[, 1], ctl_theta[, 2], n_ctl)
+    rst_ctl <- f_overall_est(ctl_theta, n_ctl)
 
     ## return
     rst <-  list(Control   = rst_ctl,
@@ -599,31 +674,254 @@ get_ps_cl_km <- function(dta_psbor,
 #'
 #' @noRd
 #'
-get_overall_est <- function(theta, sds, weights) {
-    ws         <- weights / sum(weights)
-    overall    <- sum(theta * ws)
-    sd_overall <- sqrt(sum(ws^2 * sds^2))
+get_overall_est <- function(ts1, weights, ts2 = NULL) {
 
-    list(Stratum_Estimate = cbind(Mean = theta,
-                                  SD   = sds),
-         Overall_Estimate = c(Mean = overall,
-                              SD   = sd_overall))
+    if (is.null(ts2)) {
+        theta0 <- ts1[, 1]
+        sds0   <- ts1[, 2]
+    } else {
+        theta0 <- ts1[, 1] - ts2[, 1]
+        sds0   <- sqrt(ts1[, 2] + ts2[, 2])
+    }
+
+    ws         <- weights / sum(weights)
+    nstrata    <- length(ws)
+    theta      <- matrix(theta0, ncol = nstrata)
+    sds        <- matrix(sds0,   ncol = nstrata)
+
+    overall    <- as.vector(theta %*% ws)
+    sd_overall <- as.vector(sqrt(sds^2 %*% ws^2))
+
+    ## stratum est
+    s_est <- data.frame(Mean   = theta0,
+                        StdErr = sds0)
+    o_est <- data.frame(Mean   = overall,
+                        StdErr = sd_overall)
+
+    if (ncol(ts1) > 2) {
+        prept <- matrix(ts1[, 3], ncol = nstrata)
+        s_est <- cbind(s_est, T = prept[, 1],
+                       Stratum = rep(1:nstrata, each = nrow(theta)))
+        o_est <- cbind(o_est, T = prept[, 1])
+    }
+
+    list(Stratum_Estimate = s_est,
+         Overall_Estimate = o_est)
 }
 
-#' Summarize overall theta for km at all time points
+
+#' Get KM CI
+#'
+#' @noRd
+#'
+get_km_ci <- function(S, S_se, conf_int = 0.95,
+                      conf_type = c("log_log", "plain"), ...) {
+
+    conf_type <- match.arg(conf_type)
+    z_alphad2 <- qnorm((1 - conf_int) / 2,
+                       lower.tail = FALSE)
+
+    ci <- switch(conf_type,
+                 log_log = {
+                     log_S        <- log(S)
+                     se_log_log_S <- S_se / S / log_S
+                     A <- cbind(-z_alphad2 * se_log_log_S,
+                                z_alphad2 * se_log_log_S)
+                     ci <- S^exp(A)
+                 },
+                 plain = cbind(S - z_alphad2 * S_se, S + z_alphad2 * S_se)
+                 )
+
+    colnames(ci) <- c("lower", "upper")
+    ci
+}
+
+
+#'  Plot density for power prior results
 #'
 #'
 #' @noRd
 #'
-get_overall_est_km <- function(theta, sds, weights) {
-    ws         <- weights / sum(weights)
-    theta <- matrix(theta, ncol = length(ws))
-    sds <- matrix(sds, ncol = length(ws))
-    overall    <- as.vector(theta %*% ws)
-    sd_overall <- as.vector(sqrt(sds^2 %*% ws^2))
+plot_pp_rst <- function(x) {
+    rst <- data.frame(Type  = "Arm Specific",
+                      Arm   = "Arm-Control",
+                      theta = x$Control$Overall_Samples)
 
-    list(Stratum_Estimate = list(Mean = theta,
-                                 SD   = sds),
-         Overall_Estimate = list(Mean = overall,
-                                 SD   = sd_overall))
+    if (x$is_rct) {
+        rst <- rbind(rst,
+                     data.frame(Type  = "Arm Specific",
+                                Arm   = "Arm-Treatment",
+                                theta = x$Treatment$Overall_Samples),
+                     data.frame(Type  = "Treatment Effect",
+                                Arm   = "Effect",
+                                theta = x$Effect$Overall_Samples))
+    }
+
+    rst_plt <- ggplot(data = rst, aes(x = theta)) +
+        theme_bw() +
+        labs(x = expression(theta), y = "Density")
+
+    if (x$is_rct) {
+        rst_plt <- rst_plt +
+            stat_density(aes(group = Arm, color = Arm),
+                         position  = "identity",
+                         geom      = "line", adjust = 1.2) +
+            facet_wrap(~ Type, scales = "free")
+    } else {
+        rst_plt <- rst_plt +
+            stat_density(geom = "line", adjust = 1.2)
+    }
+
+    rst_plt
+}
+
+#' @title Plot KM at all time points
+#'
+#'
+#' @noRd
+#'
+plot_km_rst <- function(x,
+                        xlab = "Time",
+                        ylab = "Survival Probability",
+                        ...) {
+
+    ## prepare data
+    rst <- cbind(Arm = "Arm-Control",
+                 x$Control$Overall_Estimate)
+
+    if (x$is_rct) {
+        rst <- rbind(rst,
+                     cbind(Arm   = "Arm-Treatment",
+                           x$Treatment$Overall_Estimate))
+    }
+
+    ## CI
+    ci  <- get_km_ci(rst[, 2], rst[, 3], ...)
+    rst <- cbind(rst, ci)
+
+    ## check arguments
+    args <- list(...)
+    if ("xlim" %in% names(args)) {
+        xlim <- args[['xlim']]
+    } else {
+        xlim <- range(rst$T)
+    }
+
+    if ("ylim" %in% names(args)) {
+        ylim <- args[['ylim']]
+    } else {
+        ylim <- c(0, 1)
+    }
+
+    ## plot
+    rst_plt <- ggplot(data = rst) +
+        geom_step(aes(x = T, y = Mean,  col = Arm)) +
+        geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
+        geom_step(aes(x = T, y = upper, col = Arm), linetype = 3) +
+        scale_y_continuous(limits = ylim) +
+        scale_x_continuous(limits = xlim) +
+        labs(x = xlab, y = ylab) +
+        theme_bw()
+
+    rst_plt
+}
+
+## ------------------------------------------------------------
+##
+##                MATCHING METHODS
+##
+## ------------------------------------------------------------
+
+#' @title optmatch method
+#'
+#' @noRd
+#'
+get_match_optm <- function(data, ratio, caliper, ...) {
+    ## prepare data
+    dta_sub <- data.frame(gid = data[["_grp_"]],
+                          psv = data[["_ps_"]],
+                          sid = data[["_strata_"]])
+
+    ## build distance matrix by stratum and within caliper distance
+    mat_dm <- match_on(gid ~ psv + strata(sid), data = dta_sub,
+                       method = "euclidean")
+    mat_dm <- mat_dm + caliper(mat_dm, width = caliper)
+
+    ## optmatch
+    pm <- pairmatch(mat_dm, data = dta_sub, controls = ratio)
+
+    ## match
+    id_matched <- !is.na(pm)
+    to_match   <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    for (i in seq_len(nrow(to_match))) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_match <- data[id_matched &
+                          pm == pm[cur_id] &
+                          data$"_id_" != cur_id, ]
+
+        cur_matchn <- nrow(cur_match)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
+}
+
+
+#' @title Nearest neighbor without replacement matching method by CG
+#'
+#' @noRd
+#'
+get_match_nnwor <- function(data, ratio, caliper, ...) {
+    ## match
+    to_match <- data %>%
+        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+
+    data[["_matchn_"]]   <- NA
+    data[["_matchid_"]]  <- NA
+
+    ## random order nearest neighbor match
+    to_match_id <- sample(nrow(to_match))
+    for (i in to_match_id) {
+        cur_id    <- to_match[i, "_id_"]
+        cur_stra  <- to_match[i, "_strata_"]
+        cur_ps    <- to_match[i, "_ps_"]
+
+        cur_match <- data %>%
+            filter(0        == `_grp_`    &
+                   cur_stra == `_strata_` &
+                   is.na(`_matchid_`)) %>%
+            mutate(dif_ps = abs(`_ps_` - cur_ps)) %>%
+            filter(dif_ps <= caliper) %>%
+            arrange(dif_ps)
+
+        cur_matchn <- min(nrow(cur_match), ratio)
+
+        ## update
+        data[cur_id, "_matchn_"] <- cur_matchn
+        if (cur_matchn > 0) {
+            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+            data[cur_matchid, "_matchid_"] <- cur_id
+        }
+    }
+
+    data[which(0 == data[["_grp_"]] &
+               is.na(data[["_matchid_"]])),
+         "_strata_"] <- NA
+
+    return(data)
 }

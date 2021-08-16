@@ -10,6 +10,7 @@
 #' \describe{
 #'   \item{\code{ovl}}{Overlapping area} (default)
 #'   \item{\code{ksd}}{Kullback-Leibler distance}
+#'   \item{\code{astd}}{Absolute standardized difference in means}
 #'   \item{\code{std}}{Standardized difference in means}
 #'   \item{\code{abd}}{Absolute difference in means}
 #'   \item{\code{ley}}{Levy distance}
@@ -29,15 +30,13 @@
 #' @export
 #'
 get_distance <- function(cov0, cov1,
-                         metric = c("ovl", "ksd", "std", "abd",
+                         metric = c("ovl", "ksd", "astd", "std", "abd",
                                     "ley", "mhb", "omkss")) {
     metric <- match.arg(metric)
     switch(metric,
-           std = {
-               s <- sqrt((var(cov1) + var(cov0)) / 2)
-               abs(mean(cov1) - mean(cov0)) / s
-           },
            abd   = abs(mean(cov0) - mean(cov1)),
+           std   = metric_std(cov0, cov1),
+           astd  = metric_std(cov0, cov1, TRUE),
            ovl   = metric_ovl(cov0, cov1),
            ksd   = metric_ksd(cov0, cov1),
            ley   = metric_ley(cov0, cov1),
@@ -145,4 +144,22 @@ metric_mhb <- function(cov0, cov1) {
 metric_omkss <- function(cov0, cov1) {
     1 - ks.test(cov0[!is.na(cov0)],
                 cov1[!is.na(cov0)])$statistic
+}
+
+#' @title Standardized difference in means
+#'
+#' @inheritParams get_distance
+#'
+#' @param is_abs Whether to take the absolute values
+#'
+#' @noRd
+metric_std <- function(cov0, cov1, is_abs = FALSE) {
+    s   <- sqrt((var(cov1) + var(cov0)) / 2)
+    rst <- (mean(cov1) - mean(cov0)) / s
+
+    if (is_abs) {
+        rst <- abs(rst)
+    }
+
+    rst
 }

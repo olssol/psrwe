@@ -7,7 +7,7 @@
 get_distance(
   cov0,
   cov1,
-  metric = c("ovl", "ksd", "std", "abd", "ley", "mhb", "omkss")
+  metric = c("ovl", "ksd", "astd", "std", "abd", "ley", "mhb", "omkss")
 )
 }
 \arguments{
@@ -21,6 +21,7 @@ second distribution.}
 \describe{
   \item{\code{ovl}}{Overlapping area} (default)
   \item{\code{ksd}}{Kullback-Leibler distance}
+  \item{\code{astd}}{Absolute standardized difference in means}
   \item{\code{std}}{Standardized difference in means}
   \item{\code{abd}}{Absolute difference in means}
   \item{\code{ley}}{Levy distance}
