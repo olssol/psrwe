@@ -4,12 +4,15 @@
 #'     study based on PS using nearest neighbor method.
 #'
 #' @param dta_ps A list of class \code{RWE_PS_DAT} that is generated using the
-#'     \code{\link{rwe_ps_est}} function
+#'     \code{\link{rwe_ps_est}} function.
 #' @param ratio Matching ratio (RWD : Current) with default value 3 meaning 3:1
 #'     matching.
-#' @param strata_covs Stratification covariates for matching
-#' @param caliper PS matching caliper width. Default 1.
+#' @param strata_covs Stratification covariates for matching.
+#' @param caliper PS matching caliper width. Default 1. This specifies a
+#'     width (euclidean distance) on the probability scale.
 #' @param seed Random seed.
+#' @param method matching algorithm for PS matching.
+#' @param ... Additional parameters for matching
 #'
 #' @return A list of class \code{RWE_PS_DTA_MAT} with items:
 #'
@@ -36,12 +39,21 @@
 #' @export
 #'
 rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
-                         caliper = 1, seed = NULL) {
+                         caliper = 1, seed = NULL,
+                         method = c("nnwor", "optm"), ...) {
 
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
-    if (!is.null(seed))
-        old_seed <- set.seed(seed)
+    mat_method <- match.arg(method)
+
+    ## save the seed from global if any then set random seed
+    old_seed <- NULL
+    if (!is.null(seed)) {
+        if (exists(".Random.seed", envir = .GlobalEnv)) {
+            old_seed <- get(".Random.seed", envir = .GlobalEnv)
+        }
+        set.seed(seed)
+    }
 
     ## check stratification factors
     data   <- dta_ps$data
@@ -56,46 +68,24 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     if (nstrata > 5)
         warning("Number of strata is more than 5. Data may be over-stratified.")
 
+    ## prepare data
     data <- dat_strata$data
 
-    ## match
-    to_match <- data %>%
-        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+    ## start matching
+    data <- switch(mat_method,
+                   nnwor = get_match_nnwor(data, ratio, caliper, ...),
+                   optm  = get_match_optm(data, ratio, caliper, ...)
+                   )
 
-    data[["_matchn_"]]   <- NA
-    data[["_matchid_"]]  <- NA
-
-    ## random order nearest neighbor match
-    to_match_id <- sample(nrow(to_match))
-    for (i in to_match_id) {
-        cur_id    <- to_match[i, "_id_"]
-        cur_stra  <- to_match[i, "_strata_"]
-        cur_ps    <- to_match[i, "_ps_"]
-
-        cur_match <- data %>%
-            filter(0        == `_grp_`    &
-                   cur_stra == `_strata_` &
-                   is.na(`_matchid_`)) %>%
-            mutate(dif_ps = abs(`_ps_` - cur_ps)) %>%
-            filter(dif_ps <= caliper) %>%
-            arrange(dif_ps)
-
-        cur_matchn <- min(nrow(cur_match), ratio)
-
-        ## update
-        data[cur_id, "_matchn_"] <- cur_matchn
-        if (cur_matchn > 0) {
-            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
-            data[cur_matchid, "_matchid_"] <- cur_id
+    ## reset the orignal seed back to the global or
+    ## remove the one set within this session earlier.
+    if (!is.null(seed)) {
+        if (!is.null(old_seed)) {
+            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+        } else {
+            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
         }
     }
-
-    data[which(0 == data[["_grp_"]] &
-               is.na(data[["_matchid_"]])), "_strata_"] <- NA
-
-    ## reset seed
-    if (!is.null(seed))
-        set.seed(old_seed)
 
     ## result
     rst             <- dta_ps
@@ -104,6 +94,7 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     rst$ratio       <- ratio
     rst$caliper     <- caliper
     rst$strata_covs <- strata_covs
+    rst$mat_method  <- mat_method
     class(rst)      <- get_rwe_class("DPSMATCH")
     return(rst)
 }
@@ -117,7 +108,7 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #'     the \code{\link{rwe_ps_match}} function.
 #'
 #' @param ... Additional parameters.
-
+#'
 #' @return A list with columns:
 #'   \itemize{
 #'
@@ -154,6 +145,13 @@ summary.RWE_PS_DTA_MAT <- function(object, ...) {
     rst_sum$Summary$Distance <- NULL
     rst_sum$Overall$Distance <- NULL
     rst_sum$ratio            <- object$ratio
+
+    ## TODO: The distance may base on matched samples
+    # if ("metric" %in% names(list(...))) {
+        # rst_sum$Summary$Distance <- update_distance(object, ...)
+        ## or
+        # rst_sum <- update_distance(object, ...)
+    # }
 
     ## check matching ratio
     match_n   <- object$data %>%

@@ -1,4 +1,4 @@
-### Example of Section 4.3.
+### Example of Section 4.1.
 suppressMessages(library(psrwe, quietly = TRUE))
 data(ex_dta)
 
@@ -9,26 +9,34 @@ head(ex_dta)
 dta_ps_single <- rwe_ps_est(ex_dta,
                      v_covs = paste("V", 1:7, sep = ""),
                      v_grp = "Group", cur_grp_level = "current",
-                     ps_method = "logistic", nstrata = 5)
+                     ps_method = "logistic")
+
+### PS matching.
+dta_ps_match <- rwe_ps_match(dta_ps_single, ratio = 2, strata_covs = "V1")
+dta_ps_match
 
 ### Balance assessment of PS stratification.
-### See "sec_4_1_ex" for details.
+plot(dta_ps_match, "balance")
+plot(dta_ps_match, "ps")
+plot(dta_ps_match, "diff")
+# plot(dta_ps_match, "diff", metric = "astd")
 
 ### Obtain discounting parameters.
-### See "sec_4_1_ex" for details.
-ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30,
-                               method = "distance", metric = "ovl")
+ps_bor_match <- rwe_ps_borrow(dta_ps_match, total_borrow = 30)
+ps_bor_match
 
-### PSKM, single arm study, time-to-event outcome.
-rst_km <- rwe_ps_survkm(ps_bor_single,
-                        v_time    = "Y_Surv",
-                        v_event   = "Status",
-                        pred_tp  = 365)
-rst_km
+### PSCL, single arm study, binary outcome.
+rst_cl <- rwe_ps_compl(ps_bor_match,
+                       outcome_type = "binary",
+                       v_outcome    = "Y_Bin")
+rst_cl
 
-### Plot PSKM
-rst_km_allt <- rwe_ps_survkmplot(ps_bor_single,
-                                 v_time    = "Y_Surv",
-                                 v_event   = "Status")
-rst_km_ci <- rwe_ps_survkmci(rst_km_allt)
-plot_survkm(rst_km_ci)
+### Use optmatch with caliper
+dta_ps_match_opt <- rwe_ps_match(dta_ps_single, ratio = 2, strata_covs = "V2",
+                                 mat_method = "optm", caliper = 0.5)
+ps_bor_match_opt <- rwe_ps_borrow(dta_ps_match_opt, total_borrow = 30)
+rst_cl_opt <- rwe_ps_compl(ps_bor_match_opt,
+                           outcome_type = "binary",
+                           v_outcome    = "Y_Bin")
+rst_cl_opt
+
