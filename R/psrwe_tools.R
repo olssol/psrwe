@@ -724,7 +724,6 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
     ci <- switch(conf_type,
                  log_log = {
                      log_S        <- log(S)
-                     log_log_S    <- log(-log_S)
                      se_log_log_S <- S_se / S / log_S
                      A <- cbind(-z_alphad2 * se_log_log_S,
                                 z_alphad2 * se_log_log_S)
