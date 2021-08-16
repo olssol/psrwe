@@ -864,7 +864,7 @@ get_match_optm <- function(data, ratio, caliper, ...) {
                           pm == pm[cur_id] &
                           data$"_id_" != cur_id, ]
 
-        cur_matchn <- min(nrow(cur_match), ratio)
+        cur_matchn <- nrow(cur_match)
 
         ## update
         data[cur_id, "_matchn_"] <- cur_matchn
