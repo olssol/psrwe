@@ -755,14 +755,20 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
 #' @noRd
 #'
 plot_pp_rst <- function(x) {
+    if (x$is_rct){
+      label_Arm <- "Control"
+    } else {
+      label_Arm <- "Single"
+    }
+
     rst <- data.frame(Type  = "Arm Specific",
-                      Arm   = "Arm-Control",
+                      Arm   = label_Arm,
                       theta = x$Control$Overall_Samples)
 
     if (x$is_rct) {
         rst <- rbind(rst,
                      data.frame(Type  = "Arm Specific",
-                                Arm   = "Arm-Treatment",
+                                Arm   = "Treatment",
                                 theta = x$Treatment$Overall_Samples),
                      data.frame(Type  = "Treatment Effect",
                                 Arm   = "Effect",
@@ -800,12 +806,18 @@ plot_km_rst <- function(x,
                         ...) {
 
     ## prepare data
-    rst <- cbind(Arm = "Arm-Control Overall",
+    if (x$is_rct){
+      label_Arm <- "Control"
+    } else {
+      label_Arm <- "Single"
+    }
+
+    rst <- cbind(Arm = paste(label_Arm, "Overall", sep = " "),
                  x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Arm-Treatment Overall",
+                     cbind(Arm   = "Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 
@@ -814,13 +826,13 @@ plot_km_rst <- function(x,
         name.v <- c("Mean", "StdErr", "T")
         name.s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
         rst <- rbind(rst,
-                     cbind(Arm = paste("Arm-Control ", name.s, sep = ""),
+                     cbind(Arm = paste(label_Arm, name.s, sep = " "),
                            x$Control$Stratum_Estimate[, name.v]))
 
         if (x$is_rct) {
             name.s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
             rst <- rbind(rst,
-                         cbind(Arm = paste("Arm-Treatment ", name.s, sep = ""),
+                         cbind(Arm = paste("Treatment", name.s, sep = " "),
                                x$Treatment$Stratum_Estimate[, name.v]))
         }
     }
