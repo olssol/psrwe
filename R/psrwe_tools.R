@@ -450,6 +450,7 @@ plot_balance <- function(data.withps,
 #' @noRd
 plot_astd <- function(data.withps,
                       metric = c("std", "astd"),
+                      avg.only = FALSE,
                       ...) {
 
     v.cov <- all.vars(data.withps$ps_fml)[-1]
@@ -497,12 +498,23 @@ plot_astd <- function(data.withps,
                                           dtaps$Strata == s &
                                           !is.na(dtaps$Strata)])
             std.s <- get_distance(cov0, cov1, metric = d.metric)
-            dta_asd <- rbind(dta_asd,
-                             data.frame(v.cov = v,
-                                        Group = s,
-                                        asd   = std.s))
+
+            if (!avg.only) {
+                dta_asd <- rbind(dta_asd,
+                                 data.frame(v.cov = v,
+                                            Group = s,
+                                            asd   = std.s))
+	    }
+
+            std.ws <- c(std.ws, std.s)
         }
 
+        if (avg.only) {
+            dta_asd <- rbind(dta_asd,
+                             data.frame(v.cov = v,
+                                        Group = "Averaged",
+                                        asd   = mean(std.ws)))
+        }
     }
 
     ## plot
