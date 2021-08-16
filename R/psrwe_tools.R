@@ -834,8 +834,10 @@ plot_km_rst <- function(x,
     }
 
     ## plot
+    # lt.a <- rep(2, length(rst$Arm))
+    # lt.a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
-        geom_step(aes(x = T, y = Mean,  col = Arm)) +
+        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
