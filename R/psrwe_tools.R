@@ -450,6 +450,7 @@ plot_balance <- function(data.withps,
 #' @noRd
 plot_astd <- function(data.withps,
                       metric = c("std", "astd"),
+                      avg.only = FALSE,
                       ...) {
 
     v.cov <- all.vars(data.withps$ps_fml)[-1]
@@ -497,12 +498,23 @@ plot_astd <- function(data.withps,
                                           dtaps$Strata == s &
                                           !is.na(dtaps$Strata)])
             std.s <- get_distance(cov0, cov1, metric = d.metric)
-            dta_asd <- rbind(dta_asd,
-                             data.frame(v.cov = v,
-                                        Group = s,
-                                        asd   = std.s))
+
+            if (!avg.only) {
+                dta_asd <- rbind(dta_asd,
+                                 data.frame(v.cov = v,
+                                            Group = s,
+                                            asd   = std.s))
+	    }
+
+            std.ws <- c(std.ws, std.s)
         }
 
+        if (avg.only) {
+            dta_asd <- rbind(dta_asd,
+                             data.frame(v.cov = v,
+                                        Group = "Averaged",
+                                        asd   = mean(std.ws)))
+        }
     }
 
     ## plot
@@ -724,7 +736,6 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
     ci <- switch(conf_type,
                  log_log = {
                      log_S        <- log(S)
-                     log_log_S    <- log(-log_S)
                      se_log_log_S <- S_se / S / log_S
                      A <- cbind(-z_alphad2 * se_log_log_S,
                                 z_alphad2 * se_log_log_S)
@@ -744,14 +755,20 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
 #' @noRd
 #'
 plot_pp_rst <- function(x) {
+    if (x$is_rct){
+      label_Arm <- "Control"
+    } else {
+      label_Arm <- "Single"
+    }
+
     rst <- data.frame(Type  = "Arm Specific",
-                      Arm   = "Arm-Control",
+                      Arm   = label_Arm,
                       theta = x$Control$Overall_Samples)
 
     if (x$is_rct) {
         rst <- rbind(rst,
                      data.frame(Type  = "Arm Specific",
-                                Arm   = "Arm-Treatment",
+                                Arm   = "Treatment",
                                 theta = x$Treatment$Overall_Samples),
                      data.frame(Type  = "Treatment Effect",
                                 Arm   = "Effect",
@@ -784,21 +801,47 @@ plot_pp_rst <- function(x) {
 plot_km_rst <- function(x,
                         xlab = "Time",
                         ylab = "Survival Probability",
+                        add.ci = TRUE,
+                        add.stratum = FALSE,
                         ...) {
 
     ## prepare data
-    rst <- cbind(Arm = "Arm-Control",
+    if (x$is_rct){
+      label_Arm <- "Control"
+    } else {
+      label_Arm <- "Single"
+    }
+
+    rst <- cbind(Arm = paste(label_Arm, "Overall", sep = " "),
                  x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Arm-Treatment",
+                     cbind(Arm   = "Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 
+    ## add stratum
+    if (add.stratum) {
+        name.v <- c("Mean", "StdErr", "T")
+        name.s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
+        rst <- rbind(rst,
+                     cbind(Arm = paste(label_Arm, name.s, sep = " "),
+                           x$Control$Stratum_Estimate[, name.v]))
+
+        if (x$is_rct) {
+            name.s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
+            rst <- rbind(rst,
+                         cbind(Arm = paste("Treatment", name.s, sep = " "),
+                               x$Treatment$Stratum_Estimate[, name.v]))
+        }
+    }
+
     ## CI
-    ci  <- get_km_ci(rst[, 2], rst[, 3], ...)
-    rst <- cbind(rst, ci)
+    if (add.ci) {
+      ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
+      rst <- cbind(rst, ci)
+    }
 
     ## check arguments
     args <- list(...)
@@ -815,14 +858,20 @@ plot_km_rst <- function(x,
     }
 
     ## plot
+    # lt.a <- rep(2, length(rst$Arm))
+    # lt.a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
-        geom_step(aes(x = T, y = Mean,  col = Arm)) +
-        geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
-        geom_step(aes(x = T, y = upper, col = Arm), linetype = 3) +
+        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
         theme_bw()
+
+    if (add.ci) {
+      rst_plt <- rst_plt +
+          geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
+          geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)
+    }
 
     rst_plt
 }
@@ -865,7 +914,7 @@ get_match_optm <- function(data, ratio, caliper, ...) {
                           pm == pm[cur_id] &
                           data$"_id_" != cur_id, ]
 
-        cur_matchn <- min(nrow(cur_match), ratio)
+        cur_matchn <- nrow(cur_match)
 
         ## update
         data[cur_id, "_matchn_"] <- cur_matchn
