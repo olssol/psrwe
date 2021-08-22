@@ -16,7 +16,7 @@ dta_ps_rct <- rwe_ps_est(ex_dta_rct,
 plot(dta_ps_rct, "balance")
 plot(dta_ps_rct, "ps")
 plot(dta_ps_rct, "diff")
-# plot(dta_ps_rct, "diff", metric = "astd", avg.only = TRUE)
+# plot(dta_ps_rct, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
 ps_bor_rct <- rwe_ps_borrow(dta_ps_rct, total_borrow = 30)
@@ -32,3 +32,13 @@ rst_cl_rct$Effect
 rst_cl_rct$Treatment
 rst_cl_rct$Control
 
+### PSPP, two-arm RCT, continuous outcome.
+# options(mc.cores = 1)
+# .msg <- capture.output({ suppressWarnings({
+# rst_pp_rct <- rwe_ps_powerp(ps_bor_rct,
+#                             outcome_type = "continuous",
+#                             v_outcome    = "Y_Con",
+#                             seed         = 1234)
+# }) })
+# plot(rst_pp_rct)
+# plot(rst_pp_rct, add_stratum = TRUE)
