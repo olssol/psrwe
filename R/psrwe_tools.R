@@ -754,41 +754,84 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
 #'
 #' @noRd
 #'
-plot_pp_rst <- function(x) {
+plot_pp_rst <- function(x,
+                        add_stratum = FALSE,
+                        split_rct_arm = FALSE,
+                        ...) {
+    ## prepare data
     if (x$is_rct){
       label_Arm <- "Control"
     } else {
       label_Arm <- "Single"
     }
 
-    rst <- data.frame(Type  = "Arm Specific",
-                      Arm   = label_Arm,
-                      theta = x$Control$Overall_Samples)
+    label_Type <- c("Arm Specific", "Arm Specific", "Treatment Effect")
+    if (x$is_rct && split_rct_arm) {
+      label_Type <- c("Arm Control", "Arm Treatment", "Treatment Effect")
+    }
+
+    rst <- data.frame(Type    = label_Type[1],
+                      Arm     = label_Arm,
+                      Stratum = "Overall",
+                      theta   = x$Control$Overall_Samples)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     data.frame(Type  = "Arm Specific",
-                                Arm   = "Treatment",
-                                theta = x$Treatment$Overall_Samples),
-                     data.frame(Type  = "Treatment Effect",
-                                Arm   = "Effect",
-                                theta = x$Effect$Overall_Samples))
+                     data.frame(Type    = label_Type[2],
+                                Arm     = "Treatment",
+                                Stratum = "Overall",
+                                theta   = x$Treatment$Overall_Samples),
+                     data.frame(Type    = label_Type[3],
+                                Arm     = "Effect",
+                                Stratum = "Overall",
+                                theta   = x$Effect$Overall_Samples))
     }
 
-    rst_plt <- ggplot(data = rst, aes(x = theta)) +
-        theme_bw() +
-        labs(x = expression(theta), y = "Density")
+    ## add stratum
+    if (add_stratum) {
+        rst <- rbind(rst,
+                     data.frame(Type    = label_Type[1],
+                                Arm     = label_Arm,
+                                Stratum = x$Borrow$Stratum,
+                                theta   = as.vector(x$Control$Stratum_Samples)))
 
+        if (x$is_rct) {
+            rst <- rbind(rst,
+                         data.frame(Type    = label_Type[2],
+                                    Arm     = "Treatment",
+                                    Stratum = x$Borrow$Stratum,
+                                    theta   = as.vector(x$Treatment$Stratum_Samples)),
+                         data.frame(Type    = label_Type[3],
+                                    Arm     = "Effect",
+                                    Stratum = x$Borrow$Stratum,
+                                    theta   = as.vector(x$Effect$Stratum_Samples))
+	                 )
+        }
+    }
+
+    ## plot
+    rst$Arm_by_Stratum <- interaction(rst$Arm, rst$Stratum)
     if (x$is_rct) {
-        rst_plt <- rst_plt +
-            stat_density(aes(group = Arm, color = Arm),
+        rst_plt <- ggplot(data = rst, aes(x = theta)) +
+            stat_density(aes(group = Arm_by_Stratum,
+			     color = Arm,
+                             linetype = Stratum),
                          position  = "identity",
-                         geom      = "line", adjust = 1.2) +
+                         geom      = "line",
+                         adjust    = 1.2,
+                         trim      = TRUE) +
             facet_wrap(~ Type, scales = "free")
     } else {
-        rst_plt <- rst_plt +
-            stat_density(geom = "line", adjust = 1.2)
+        rst_plt <- ggplot(data = rst, aes(x = theta)) +
+            stat_density(aes(group    = Arm_by_Stratum,
+                             linetype = Stratum),
+                         position  = "identity",
+                         geom      = "line",
+                         adjust    = 1.2)
     }
+    rst_plt <- rst_plt +
+        theme_bw() +
+        labs(x = expression(theta), y = "Density")
 
     rst_plt
 }
@@ -817,7 +860,7 @@ plot_km_rst <- function(x,
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Treatment Overall",
+                     cbind(Arm = "Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 

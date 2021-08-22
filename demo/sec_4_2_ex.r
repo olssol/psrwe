@@ -41,4 +41,6 @@ rst_cl_rct$Control
 #                             seed         = 1234)
 # }) })
 # plot(rst_pp_rct)
+# plot(rst_pp_rct, split_rct_arm = TRUE)
 # plot(rst_pp_rct, add_stratum = TRUE)
+# plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
