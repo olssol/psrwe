@@ -31,7 +31,7 @@ rst_pp <- rwe_ps_powerp(ps_bor_single,
 }) })
 rst_pp
 # plot(rst_pp)
-# plot(rst_pp, add_stratum = TRUE)
+plot(rst_pp, add_stratum = TRUE)
 
 ### PSCL, single arm study, binary outcome.
 rst_cl <- rwe_ps_compl(ps_bor_single,

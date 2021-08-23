@@ -33,14 +33,14 @@ rst_cl_rct$Treatment
 rst_cl_rct$Control
 
 ### PSPP, two-arm RCT, continuous outcome.
-# options(mc.cores = 1)
-# .msg <- capture.output({ suppressWarnings({
-# rst_pp_rct <- rwe_ps_powerp(ps_bor_rct,
-#                             outcome_type = "continuous",
-#                             v_outcome    = "Y_Con",
-#                             seed         = 1234)
-# }) })
-# plot(rst_pp_rct)
+options(mc.cores = 1)
+.msg <- capture.output({ suppressWarnings({
+rst_pp_rct <- rwe_ps_powerp(ps_bor_rct,
+                            outcome_type = "continuous",
+                            v_outcome    = "Y_Con",
+                            seed         = 1234)
+}) })
+plot(rst_pp_rct)
 # plot(rst_pp_rct, split_rct_arm = TRUE)
 # plot(rst_pp_rct, add_stratum = TRUE)
 # plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
