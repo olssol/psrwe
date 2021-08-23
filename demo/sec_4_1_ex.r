@@ -38,3 +38,8 @@ rst_cl <- rwe_ps_compl(ps_bor_single,
                        outcome_type = "binary",
                        v_outcome    = "Y_Bin")
 rst_cl
+
+### 95% two-sided CI
+rst_cl <- rwe_ps_ci(rst_cl)
+rst_cl$CI$Control$Overall_Estimate
+

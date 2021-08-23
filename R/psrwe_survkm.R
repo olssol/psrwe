@@ -64,6 +64,7 @@ rwe_ps_survkm <- function(dta_psbor,
     rst$Observed <- rst_obs
     rst$pred_tp  <- pred_tp
     rst$Method   <- "ps_km"
+    rst$Outcome_type <- "tte"
     class(rst)   <- get_rwe_class("ANARST")
     rst
 }

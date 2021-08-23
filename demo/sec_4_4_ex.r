@@ -28,3 +28,10 @@ rst_km
 ### Plot PSKM
 plot(rst_km)
 # plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
+
+### 95% two-sided CI
+rst_km_log <- rwe_ps_ci(rst_km)
+head(rst_km_log$CI$Control$Overall_Estimate)
+rst_km_pln <- rwe_ps_ci(rst_km, conf_type = "plain")
+head(rst_km_pln$CI$Control$Overall_Estimate)
+

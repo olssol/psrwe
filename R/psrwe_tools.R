@@ -733,16 +733,7 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
     z_alphad2 <- qnorm((1 - conf_int) / 2,
                        lower.tail = FALSE)
 
-    ci <- switch(conf_type,
-                 log_log = {
-                     log_S        <- log(S)
-                     se_log_log_S <- S_se / S / log_S
-                     A <- cbind(-z_alphad2 * se_log_log_S,
-                                z_alphad2 * se_log_log_S)
-                     ci <- S^exp(A)
-                 },
-                 plain = cbind(S - z_alphad2 * S_se, S + z_alphad2 * S_se)
-                 )
+    ci <- as.matrix(get_ci_km(S, S_se, z_alphad2, conf_type))
 
     colnames(ci) <- c("lower", "upper")
     ci

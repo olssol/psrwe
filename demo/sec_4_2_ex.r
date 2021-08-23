@@ -32,6 +32,10 @@ rst_cl_rct$Effect
 rst_cl_rct$Treatment
 rst_cl_rct$Control
 
+### 95% two-sided CI
+rst_cl_rct <- rwe_ps_ci(rst_cl_rct)
+rst_cl_rct$CI$Effect$Overall_Estimate
+
 ### PSPP, two-arm RCT, continuous outcome.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
