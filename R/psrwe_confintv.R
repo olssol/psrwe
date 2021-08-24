@@ -102,7 +102,7 @@ rwe_ps_ci <- function(dta_psrst,
 }
 
 
-#' @title Confidence interval
+#' @title Confidence interval (one arm)
 #'
 #' @noRd
 get_ci <- function(x,
@@ -128,16 +128,26 @@ get_ci <- function(x,
 }
 
 
-#' @title Wilson Confidence interval for proportion
+#' @title Wilson Confidence interval for binary outcomes (one arm)
 #'
 #' @noRd
 get_ci_wilson <- function(mean,
                           stderr,
                           conf_int = 0.95,
                           n,
+                          method_stderr = c("original", "plain"),
                           ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
+
+    method_stderr <- match.arg(method_stderr)
+    stderr <- switch(method_stderr,
+                     original = {
+                         sqrt(mean * (1 - mean) / n)
+                     },
+                     plain = {
+                         stderr
+                     })
 
     w_n <- n / (n + z_alphad2^2)
     w_z <- z_alphad2^2 / (n + z_alphad2^2)
@@ -150,7 +160,7 @@ get_ci_wilson <- function(mean,
 }
 
 
-#' @title Wald Confidence interval
+#' @title Wald Confidence interval for continous outcomes (one arm)
 #'
 #' @noRd
 get_ci_wald <- function(mean,
@@ -168,7 +178,7 @@ get_ci_wald <- function(mean,
 }
 
 
-#' @title Wald Confidence interval for KM and time-to-event
+#' @title Wald Confidence interval for KM and time-to-event (one arm)
 #'
 #' @noRd
 get_ci_km <- function(mean,
