@@ -722,24 +722,6 @@ get_overall_est <- function(ts1, weights, ts2 = NULL) {
 }
 
 
-#' Get KM CI
-#'
-#' @noRd
-#'
-get_km_ci <- function(S, S_se, conf_int = 0.95,
-                      conf_type = c("log_log", "plain"), ...) {
-
-    conf_type <- match.arg(conf_type)
-    z_alphad2 <- qnorm((1 - conf_int) / 2,
-                       lower.tail = FALSE)
-
-    ci <- as.matrix(get_ci_km(S, S_se, z_alphad2, conf_type))
-
-    colnames(ci) <- c("lower", "upper")
-    ci
-}
-
-
 #'  Plot density for power prior results
 #'
 #'
@@ -846,8 +828,8 @@ plot_km_rst <- function(x,
       label_Arm <- "Single"
     }
 
-    rst <- cbind(Arm = paste(label_Arm, "Overall", sep = " "),
-                 x$Control$Overall_Estimate)
+    rst <- data.frame(Arm = paste(label_Arm, "Overall", sep = " "),
+                      x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
@@ -873,7 +855,7 @@ plot_km_rst <- function(x,
 
     ## CI
     if (add_ci) {
-      ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
+      ci  <- get_ci_km(rst$Mean, rst$StdErr, ...)
       rst <- cbind(rst, ci)
     }
 
@@ -903,8 +885,8 @@ plot_km_rst <- function(x,
 
     if (add_ci) {
       rst_plt <- rst_plt +
-          geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
-          geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)
+          geom_step(aes(x = T, y = Lower, col = Arm), linetype = 3) +
+          geom_step(aes(x = T, y = Upper, col = Arm), linetype = 3)
     }
 
     rst_plt

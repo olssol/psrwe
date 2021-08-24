@@ -109,16 +109,14 @@ get_ci <- function(x,
                    conf_int,
                    n) {
 
-    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
-
     if (method_ci == "wald") {
         if (is.null(conf_type) || is.na(conf_type)) {
-            rst <- get_ci_wald(x$Mean, x$StdErr, z_alphad2)
+            rst <- get_ci_wald(x$Mean, x$StdErr, conf_int)
         } else {
-            rst <- get_ci_km(x$Mean, x$StdErr, z_alphad2, conf_type)
+            rst <- get_ci_km(x$Mean, x$StdErr, conf_int, conf_type)
         }
     } else if (method_ci == "wilson") {
-        rst <- get_ci_wilson(x$Mean, x$StdErr, z_alphad2, n)
+        rst <- get_ci_wilson(x$Mean, x$StdErr, conf_int, n)
     } else {
         stop("Confidence interval method is not implemented.")
     }
@@ -132,8 +130,10 @@ get_ci <- function(x,
 #' @noRd
 get_ci_wilson <- function(mean,
                           stderr,
-                          z_alphad2,
+                          conf_int = 0.95,
                           n) {
+
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
     w_n <- n / (n + z_alphad2^2)
     w_z <- z_alphad2^2 / (n + z_alphad2^2)
@@ -151,7 +151,9 @@ get_ci_wilson <- function(mean,
 #' @noRd
 get_ci_wald <- function(mean,
                         stderr,
-                        z_alphad2) {
+                        conf_int = 0.95) {
+
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
     ci_wl_lb <- mean - stderr * z_alphad2 
     ci_wl_ub <- mean + stderr * z_alphad2 
@@ -166,8 +168,11 @@ get_ci_wald <- function(mean,
 #' @noRd
 get_ci_km <- function(mean,
                       stderr,
-                      z_alphad2,
-                      conf_type) {
+                      conf_int = 0.95,
+                      conf_type = c("log_log", "plain")) {
+
+    conf_type <- match.arg(conf_type)
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
     ci <- switch(conf_type,
                  log_log = {
