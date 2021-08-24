@@ -6,34 +6,34 @@
 #' @param sub.str Pattern of string to be replaced.
 #'
 #' @noRd
-tkExpRst <- function(numbers, template.f,  
-                     out.f = "rst.txt", sub.str = "AA") {
-    if (!file.exists(template.f)) {
+tkExpRst <- function(numbers, template_f,
+                     out_f = "rst.txt", sub_str = "AA") {
+    if (!file.exists(template_f)) {
         return(NULL)
     }
     
     # Read template
-    tpla <- readChar(template.f, file.info(template.f)$size)
+    tpla <- readChar(template_f, file.info(template_f)$size)
 
     # Substitute
     for (i in 1:length(numbers)) {
-        tpla <- sub(sub.str, numbers[i], tpla);
+        tpla <- sub(sub_str, numbers[i], tpla);
     }
 
     # Write out
-    write(tpla, file = out.f)
+    write(tpla, file = out_f)
 }
 
 
 #' @title Import objects in a list into a designated environment
 #'
 #' @param alist List of objects.
-#' @param dest.env Designated environment.
+#' @param dest_env Designated environment.
 #'
 #' @noRd
-tkMakeLocal <- function(alist, dest.env) {
+tkMakeLocal <- function(alist, dest_env) {
     for (i in 1:length(alist)) {
-        assign(names(alist[i]), alist[[i]], dest.env)
+        assign(names(alist[i]), alist[[i]], dest_env)
     }
 }
 

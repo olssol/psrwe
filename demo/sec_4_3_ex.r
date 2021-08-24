@@ -19,7 +19,7 @@ dta_ps_match
 plot(dta_ps_match, "balance")
 plot(dta_ps_match, "ps")
 plot(dta_ps_match, "diff")
-# plot(dta_ps_match, "diff", metric = "astd", avg.only = TRUE)
+# plot(dta_ps_match, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
 ps_bor_match <- rwe_ps_borrow(dta_ps_match, total_borrow = 30)
@@ -30,6 +30,12 @@ rst_cl <- rwe_ps_compl(ps_bor_match,
                        outcome_type = "binary",
                        v_outcome    = "Y_Bin")
 rst_cl
+
+### 95% two-sided CI
+rst_cl_wl <- rwe_ps_ci(rst_cl)
+rst_cl_wl$CI$Control$Overall_Estimate
+rst_cl_ws <- rwe_ps_ci(rst_cl, method_ci = "wilson")
+rst_cl_ws$CI$Control$Overall_Estimate
 
 ### Use optmatch with caliper
 dta_ps_match_opt <- rwe_ps_match(dta_ps_single, ratio = 2, strata_covs = "V2",
