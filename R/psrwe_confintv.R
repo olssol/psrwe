@@ -7,6 +7,7 @@
 #' @param conf_type a type name of transformation for the confidence interal
 #'        of PSKM approach (default log_log)
 #' @param conf_int a two-sided level of confidence limits (default 0.95)
+#' @param ... other options
 #'
 #' @return A list with class name \code{RWE_PS_EST}.
 #'
@@ -28,7 +29,8 @@
 rwe_ps_ci <- function(dta_psrst,
                       method_ci = c("wald", "wilson"),
                       conf_type = c("log_log", "plain"),
-                      conf_int = 0.95) {
+                      conf_int = 0.95,
+                      ...) {
 
     ## check
     stopifnot(inherits(dta_psrst,
@@ -72,25 +74,25 @@ rwe_ps_ci <- function(dta_psrst,
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
         get_ci(dta_psrst$Control$Stratum_Estimate,
-               method_ci, conf_type, conf_int, n_ctl_s)
+               method_ci, conf_type, conf_int, n_ctl_s, ...)
     rst_psci$Control$Overall_Estimate <-
         get_ci(dta_psrst$Control$Overall_Estimate,
-               method_ci, conf_type, conf_int, n_ctl)
+               method_ci, conf_type, conf_int, n_ctl, ...)
 
     if (is_rct) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_ci(dta_psrst$Treatment$Stratum_Estimate,
-                   method_ci, conf_type, conf_int, n_trt_s)
+                   method_ci, conf_type, conf_int, n_trt_s, ...)
         rst_psci$Treatment$Overall_Estimate <-
             get_ci(dta_psrst$Treatment$Overall_Estimate,
-                   method_ci, conf_type, conf_int, n_trt)
+                   method_ci, conf_type, conf_int, n_trt, ...)
 
         rst_psci$Effect$Stratum_Estimate <-
             get_ci(dta_psrst$Effect$Stratum_Estimate,
-                   method_ci, conf_type, conf_int, n_eff_s)
+                   method_ci, conf_type, conf_int, n_eff_s, ...)
         rst_psci$Effect$Overall_Estimate <-
             get_ci(dta_psrst$Effect$Overall_Estimate,
-                   method_ci, conf_type, conf_int, n_eff)
+                   method_ci, conf_type, conf_int, n_eff, ...)
     }
 
     ## return
@@ -107,16 +109,17 @@ get_ci <- function(x,
                    method_ci,
                    conf_type,
                    conf_int,
-                   n) {
+                   n,
+                   ...) {
 
     if (method_ci == "wald") {
         if (is.null(conf_type) || is.na(conf_type)) {
-            rst <- get_ci_wald(x$Mean, x$StdErr, conf_int)
+            rst <- get_ci_wald(x$Mean, x$StdErr, conf_int, ...)
         } else {
-            rst <- get_ci_km(x$Mean, x$StdErr, conf_int, conf_type)
+            rst <- get_ci_km(x$Mean, x$StdErr, conf_int, conf_type, ...)
         }
     } else if (method_ci == "wilson") {
-        rst <- get_ci_wilson(x$Mean, x$StdErr, conf_int, n)
+        rst <- get_ci_wilson(x$Mean, x$StdErr, conf_int, n, ...)
     } else {
         stop("Confidence interval method is not implemented.")
     }
@@ -131,7 +134,8 @@ get_ci <- function(x,
 get_ci_wilson <- function(mean,
                           stderr,
                           conf_int = 0.95,
-                          n) {
+                          n,
+                          ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -151,7 +155,8 @@ get_ci_wilson <- function(mean,
 #' @noRd
 get_ci_wald <- function(mean,
                         stderr,
-                        conf_int = 0.95) {
+                        conf_int = 0.95,
+                        ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -169,7 +174,8 @@ get_ci_wald <- function(mean,
 get_ci_km <- function(mean,
                       stderr,
                       conf_int = 0.95,
-                      conf_type = c("log_log", "plain")) {
+                      conf_type = c("log_log", "plain"),
+                      ...) {
 
     conf_type <- match.arg(conf_type)
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
