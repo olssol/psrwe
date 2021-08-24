@@ -870,7 +870,11 @@ plot_km_rst <- function(x,
     if ("ylim" %in% names(args)) {
         ylim <- args[['ylim']]
     } else {
-        ylim <- c(0, 1)
+        ylim <- c(min(0, rst$Mean), max(1, rst$Mean))
+
+        if (add_ci) {
+            ylim <- c(min(0, rst$Lower), max(1, rst$Upper))
+        }
     }
 
     ## plot
