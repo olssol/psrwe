@@ -1,4 +1,4 @@
-### Example of Section 4.3.
+### Example of Section 4.4.
 suppressMessages(library(psrwe, quietly = TRUE))
 data(ex_dta)
 
