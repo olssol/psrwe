@@ -107,13 +107,19 @@ rwe_ps_ci <- function(dta_psrst,
                        conf_type = conf_type,
                        conf_int = conf_int,
                        ...)
-            rst_psci$Effect$Overall_Estimate <-
-                get_ci(dta_psrst$Effect$Overall_Estimate,
-                       n_eff,
-                       method_ci = method_ci,
-                       conf_type = conf_type,
-                       conf_int = conf_int,
-                       ...)
+
+            if (outcome_type != "tte" || conf_type == "plain") {
+                rst_psci$Effect$Overall_Estimate <-
+                    get_ci(dta_psrst$Effect$Overall_Estimate,
+                           n_eff,
+                           method_ci = method_ci,
+                           conf_type = conf_type,
+                           conf_int = conf_int,
+                           ...)
+            } else {
+                ## TODO: Difference of two KM with log-log.
+                rst_psci$Effect$Overall_Estimate <- NA
+            }
         } else {
             rst_psci$Effect$Stratum_Estimate <-
                 get_ci_2arms(dta_psrst$Treatment$Stratum_Estimate,
@@ -124,6 +130,8 @@ rwe_ps_ci <- function(dta_psrst,
                              conf_type = conf_type,
                              conf_int = conf_int,
                              ...)
+
+            ## TODO: Derive score method
             rst_psci$Effect$Overall_Estimate <- NA
         }
     }
@@ -172,7 +180,7 @@ get_ci <- function(x,
 }
 
 
-#' @title Wald confidence interval for continous outcomes (one arm)
+#' @title Wald CI for continous outcomes (one arm)
 #'
 #' @noRd
 get_ci_wald <- function(mean,
@@ -190,7 +198,7 @@ get_ci_wald <- function(mean,
 }
 
 
-#' @title Wilson confidence interval for binary outcomes (one arm)
+#' @title Wilson CI for binary outcomes (one arm)
 #'
 #' @noRd
 get_ci_wilson <- function(mean,
@@ -219,7 +227,7 @@ get_ci_wilson <- function(mean,
 }
 
 
-#' @title Wald confidence interval for KM and time-to-event (one arm)
+#' @title Wald CI for KM and time-to-event (one arm)
 #'
 #' @noRd
 get_ci_km <- function(mean,
@@ -248,7 +256,7 @@ get_ci_km <- function(mean,
 }
 
 
-#' @title Confidence interval (two arms)
+#' @title Confidence interval (two arms, independent)
 #'
 #' @noRd
 get_ci_2arms <- function(x,
@@ -294,7 +302,7 @@ get_ci_2arms <- function(x,
 }
 
 
-#' @title Wald confidence interval for continous outcomes (two arms)
+#' @title Wald CI for continous outcomes (two arms, independent)
 #'
 #' @noRd
 get_ci_wald_2arms <- function(mean,
@@ -315,7 +323,7 @@ get_ci_wald_2arms <- function(mean,
 }
 
 
-#' @title Wilson confidence interval for binary outcomes (two arms)
+#' @title Wilson CI for binary outcomes (two arms, independent)
 #'
 #' @noRd
 get_ci_wilson_2arms <- function(mean,
@@ -362,7 +370,7 @@ get_ci_wilson_2arms <- function(mean,
 }
 
 
-#' @title Wald confidence interval for KM and time-to-event (two arms)
+#' @title Wald CI for KM and time-to-event (two arms, independent)
 #'
 #' @noRd
 get_ci_km_2arms <- function(mean,
@@ -378,6 +386,7 @@ get_ci_km_2arms <- function(mean,
 
     ci <- switch(conf_type,
                  log_log = {
+                     ## TODO: Difference of two KMs with log-log.
                      cbind(rep(NA, length(mean)),
                            rep(NA, length(mean)))
                  },
