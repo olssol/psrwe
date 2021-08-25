@@ -16,7 +16,7 @@ dta_ps_rct <- rwe_ps_est(ex_dta_rct,
 plot(dta_ps_rct, "balance")
 plot(dta_ps_rct, "ps")
 plot(dta_ps_rct, "diff")
-# plot(dta_ps_rct, "diff", metric = "astd", avg_only = TRUE)
+plot(dta_ps_rct, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
 ps_bor_rct <- rwe_ps_borrow(dta_ps_rct, total_borrow = 30)
@@ -45,6 +45,6 @@ rst_pp_rct <- rwe_ps_powerp(ps_bor_rct,
                             seed         = 1234)
 }) })
 plot(rst_pp_rct)
-# plot(rst_pp_rct, split_rct_arm = TRUE)
-# plot(rst_pp_rct, add_stratum = TRUE)
-# plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
+plot(rst_pp_rct, split_rct_arm = TRUE)
+plot(rst_pp_rct, add_stratum = TRUE)
+plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)

@@ -856,7 +856,7 @@ plot_km_rst <- function(x,
     ## CI
     if (add_ci) {
       ci  <- get_ci_km(rst$Mean, rst$StdErr, ...)
-      rst <- cbind(rst, ci)
+      rst <- cbind(rst, Lower = ci$Lower, Upper = ci$Upper)
     }
 
     ## check arguments

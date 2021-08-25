@@ -39,11 +39,10 @@ rwe_ps_ci <- function(dta_psrst,
     stopifnot(dta_psrst$Method %in% c("ps_cl", "ps_km"))
 
     method_ci <- match.arg(method_ci)
-    stopifnot(!(method_ci == "wilson" &&
-                dta_psrst$Outcome_type != "binary"))
+    outcome_type <- dta_psrst$Outcome_type
 
-    conf_type <- ifelse(dta_psrst$Outcome_type == "tte",
-                        match.arg(conf_type), NULL)
+    stopifnot(!(method_ci == "wilson" && outcome_type != "binary"))
+    conf_type <- ifelse(outcome_type == "tte", match.arg(conf_type), NA)
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
@@ -64,35 +63,68 @@ rwe_ps_ci <- function(dta_psrst,
     rst_psci <- list(Control = NULL,
                      Treatment = NULL,
                      Effect = NULL,
-                     Method = method_ci,
+                     Method_ci = method_ci,
                      Conf_type = conf_type,
                      Conf_int = conf_int)
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
         get_ci(dta_psrst$Control$Stratum_Estimate,
-               method_ci, conf_type, conf_int, n_ctl_s, ...)
+               n_ctl_s,
+               method_ci,
+               conf_type,
+               conf_int,
+               ...)
     rst_psci$Control$Overall_Estimate <-
         get_ci(dta_psrst$Control$Overall_Estimate,
-               method_ci, conf_type, conf_int, n_ctl, ...)
+               n_ctl,
+               method_ci,
+               conf_type,
+               conf_int,
+               ...)
 
     if (is_rct) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_ci(dta_psrst$Treatment$Stratum_Estimate,
-                   method_ci, conf_type, conf_int, n_trt_s, ...)
+                   n_trt_s,
+                   method_ci,
+                   conf_type,
+                   conf_int,
+                   ...)
         rst_psci$Treatment$Overall_Estimate <-
             get_ci(dta_psrst$Treatment$Overall_Estimate,
-                   method_ci, conf_type, conf_int, n_trt, ...)
+                   n_trt,
+                   method_ci,
+                   conf_type,
+                   conf_int,
+                   ...)
 
         if (method_ci == "wald") {
             rst_psci$Effect$Stratum_Estimate <-
                 get_ci(dta_psrst$Effect$Stratum_Estimate,
-                       method_ci, conf_type, conf_int, n_eff_s, ...)
+                       n_eff_s,
+                       method_ci,
+                       conf_type,
+                       conf_int,
+                       ...)
             rst_psci$Effect$Overall_Estimate <-
                 get_ci(dta_psrst$Effect$Overall_Estimate,
-                       method_ci, conf_type, conf_int, n_eff, ...)
+                       n_eff,
+                       method_ci,
+                       conf_type,
+                       conf_int,
+                       ...)
         } else {
-            ## TODO: Wilson score, two arm, binarary.
+            rst_psci$Effect$Stratum_Estimate <-
+                get_ci_2arms(dta_psrst$Treatment$Stratum_Estimate,
+                             n_trt_s,
+                             method_ci,
+                             conf_type,
+                             conf_int,
+                             x_2 = dta_psrst$Control$Stratum_Estimate,
+                             n_2 = n_ctr_s,
+                             ...)
+            rst_psci$Effect$Overall_Estimate <- NA
         }
     }
 
@@ -107,20 +139,31 @@ rwe_ps_ci <- function(dta_psrst,
 #'
 #' @noRd
 get_ci <- function(x,
-                   method_ci,
-                   conf_type,
-                   conf_int,
-                   n,
+                   n = NULL,
+                   method_ci = c("wald", "wilson"),
+                   conf_type = c("log_log", "plain"),
+                   conf_int = 0.95,
                    ...) {
 
     if (method_ci == "wald") {
-        if (!exists(x$T)) {
-            rst <- get_ci_wald(x$Mean, x$StdErr, conf_int, ...)
+        if (!any("T" %in% names(x))) {
+            rst <- get_ci_wald(x$Mean,
+                               x$StdErr,
+                               conf_int,
+                               ...)
         } else {
-            rst <- get_ci_km(x$Mean, x$StdErr, conf_int, conf_type, ...)
+            rst <- get_ci_km(x$Mean,
+                             x$StdErr,
+                             conf_int,
+                             conf_type,
+                             ...)
         }
     } else if (method_ci == "wilson") {
-        rst <- get_ci_wilson(x$Mean, x$StdErr, conf_int, n, ...)
+        rst <- get_ci_wilson(x$Mean,
+                             x$StdErr,
+                             n,
+                             conf_int,
+                             ...)
     } else {
         stop("Confidence interval method is not implemented.")
     }
@@ -129,39 +172,36 @@ get_ci <- function(x,
 }
 
 
-#' @title Wilson Confidence interval for binary outcomes (one arm)
+#' @title Wilson confidence interval for binary outcomes (one arm)
 #'
 #' @noRd
 get_ci_wilson <- function(mean,
                           stderr,
-                          conf_int = 0.95,
                           n,
+                          conf_int = 0.95,
                           method_stderr = c("original", "plain"),
                           ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
     method_stderr <- match.arg(method_stderr)
-    stderr <- switch(method_stderr,
-                     original = {
-                         sqrt(mean * (1 - mean) / n)
-                     },
-                     plain = {
-                         stderr
-                     })
+    if (method_stderr == "original") {
+        stderr <- sqrt(mean * (1 - mean) / n)
+    }
 
-    w_n <- n / (n + z_alphad2^2)
-    w_z <- z_alphad2^2 / (n + z_alphad2^2)
-    var_ws <- stderr^2 * w_n^2 + w_z^2 / (4 * z_alphad2^2)
-    ci_ws_lb <- mean * w_n + w_z / 2 - z_alphad2 * sqrt(var_ws)
-    ci_ws_ub <- mean * w_n + w_z / 2 + z_alphad2 * sqrt(var_ws)
+    two_a <- 2 * (n + z_alphad2^2)
+    minus_b <- 2 * n * mean + z_alphad2^2
+    b2_m_4ac <- (z_alphad2^2 + 4 * n * (stderr^2 * n)) * z_alphad2^2
+    sqrt_b2_m_4ac <- sqrt(b2_m_4ac)
+    ci_ws_lb <- (minus_b - sqrt_b2_m_4ac) / two_a
+    ci_ws_ub <- (minus_b + sqrt_b2_m_4ac) / two_a
 
     rst <- data.frame(Lower = ci_ws_lb, Upper = ci_ws_ub)
     rst
 }
 
 
-#' @title Wald Confidence interval for continous outcomes (one arm)
+#' @title Wald confidence interval for continous outcomes (one arm)
 #'
 #' @noRd
 get_ci_wald <- function(mean,
@@ -171,15 +211,15 @@ get_ci_wald <- function(mean,
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
-    ci_wl_lb <- mean - stderr * z_alphad2 
-    ci_wl_ub <- mean + stderr * z_alphad2 
+    ci_wl_lb <- mean - z_alphad2 * stderr
+    ci_wl_ub <- mean + z_alphad2 * stderr
 
     rst <- data.frame(Lower = ci_wl_lb, Upper = ci_wl_ub)
     rst
 }
 
 
-#' @title Wald Confidence interval for KM and time-to-event (one arm)
+#' @title Wald confidence interval for KM and time-to-event (one arm)
 #'
 #' @noRd
 get_ci_km <- function(mean,
@@ -202,6 +242,150 @@ get_ci_km <- function(mean,
                  plain = cbind(mean - z_alphad2 * stderr,
                                mean + z_alphad2 * stderr)
                  )
+
+    rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
+    rst
+}
+
+
+#' @title Confidence interval (two arms)
+#'
+#' @noRd
+get_ci_2arms <- function(x,
+                         n = NULL,
+                         method_ci = c("wald", "wilson"),
+                         conf_type = c("log_log", "plain"),
+                         conf_int = 0.95,
+                         x_2,
+                         n_2 = NULL,
+                         ...) {
+
+    if (method_ci == "wald") {
+        if (!any("T" %in% names(x))) {
+            rst <- get_ci_wald_2arms(x$Mean,
+                                     x$StdErr,
+                                     conf_int,
+                                     mean_2 = x_2$Mean,
+                                     stderr_2 = x_2$StdErr,
+                                     ...)
+        } else {
+            rst <- get_ci_km_2arms(x$Mean,
+                                   x$StdErr,
+                                   conf_int,
+                                   conf_type,
+                                   mean_2 = x_2$Mean,
+                                   stderr_2 = x_2$StdErr,
+                                   ...)
+        }
+    } else if (method_ci == "wilson") {
+        rst <- get_ci_wilson_2arms(x$Mean,
+                                   x$StdErr,
+                                   n,
+                                   conf_int,
+                                   mean_2 = x_2$Mean,
+                                   stderr_2 = x_2$StdErr,
+                                   n_2 = n_2,
+                                   ...)
+    } else {
+        stop("Confidence interval method is not implemented.")
+    }
+
+    rst
+}
+
+
+#' @title Wald confidence interval for continous outcomes (two arms)
+#'
+#' @noRd
+get_ci_wald_2arms <- function(mean,
+                              stderr,
+                              conf_int = 0.95,
+                              mean_2,
+                              stderr_2,
+                              ...) {
+
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
+
+    stderr_p <- sqrt(stderr^2 + stderr_2^2)
+    ci_wl_lb <- (mean - mean_2) - z_alphad2 * stderr_p
+    ci_wl_ub <- (mean - mean_2) + z_alphad2 * stderr_p
+
+    rst <- data.frame(Lower = ci_wl_lb, Upper = ci_wl_ub)
+    rst
+}
+
+
+#' @title Wilson confidence interval for binary outcomes (two arms)
+#'
+#' @noRd
+get_ci_wilson_2arms <- function(mean,
+                                stderr,
+                                n,
+                                conf_int = 0.95,
+                                method_stderr = c("original", "plain"),
+                                mean_2,
+                                stderr_2,
+                                n_2,
+                                ...) {
+
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
+
+    method_stderr <- match.arg(method_stderr)
+    if (method_stderr == "original") {
+        stderr <- sqrt(mean * (1 - mean) / n)
+        stderr_2 <- sqrt(mean_2 * (1 - mean_2) / n_2)
+    }
+
+    get_root <- function(p, se, n, z) {
+        two_a <- 2 * (n + z^2)
+        minus_b <- 2 * n * p + z^2
+        b2_m_4ac <- (z^2 + 4 * n * (se^2 * n)) * z^2
+        sqrt_b2_m_4ac <- sqrt(b2_m_4ac)
+        lb <- (minus_b - sqrt_b2_m_4ac) / two_a
+        ub <- (minus_b + sqrt_b2_m_4ac) / two_a
+        cbind(lb, ub)
+    }
+
+    rt <- get_root(mean, stderr, n, z_alphad2)
+    rt_2 <- get_root(mean_2, stderr_2, n_2, z_alphad2)
+
+    stderr_d <- sqrt(rt[, 1] * (1 - rt[, 1]) / n +
+                     rt_2[, 2] * (1 - rt_2[, 2]) / n_2)
+    stderr_e <- sqrt(rt[, 2] * (1 - rt[, 2]) / n +
+                     rt_2[, 1] * (1 - rt_2[, 1]) / n_2)
+
+    ci_ws_lb <- (mean - mean_2) - z_alphad2 * stderr_d
+    ci_ws_ub <- (mean - mean_2) + z_alphad2 * stderr_e
+
+    rst <- data.frame(Lower = ci_ws_lb, Upper = ci_ws_ub)
+    rst
+}
+
+
+#' @title Wald confidence interval for KM and time-to-event (two arms)
+#'
+#' @noRd
+get_ci_km_2arms <- function(mean,
+                            stderr,
+                            conf_int = 0.95,
+                            conf_type = c("log_log", "plain"),
+                            mean_2,
+                            stderr_2,
+                            ...) {
+
+    conf_type <- match.arg(conf_type)
+    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
+
+    ci <- switch(conf_type,
+                 log_log = {
+                     cbind(rep(NA, length(mean)),
+                           rep(NA, length(mean)))
+                 },
+                 plain = {
+                     stderr_p <- sqrt(stderr^2 + stderr_2^2)
+                     cbind((mean - mean_2) - z_alphad2 * stderr_p,
+                           (mean - mean_2) + z_alphad2 * stderr_p)
+                 })
 
     rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
     rst

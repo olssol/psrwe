@@ -27,8 +27,8 @@ rst_km
 
 ### Plot PSKM
 plot(rst_km)
-# plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
-# plot(rst_km, conf_type = "plain")
+plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
+plot(rst_km, conf_type = "plain")
 
 ### 95% two-sided CI
 rst_km_log <- rwe_ps_ci(rst_km)

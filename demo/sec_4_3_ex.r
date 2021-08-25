@@ -19,7 +19,7 @@ dta_ps_match
 plot(dta_ps_match, "balance")
 plot(dta_ps_match, "ps")
 plot(dta_ps_match, "diff")
-# plot(dta_ps_match, "diff", metric = "astd", avg_only = TRUE)
+plot(dta_ps_match, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
 ps_bor_match <- rwe_ps_borrow(dta_ps_match, total_borrow = 30)
