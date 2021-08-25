@@ -117,7 +117,7 @@ rwe_ps_ci <- function(dta_psrst,
                            conf_int = conf_int,
                            ...)
             } else {
-                ## TODO: Difference of two KM with log-log.
+                ## TODO: Difference of two KMs with log-log.
                 rst_psci$Effect$Overall_Estimate <- NA
             }
         } else {
