@@ -107,17 +107,13 @@ rwe_ps_ci <- function(dta_psrst,
                        conf_type = conf_type,
                        conf_int = conf_int,
                        ...)
-            if (outcome_type != "tte" || conf_type == "plain") {
-                rst_psci$Effect$Overall_Estimate <-
-                    get_ci(dta_psrst$Effect$Overall_Estimate,
-                           n_eff,
-                           method_ci = method_ci,
-                           conf_type = conf_type,
-                           conf_int = conf_int,
-                           ...)
-            } else {
-                rst_psci$Effect$Overall_Estimate <- NA
-            }
+            rst_psci$Effect$Overall_Estimate <-
+                get_ci(dta_psrst$Effect$Overall_Estimate,
+                       n_eff,
+                       method_ci = method_ci,
+                       conf_type = conf_type,
+                       conf_int = conf_int,
+                       ...)
         } else {
             rst_psci$Effect$Stratum_Estimate <-
                 get_ci_2arms(dta_psrst$Treatment$Stratum_Estimate,
