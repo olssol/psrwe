@@ -39,17 +39,15 @@ rwe_ps_ci <- function(dta_psrst,
     stopifnot(dta_psrst$Method %in% c("ps_cl", "ps_km"))
 
     method_ci <- match.arg(method_ci)
-    conf_type <- match.arg(conf_type)
+    stopifnot(!(method_ci == "wilson" &&
+                dta_psrst$Outcome_type != "binary"))
 
-    if (dta_psrst$Outcome_type != "binary") {
-        method_ci <- "wald"
-    }
+    conf_type <- match.arg(conf_type)
     if (dta_psrst$Outcome_type != "tte") {
         conf_type <- NULL
     }
 
     ## prepare data
-    outcome_type <- dta_psrst$Outcome_type
     is_rct <- dta_psrst$is_rct 
 
     n_ctl_s <- dta_psrst$Borrow$N_Current + dta_psrst$Borrow$N_Borrow
@@ -118,7 +116,7 @@ get_ci <- function(x,
                    ...) {
 
     if (method_ci == "wald") {
-        if (is.null(conf_type) || is.na(conf_type)) {
+        if (!exists(x$T)) {
             rst <- get_ci_wald(x$Mean, x$StdErr, conf_int, ...)
         } else {
             rst <- get_ci_km(x$Mean, x$StdErr, conf_int, conf_type, ...)
