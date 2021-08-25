@@ -42,10 +42,8 @@ rwe_ps_ci <- function(dta_psrst,
     stopifnot(!(method_ci == "wilson" &&
                 dta_psrst$Outcome_type != "binary"))
 
-    conf_type <- match.arg(conf_type)
-    if (dta_psrst$Outcome_type != "tte") {
-        conf_type <- NULL
-    }
+    conf_type <- ifelse(dta_psrst$Outcome_type == "tte",
+                        match.arg(conf_type), NULL)
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
@@ -68,7 +66,7 @@ rwe_ps_ci <- function(dta_psrst,
                      Effect = NULL,
                      Method = method_ci,
                      Conf_type = conf_type,
-                     level_2sided = conf_int)
+                     Conf_int = conf_int)
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
