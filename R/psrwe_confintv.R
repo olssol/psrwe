@@ -49,6 +49,7 @@ rwe_ps_ci <- function(dta_psrst,
     }
 
     ## prepare data
+    outcome_type <- dta_psrst$Outcome_type
     is_rct <- dta_psrst$is_rct 
 
     n_ctl_s <- dta_psrst$Borrow$N_Current + dta_psrst$Borrow$N_Borrow
@@ -87,12 +88,16 @@ rwe_ps_ci <- function(dta_psrst,
             get_ci(dta_psrst$Treatment$Overall_Estimate,
                    method_ci, conf_type, conf_int, n_trt, ...)
 
-        rst_psci$Effect$Stratum_Estimate <-
-            get_ci(dta_psrst$Effect$Stratum_Estimate,
-                   method_ci, conf_type, conf_int, n_eff_s, ...)
-        rst_psci$Effect$Overall_Estimate <-
-            get_ci(dta_psrst$Effect$Overall_Estimate,
-                   method_ci, conf_type, conf_int, n_eff, ...)
+        if (method_ci == "wald") {
+            rst_psci$Effect$Stratum_Estimate <-
+                get_ci(dta_psrst$Effect$Stratum_Estimate,
+                       method_ci, conf_type, conf_int, n_eff_s, ...)
+            rst_psci$Effect$Overall_Estimate <-
+                get_ci(dta_psrst$Effect$Overall_Estimate,
+                       method_ci, conf_type, conf_int, n_eff, ...)
+        } else {
+            ## TODO: Wilson score, two arm, binarary.
+        }
     }
 
     ## return
