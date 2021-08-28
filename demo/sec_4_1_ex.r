@@ -15,7 +15,7 @@ dta_ps_single <- rwe_ps_est(ex_dta,
 plot(dta_ps_single, "balance")
 plot(dta_ps_single, "ps")
 plot(dta_ps_single, "diff")
-# plot(dta_ps_single, "diff", metric = "astd", avg.only = TRUE)
+# plot(dta_ps_single, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
 ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30)
@@ -30,6 +30,8 @@ rst_pp <- rwe_ps_powerp(ps_bor_single,
                         seed         = 1234)
 }) })
 rst_pp
+# plot(rst_pp)
+plot(rst_pp, add_stratum = TRUE)
 
 ### PSCL, single arm study, binary outcome.
 rst_cl <- rwe_ps_compl(ps_bor_single,

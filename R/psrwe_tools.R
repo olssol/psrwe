@@ -1,8 +1,8 @@
 #' @title RWE related class names
 #'
 #' @noRd
-get_rwe_class <- function(c.str) {
-  switch(c.str,
+get_rwe_class <- function(c_str) {
+  switch(c_str,
          DWITHPS   = "RWE_PS_DTA",
          DPSMATCH  = "RWE_PS_DTA_MAT",
          PSDIST    = "RWE_PS_BOR",
@@ -70,9 +70,9 @@ get_ps <- function(dta,
 #'   each stratum.
 #' @param rs vector. Similarity measure; for example, overlapping coefficient
 #'   for each stratum.
-#' @param m.lambda character. Method to split \code{total_borrow}, which can be
-#'   based on distance (\code{m.lambda = "dist"}) or inverse distance
-#'   (\code{m.lambda = "inverse"}).
+#' @param m_lambda character. Method to split \code{total_borrow}, which can be
+#'   based on distance (\code{m_lambda = "dist"}) or inverse distance
+#'   (\code{m_lambda = "inverse"}).
 #'
 #' @return Data frame with proportion for borrowing
 #'
@@ -188,7 +188,7 @@ get_observed <- function(data, v_covs) {
 #'   in group 1, and the distance measure from group 0 to group 1.
 #'
 #' @noRd
-get_freq_tbl <- function(data, var.groupby, vars = NULL) {
+get_freq_tbl <- function(data, var_groupby, vars = NULL) {
 
   if (is.null(vars))
     vars <- colnames(data)
@@ -199,8 +199,8 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
       next
 
     cur_freq <- data %>%
-        count(.dots = c(var.groupby, v)) %>%
-        group_by(!!as.name(var.groupby)) %>%
+        count(.dots = c(var_groupby, v)) %>%
+        group_by(!!as.name(var_groupby)) %>%
         mutate(Sum  = sum(.data$n),
                Freq = .data$n / sum(.data$n)) %>%
         ungroup() %>%
@@ -219,53 +219,53 @@ get_freq_tbl <- function(data, var.groupby, vars = NULL) {
 #' @title Plot density distribution of propensity score
 #'
 #' @noRd
-plot_ps <- function(data.withps,
-                    overall.inc = TRUE,
-                    add.text = TRUE,
-                    facet.scales = "free_y",
+plot_ps <- function(data_withps,
+                    overall_inc = TRUE,
+                    add_text = TRUE,
+                    facet_scales = "free_y",
                     ...) {
 
     N0 <- N1 <- Dist <- Ps <- Group <- NULL
 
-    ## stopifnot(inherits(data.withps,
+    ## stopifnot(inherits(data_withps,
     ##                    what = get_rwe_class("DWITHPS")))
 
-    rst_sum <- summary(data.withps, ...)
-    nstrata <- data.withps$nstrata
-    dtaps   <- data.withps$data %>%
+    rst_sum <- summary(data_withps, ...)
+    nstrata <- data_withps$nstrata
+    dtaps   <- data_withps$data %>%
         filter(!is.na(`_strata_`))
 
     xlim   <- range(dtaps[which(!is.na(dtaps[["_strata_"]])), "_ps_"],
                     na.rm = TRUE)
     strata <- levels(dtaps[["_strata_"]])
 
-    all.data <- NULL
+    all_data <- NULL
     for (i in strata) {
-        cur.sub  <- dtaps[which(i == dtaps[["_strata_"]]), ]
-        cur.data <- data.frame(Strata = i,
-                               Ps     = cur.sub[["_ps_"]],
-                               Group  = cur.sub[["_grp_"]])
-        all.data <- rbind(all.data, cur.data)
+        cur_sub  <- dtaps[which(i == dtaps[["_strata_"]]), ]
+        cur_data <- data.frame(Strata = i,
+                               Ps     = cur_sub[["_ps_"]],
+                               Group  = cur_sub[["_grp_"]])
+        all_data <- rbind(all_data, cur_data)
     }
     ps_kl <- data.frame(Strata = rst_sum$Summary$Stratum,
                         N0     = rst_sum$Summary$N_RWD,
                         N1     = rst_sum$Summary$N_Current)
 
-    if (overall.inc) {
-        cur.data <-  data.frame(Strata = "Overall",
+    if (overall_inc) {
+        cur_data <-  data.frame(Strata = "Overall",
                                 Ps     = dtaps[["_ps_"]],
                                 Group  = dtaps[["_grp_"]])
 
-        all.data <- rbind(all.data, cur.data)
+        all_data <- rbind(all_data, cur_data)
         ps_kl    <- rbind(ps_kl,
                           data.frame(Strata = "Overall",
                                      N0     = rst_sum$Overall$N_RWD,
                                      N1     = rst_sum$Overall$N_Current))
     }
 
-    all.data$Group <- as.factor(all.data$Group)
+    all_data$Group <- as.factor(all_data$Group)
 
-    rst <- ggplot(data = all.data, aes(x = Ps)) +
+    rst <- ggplot(data = all_data, aes(x = Ps)) +
         geom_density(alpha = 0.2,
                      aes(group = Group,
                          fill  = Group,
@@ -281,9 +281,9 @@ plot_ps <- function(data.withps,
               panel.grid = element_blank(),
               panel.border = element_rect(colour = "black"),
               panel.spacing = unit(0, "lines")) +
-        facet_grid(Strata ~ ., scales = facet.scales)
+        facet_grid(Strata ~ ., scales = facet_scales)
 
-    if (add.text) {
+    if (add_text) {
         rst <- rst +
             geom_text(x = Inf, y = Inf, hjust = 1, vjust = 1,
                       aes(label = paste('N0 =', N0, ", N1 =", N1,
@@ -298,26 +298,26 @@ plot_ps <- function(data.withps,
 #'
 #' @noRd
 plot_balance_fac <- function(dtaps, v,
-                             overall.inc = TRUE) {
+                             overall_inc = TRUE) {
 
-    cur.d <- get_freq_tbl(dtaps,
-                          var.groupby = c("Strata", "Group"),
+    cur_d <- get_freq_tbl(dtaps,
+                          var_groupby = c("Strata", "Group"),
                           vars = v)
-    cur.d <- cur.d %>%
+    cur_d <- cur_d %>%
         dplyr::filter(!is.na(Strata))
 
-    if (overall.inc) {
-        cur.overall <- get_freq_tbl(dtaps,
-                                    var.groupby = "Group",
+    if (overall_inc) {
+        cur_overall <- get_freq_tbl(dtaps,
+                                    var_groupby = "Group",
                                     vars = v)
-        cur.overall$Strata <- "Overall"
-        cur.d <- rbind(cur.d, cur.overall)
+        cur_overall$Strata <- "Overall"
+        cur_d <- rbind(cur_d, cur_overall)
     }
 
-    cur.d$Group <- as.factor(cur.d$Group)
-    cur.d$Value <- as.factor(cur.d$Value)
+    cur_d$Group <- as.factor(cur_d$Group)
+    cur_d$Value <- as.factor(cur_d$Value)
 
-    rst <- ggplot(data = cur.d, aes(x = .data$Value, y = .data$Freq)) +
+    rst <- ggplot(data = cur_d, aes(x = .data$Value, y = .data$Freq)) +
         geom_bar(alpha = 0.4,
                  stat = "identity",
                  position = "dodge",
@@ -337,31 +337,31 @@ plot_balance_fac <- function(dtaps, v,
 #'
 #' @noRd
 plot_balance_cont <- function(dtaps, v, strata,
-                              overall.inc = TRUE,
-                              facet.scales = "free_y") {
+                              overall_inc = TRUE,
+                              facet_scales = "free_y") {
 
   Value <- Group <- NULL
-  cur.d <- NULL
+  cur_d <- NULL
   for (i in strata) {
-    cur.sub      <- dtaps[which(i == dtaps[["_strata_"]]), ]
-    cur.v        <- data.frame(Cov    = v,
-                               Value  = cur.sub[[v]],
-                               Group  = cur.sub[["_grp_"]])
-    cur.v$Strata <- i
-    cur.d        <- rbind(cur.d, cur.v)
+    cur_sub      <- dtaps[which(i == dtaps[["_strata_"]]), ]
+    cur_v        <- data.frame(Cov    = v,
+                               Value  = cur_sub[[v]],
+                               Group  = cur_sub[["_grp_"]])
+    cur_v$Strata <- i
+    cur_d        <- rbind(cur_d, cur_v)
   }
 
-  if (overall.inc) {
-    cur.sub      <- dtaps
-    cur.v        <- data.frame(Cov    = v,
-                               Value  = cur.sub[[v]],
-                               Group  = cur.sub[["_grp_"]])
-    cur.v$Strata <- paste("Overall")
-    cur.d        <- rbind(cur.d, cur.v)
+  if (overall_inc) {
+    cur_sub      <- dtaps
+    cur_v        <- data.frame(Cov    = v,
+                               Value  = cur_sub[[v]],
+                               Group  = cur_sub[["_grp_"]])
+    cur_v$Strata <- paste("Overall")
+    cur_d        <- rbind(cur_d, cur_v)
   }
-  cur.d$Group <- as.factor(cur.d$Group)
+  cur_d$Group <- as.factor(cur_d$Group)
 
-  rst <- ggplot(data = cur.d, aes(x = Value)) +
+  rst <- ggplot(data = cur_d, aes(x = Value)) +
     geom_density(alpha = 0.2,
                  aes(group = Group,
                      fill  = Group,
@@ -370,7 +370,7 @@ plot_balance_cont <- function(dtaps, v, strata,
     scale_y_continuous(breaks = NULL) +
     scale_fill_manual(values = c("gray20", "white")) +
     labs(x = "", y = "") +
-    facet_grid(Strata ~ ., scales = facet.scales)
+    facet_grid(Strata ~ ., scales = facet_scales)
 
   return(rst)
 }
@@ -379,46 +379,46 @@ plot_balance_cont <- function(dtaps, v, strata,
 #' @title Plot the balance of baseline variables
 #'
 #' @noRd
-plot_balance <- function(data.withps,
-                         overall.inc = TRUE,
-                         v.cov = NULL,
-                         facet.scales = "free_y",
-                         label.cov = v.cov,
-                         legend.width = 0.08,
+plot_balance <- function(data_withps,
+                         overall_inc = TRUE,
+                         v_cov = NULL,
+                         facet_scales = "free_y",
+                         label_cov = v_cov,
+                         legend_width = 0.08,
                          ...) {
 
-    if (is.null(v.cov)) {
-        v.cov <- all.vars(data.withps$ps_fml)[-1]
+    if (is.null(v_cov)) {
+        v_cov <- all.vars(data_withps$ps_fml)[-1]
     }
 
     ## remove stratification covs
-    if (!is.null(data.withps$strata_covs)) {
-        s_cov_inx <- which(v.cov %in% data.withps$strata_covs)
-        v.cov     <- v.cov[-s_cov_inx]
+    if (!is.null(data_withps$strata_covs)) {
+        s_cov_inx <- which(v_cov %in% data_withps$strata_covs)
+        v_cov     <- v_cov[-s_cov_inx]
     }
 
-    if (is.null(label.cov)) {
-        label.cov <- v.cov
+    if (is.null(label_cov)) {
+        label_cov <- v_cov
     }
 
-    nstrata      <- data.withps$nstrata
-    dtaps        <- data.withps$data
+    nstrata      <- data_withps$nstrata
+    dtaps        <- data_withps$data
     dtaps$Strata <- dtaps[["_strata_"]]
     dtaps$Group  <- dtaps[["_grp_"]]
     strata       <- levels(dtaps[["_strata_"]])
 
     rst <- list()
-    for (v in v.cov) {
+    for (v in v_cov) {
         if (is.factor(dtaps[[v]])) {
-            cur.p <- plot_balance_fac(dtaps, v, overall.inc = overall.inc)
+            cur_p <- plot_balance_fac(dtaps, v, overall_inc = overall_inc)
         } else {
-            cur.p <- plot_balance_cont(dtaps, v, strata = strata,
-                                       overall.inc = overall.inc,
-                                       facet.scales = facet.scales)
+            cur_p <- plot_balance_cont(dtaps, v, strata = strata,
+                                       overall_inc = overall_inc,
+                                       facet_scales = facet_scales)
         }
 
-        cur.p <- cur.p +
-            labs(title = label.cov[v == v.cov]) +
+        cur_p <- cur_p +
+            labs(title = label_cov[v == v_cov]) +
             theme_bw() +
             theme(strip.background = element_blank(),
                   strip.placement  = "right",
@@ -430,7 +430,7 @@ plot_balance <- function(data.withps,
                   legend.position  = "none",
                   plot.margin      = unit(c(1, 0, 1, -0.5), "lines"))
 
-        rst[[v]] <- cur.p
+        rst[[v]] <- cur_p
     }
 
     rst[[length(rst)]] <- rst[[length(rst)]] +
@@ -438,8 +438,8 @@ plot_balance <- function(data.withps,
               legend.position = "right")
 
     rst$nrow       <- 1
-    rst$rel_widths <- c(rep(1, length(v.cov) - 1),
-                        1 + legend.width * length(v.cov))
+    rst$rel_widths <- c(rep(1, length(v_cov) - 1),
+                        1 + legend_width * length(v_cov))
     do.call(plot_grid, rst)
 }
 
@@ -448,16 +448,16 @@ plot_balance <- function(data.withps,
 #'     variables
 #'
 #' @noRd
-plot_astd <- function(data.withps,
+plot_astd <- function(data_withps,
                       metric = c("std", "astd"),
-                      avg.only = FALSE,
+                      avg_only = FALSE,
                       ...) {
 
-    v.cov <- all.vars(data.withps$ps_fml)[-1]
+    v_cov <- all.vars(data_withps$ps_fml)[-1]
 
     ## check arguments
-    d.metric <- match.arg(metric)
-    if (d.metric == "astd") {
+    d_metric <- match.arg(metric)
+    if (d_metric == "astd") {
         xlab       <- "Absolute Standardized Difference"
         xintercept <- c(0.2, 0.4)
     } else {
@@ -466,30 +466,30 @@ plot_astd <- function(data.withps,
     }
 
     ## remove stratification covs
-    if (!is.null(data.withps$strata_covs)) {
-        s_cov_inx <- which(v.cov %in% data.withps$strata_covs)
-        v.cov     <- v.cov[-s_cov_inx]
+    if (!is.null(data_withps$strata_covs)) {
+        s_cov_inx <- which(v_cov %in% data_withps$strata_covs)
+        v_cov     <- v_cov[-s_cov_inx]
     }
 
     ## prepare data
-    dtaps        <- data.withps$data
+    dtaps        <- data_withps$data
     dtaps$Strata <- dtaps[["_strata_"]]
     dtaps$Group  <- dtaps[["_grp_"]]
     strata       <- levels(dtaps[["_strata_"]])
 
     dta_asd <- data.frame()
-    for (v in v.cov) {
+    for (v in v_cov) {
         ## original data without any trimming
         cov0    <- as.numeric(dtaps[[v]][dtaps$Group == 0])
         cov1    <- as.numeric(dtaps[[v]][dtaps$Group == 1])
-        std.all <- get_distance(cov0, cov1, metric = d.metric)
+        std_all <- get_distance(cov0, cov1, metric = d_metric)
         dta_asd <- rbind(dta_asd,
-                         data.frame(v.cov = v,
+                         data.frame(v_cov = v,
                                     Group = "Observed",
-                                    asd   = std.all))
+                                    asd   = std_all))
 
         ## PS stratified data with trimming
-        std.ws <- NULL
+        std_ws <- NULL
         for (s in strata) {
             cov0 <- as.numeric(dtaps[[v]][dtaps$Group == 0 &
                                           dtaps$Strata == s &
@@ -497,29 +497,29 @@ plot_astd <- function(data.withps,
             cov1 <- as.numeric(dtaps[[v]][dtaps$Group == 1 &
                                           dtaps$Strata == s &
                                           !is.na(dtaps$Strata)])
-            std.s <- get_distance(cov0, cov1, metric = d.metric)
+            std_s <- get_distance(cov0, cov1, metric = d_metric)
 
-            if (!avg.only) {
+            if (!avg_only) {
                 dta_asd <- rbind(dta_asd,
-                                 data.frame(v.cov = v,
+                                 data.frame(v_cov = v,
                                             Group = s,
-                                            asd   = std.s))
+                                            asd   = std_s))
 	    }
 
-            std.ws <- c(std.ws, std.s)
+            std_ws <- c(std_ws, std_s)
         }
 
-        if (avg.only) {
+        if (avg_only) {
             dta_asd <- rbind(dta_asd,
-                             data.frame(v.cov = v,
+                             data.frame(v_cov = v,
                                         Group = "Averaged",
-                                        asd   = mean(std.ws)))
+                                        asd   = mean(std_ws)))
         }
     }
 
     ## plot
     rst <- ggplot(dta_asd,
-                  aes(x = asd, y = v.cov, shape = Group, color = Group)) +
+                  aes(x = asd, y = v_cov, shape = Group, color = Group)) +
            geom_point() +
            geom_vline(xintercept = 0, linetype = 2) +
            geom_vline(xintercept = xintercept, linetype = 3) +
@@ -754,41 +754,84 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
 #'
 #' @noRd
 #'
-plot_pp_rst <- function(x) {
-    if (x$is_rct) {
+plot_pp_rst <- function(x,
+                        add_stratum = FALSE,
+                        split_rct_arm = FALSE,
+                        ...) {
+    ## prepare data
+    if (x$is_rct){
       label_Arm <- "Control"
     } else {
       label_Arm <- "Single"
     }
 
-    rst <- data.frame(Type  = "Arm Specific",
-                      Arm   = label_Arm,
-                      theta = x$Control$Overall_Samples)
+    label_Type <- c("Arm Specific", "Arm Specific", "Treatment Effect")
+    if (x$is_rct && split_rct_arm) {
+      label_Type <- c("Arm Control", "Arm Treatment", "Treatment Effect")
+    }
+
+    rst <- data.frame(Type    = label_Type[1],
+                      Arm     = label_Arm,
+                      Stratum = "Overall",
+                      theta   = x$Control$Overall_Samples)
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     data.frame(Type  = "Arm Specific",
-                                Arm   = "Treatment",
-                                theta = x$Treatment$Overall_Samples),
-                     data.frame(Type  = "Treatment Effect",
-                                Arm   = "Effect",
-                                theta = x$Effect$Overall_Samples))
+                     data.frame(Type    = label_Type[2],
+                                Arm     = "Treatment",
+                                Stratum = "Overall",
+                                theta   = x$Treatment$Overall_Samples),
+                     data.frame(Type    = label_Type[3],
+                                Arm     = "Effect",
+                                Stratum = "Overall",
+                                theta   = x$Effect$Overall_Samples))
     }
 
-    rst_plt <- ggplot(data = rst, aes(x = theta)) +
-        theme_bw() +
-        labs(x = expression(theta), y = "Density")
+    ## add stratum
+    if (add_stratum) {
+        rst <- rbind(rst,
+                     data.frame(Type    = label_Type[1],
+                                Arm     = label_Arm,
+                                Stratum = x$Borrow$Stratum,
+                                theta   = as.vector(x$Control$Stratum_Samples)))
 
+        if (x$is_rct) {
+            rst <- rbind(rst,
+                         data.frame(Type    = label_Type[2],
+                                    Arm     = "Treatment",
+                                    Stratum = x$Borrow$Stratum,
+                                    theta   = as.vector(x$Treatment$Stratum_Samples)),
+                         data.frame(Type    = label_Type[3],
+                                    Arm     = "Effect",
+                                    Stratum = x$Borrow$Stratum,
+                                    theta   = as.vector(x$Effect$Stratum_Samples))
+	                 )
+        }
+    }
+
+    ## plot
+    rst$Arm_by_Stratum <- interaction(rst$Arm, rst$Stratum)
     if (x$is_rct) {
-        rst_plt <- rst_plt +
-            stat_density(aes(group = Arm, color = Arm),
+        rst_plt <- ggplot(data = rst, aes(x = theta)) +
+            stat_density(aes(group = Arm_by_Stratum,
+			     color = Arm,
+                             linetype = Stratum),
                          position  = "identity",
-                         geom      = "line", adjust = 1.2) +
+                         geom      = "line",
+                         adjust    = 1.2,
+                         trim      = TRUE) +
             facet_wrap(~ Type, scales = "free")
     } else {
-        rst_plt <- rst_plt +
-            stat_density(geom = "line", adjust = 1.2)
+        rst_plt <- ggplot(data = rst, aes(x = theta)) +
+            stat_density(aes(group    = Arm_by_Stratum,
+                             linetype = Stratum),
+                         position  = "identity",
+                         geom      = "line",
+                         adjust    = 1.2)
     }
+    rst_plt <- rst_plt +
+        theme_bw() +
+        labs(x = expression(theta), y = "Density")
 
     rst_plt
 }
@@ -801,8 +844,8 @@ plot_pp_rst <- function(x) {
 plot_km_rst <- function(x,
                         xlab = "Time",
                         ylab = "Survival Probability",
-                        add.ci = TRUE,
-                        add.stratum = FALSE,
+                        add_ci = TRUE,
+                        add_stratum = FALSE,
                         ...) {
 
     ## prepare data
@@ -817,28 +860,28 @@ plot_km_rst <- function(x,
 
     if (x$is_rct) {
         rst <- rbind(rst,
-                     cbind(Arm   = "Treatment Overall",
+                     cbind(Arm = "Treatment Overall",
                            x$Treatment$Overall_Estimate))
     }
 
     ## add stratum
-    if (add.stratum) {
-        name.v <- c("Mean", "StdErr", "T")
-        name.s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
+    if (add_stratum) {
+        name_v <- c("Mean", "StdErr", "T")
+        name_s <- x$Borrow$Stratum[x$Control$Stratum_Estimate$Stratum]
         rst <- rbind(rst,
-                     cbind(Arm = paste(label_Arm, name.s, sep = " "),
-                           x$Control$Stratum_Estimate[, name.v]))
+                     cbind(Arm = paste(label_Arm, name_s, sep = " "),
+                           x$Control$Stratum_Estimate[, name_v]))
 
         if (x$is_rct) {
-            name.s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
+            name_s <- x$Borrow$Stratum[x$Treatment$Stratum_Estimate$Stratum]
             rst <- rbind(rst,
-                         cbind(Arm = paste("Treatment", name.s, sep = " "),
-                               x$Treatment$Stratum_Estimate[, name.v]))
+                         cbind(Arm = paste("Treatment", name_s, sep = " "),
+                               x$Treatment$Stratum_Estimate[, name_v]))
         }
     }
 
     ## CI
-    if (add.ci) {
+    if (add_ci) {
       ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
       rst <- cbind(rst, ci)
     }
@@ -858,8 +901,8 @@ plot_km_rst <- function(x,
     }
 
     ## plot
-    # lt.a <- rep(2, length(rst$Arm))
-    # lt.a[grep(".* Overall$", rst$Arm)] <- 1
+    # lt_a <- rep(2, length(rst$Arm))
+    # lt_a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
         geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
         scale_y_continuous(limits = ylim) +
@@ -867,7 +910,7 @@ plot_km_rst <- function(x,
         labs(x = xlab, y = ylab) +
         theme_bw()
 
-    if (add.ci) {
+    if (add_ci) {
       rst_plt <- rst_plt +
           geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
           geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)

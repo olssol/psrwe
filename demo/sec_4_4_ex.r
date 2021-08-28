@@ -27,4 +27,4 @@ rst_km
 
 ### Plot PSKM
 plot(rst_km)
-# plot(rst_km, add.ci = FALSE, add.stratum = TRUE)
+# plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
