@@ -755,7 +755,7 @@ get_km_ci <- function(S, S_se, conf_int = 0.95,
 #' @noRd
 #'
 plot_pp_rst <- function(x) {
-    if (x$is_rct){
+    if (x$is_rct) {
       label_Arm <- "Control"
     } else {
       label_Arm <- "Single"
