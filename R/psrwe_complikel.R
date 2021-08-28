@@ -48,6 +48,7 @@ rwe_ps_compl <- function(dta_psbor, v_outcome = "Y",
     ## return
     rst$Observed <- rst_obs
     rst$Method   <- "ps_cl"
+    rst$Outcome_type <- outcome_type
     class(rst)   <- get_rwe_class("ANARST")
 
     rst

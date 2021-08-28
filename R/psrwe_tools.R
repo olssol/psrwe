@@ -722,33 +722,6 @@ get_overall_est <- function(ts1, weights, ts2 = NULL) {
 }
 
 
-#' Get KM CI
-#'
-#' @noRd
-#'
-get_km_ci <- function(S, S_se, conf_int = 0.95,
-                      conf_type = c("log_log", "plain"), ...) {
-
-    conf_type <- match.arg(conf_type)
-    z_alphad2 <- qnorm((1 - conf_int) / 2,
-                       lower.tail = FALSE)
-
-    ci <- switch(conf_type,
-                 log_log = {
-                     log_S        <- log(S)
-                     se_log_log_S <- S_se / S / log_S
-                     A <- cbind(-z_alphad2 * se_log_log_S,
-                                z_alphad2 * se_log_log_S)
-                     ci <- S^exp(A)
-                 },
-                 plain = cbind(S - z_alphad2 * S_se, S + z_alphad2 * S_se)
-                 )
-
-    colnames(ci) <- c("lower", "upper")
-    ci
-}
-
-
 #'  Plot density for power prior results
 #'
 #'
@@ -855,8 +828,8 @@ plot_km_rst <- function(x,
       label_Arm <- "Single"
     }
 
-    rst <- cbind(Arm = paste(label_Arm, "Overall", sep = " "),
-                 x$Control$Overall_Estimate)
+    rst <- data.frame(Arm = paste(label_Arm, "Overall", sep = " "),
+                      x$Control$Overall_Estimate)
 
     if (x$is_rct) {
         rst <- rbind(rst,
@@ -882,8 +855,8 @@ plot_km_rst <- function(x,
 
     ## CI
     if (add_ci) {
-      ci  <- get_km_ci(rst$Mean, rst$StdErr, ...)
-      rst <- cbind(rst, ci)
+      ci  <- get_ci_km(rst$Mean, rst$StdErr, ...)
+      rst <- cbind(rst, Lower = ci$Lower, Upper = ci$Upper)
     }
 
     ## check arguments
@@ -897,7 +870,11 @@ plot_km_rst <- function(x,
     if ("ylim" %in% names(args)) {
         ylim <- args[['ylim']]
     } else {
-        ylim <- c(0, 1)
+        ylim <- c(min(0, rst$Mean), max(1, rst$Mean))
+
+        if (add_ci) {
+            ylim <- c(min(0, rst$Lower), max(1, rst$Upper))
+        }
     }
 
     ## plot
@@ -912,8 +889,8 @@ plot_km_rst <- function(x,
 
     if (add_ci) {
       rst_plt <- rst_plt +
-          geom_step(aes(x = T, y = lower, col = Arm), linetype = 3) +
-          geom_step(aes(x = T, y = upper, col = Arm), linetype = 3)
+          geom_step(aes(x = T, y = Lower, col = Arm), linetype = 3) +
+          geom_step(aes(x = T, y = Upper, col = Arm), linetype = 3)
     }
 
     rst_plt
