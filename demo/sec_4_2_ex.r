@@ -10,7 +10,9 @@ dta_ps_rct <- rwe_ps_est(ex_dta_rct,
                          v_covs = paste("V", 1:7, sep = ""),
                          v_grp = "Group", cur_grp_level = "current",
                          v_arm = "Arm", ctl_arm_level = "control",
-                         ps_method = "logistic", nstrata = 5)
+                         ps_method = "logistic", nstrata = 5,
+                         stra_ctl_only = FALSE)
+dta_ps_rct
 
 ### Balance assessment of PS stratification.
 plot(dta_ps_rct, "balance")

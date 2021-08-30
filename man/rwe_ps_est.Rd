@@ -13,6 +13,7 @@ rwe_ps_est(
   cur_grp_level = 1,
   v_arm = NULL,
   ctl_arm_level = NULL,
+  stra_ctl_only = TRUE,
   nstrata = 5,
   ...
 )
@@ -38,6 +39,11 @@ random forest approach.}
 
 \item{ctl_arm_level}{Arm level for the control arm. Ignored for single-arm
 studies.}
+
+\item{stra_ctl_only}{Create strata by control arm patients only. Default
+\code{TRUE}. Ignored by single arm studies. For randomized studies, when
+\code{stra_ctl_only} is \code{FALSE}, strata are created based on the PS
+scores of the entire current study patients.}
 
 \item{nstrata}{Number of PS strata to be created.}
 

@@ -180,12 +180,16 @@ rwe_ps_est <- function(data,
 #' @method summary RWE_PS_DTA
 #'
 #' @examples
+#' data(ex_dta)
 #' dta_ps <- rwe_ps_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
+#' dta_ps
 #'
-#' summary(dta_ps, metric = "ovl")
+#' ## With different similarity metric
+#' print(dta_ps, metric = "omkss")
+#' dta_ps_sum <- summary(dta_ps, metric = "omkss")
 #'
 #' @export
 #'

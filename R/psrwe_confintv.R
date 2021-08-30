@@ -12,8 +12,6 @@
 #' @return A list with class name \code{RWE_PS_EST}.
 #'
 #' @examples
-#' \donttest{
-#'
 #' data(ex_dta)
 #' dta_ps <- rwe_ps_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
@@ -22,7 +20,7 @@
 #' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
 #' ps_rst <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")
 #' rst <- rwe_ps_ci(ps_rst)
-#'}
+#' rst$CI
 #'
 #' @export
 #'
