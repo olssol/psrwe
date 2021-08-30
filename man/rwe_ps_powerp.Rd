@@ -63,6 +63,6 @@ dta_ps <- rwe_ps_est(ex_dta,
        v_grp = "Group",
        cur_grp_level = "current")
 ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-rst <- rwe_ps_powerp(ps_borrow, v_outcome = "Y_Con")}
+rst <- rwe_ps_powerp(ps_borrow, v_outcome = "Y_Con", seed = 123)}
 
 }

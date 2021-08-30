@@ -28,13 +28,19 @@
 #' }
 #'
 #' @examples
-#'
+#' data(ex_dta)
 #' dta_ps <- rwe_ps_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
+#' dta_ps_mat <- rwe_ps_match(dta_ps, ratio = 2, strata_covs = "V1",
+#'                            seed = 123)
+#' dta_ps_mat
 #'
-#' dta_ps_mat <- rwe_ps_match(dta_ps, ratio = 2, strata_covs = "V1")
+#' ## With optmatch
+#' dta_ps_opt <- rwe_ps_match(dta_ps, ratio = 2, strata_covs = "V1",
+#'                            method = "optm", seed = 123)
+#' dta_ps_opt
 #'
 #' @export
 #'

@@ -856,7 +856,7 @@ plot_km_rst <- function(x,
     ## CI
     if (add_ci) {
       ci  <- get_ci_km(rst$Mean, rst$StdErr, ...)
-      rst <- cbind(rst, ci)
+      rst <- cbind(rst, Lower = ci$Lower, Upper = ci$Upper)
     }
 
     ## check arguments
@@ -870,7 +870,11 @@ plot_km_rst <- function(x,
     if ("ylim" %in% names(args)) {
         ylim <- args[['ylim']]
     } else {
-        ylim <- c(0, 1)
+        ylim <- c(min(0, rst$Mean), max(1, rst$Mean))
+
+        if (add_ci) {
+            ylim <- c(min(0, rst$Lower), max(1, rst$Upper))
+        }
     }
 
     ## plot

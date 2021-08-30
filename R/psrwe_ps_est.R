@@ -15,6 +15,10 @@
 #' @param v_arm Column name corresponding to arm assignment.
 #' @param ctl_arm_level Arm level for the control arm. Ignored for single-arm
 #'     studies.
+#' @param stra_ctl_only Create strata by control arm patients only. Default
+#'     \code{TRUE}. Ignored by single arm studies. For randomized studies, when
+#'     \code{stra_ctl_only} is \code{FALSE}, strata are created based on the PS
+#'     scores of the entire current study patients.
 #' @param nstrata Number of PS strata to be created.
 #' @param ps_method Method to calculate propensity scores. Can be set to
 #'     \code{logistic} for logistic regression or \code{randomforest} for a
@@ -49,6 +53,7 @@ rwe_ps_est <- function(data,
                        cur_grp_level = 1,
                        v_arm         = NULL,
                        ctl_arm_level = NULL,
+                       stra_ctl_only = TRUE,
                        nstrata       = 5, ...) {
 
     if (!identical("data.frame", class(data))) {
@@ -91,7 +96,8 @@ rwe_ps_est <- function(data,
         stop("No current study subjects found in data")
 
     # For two-arm studies only
-    if (!is.null(v_arm)) {
+    if (!is.null(v_arm) &
+        stra_ctl_only) {
         d1_inx <- d1_inx & ctl_arm_level == data[[v_arm]]
     }
 
@@ -174,12 +180,16 @@ rwe_ps_est <- function(data,
 #' @method summary RWE_PS_DTA
 #'
 #' @examples
+#' data(ex_dta)
 #' dta_ps <- rwe_ps_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
+#' dta_ps
 #'
-#' summary(dta_ps, metric = "ovl")
+#' ## With different similarity metric
+#' print(dta_ps, metric = "omkss")
+#' dta_ps_sum <- summary(dta_ps, metric = "omkss")
 #'
 #' @export
 #'

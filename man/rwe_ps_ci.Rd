@@ -10,7 +10,8 @@ rwe_ps_ci(
   dta_psrst,
   method_ci = c("wald", "wilson"),
   conf_type = c("log_log", "plain"),
-  conf_int = 0.95
+  conf_int = 0.95,
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ rwe_ps_ci(
 of PSKM approach (default log_log)}
 
 \item{conf_int}{a two-sided level of confidence limits (default 0.95)}
+
+\item{...}{other options}
 }
 \value{
 A list with class name \code{RWE_PS_EST}.
@@ -32,8 +35,6 @@ Confidence Interval for PS-Integrated Estimation
 Estimate the confidence interval for he PS-integrated approach.
 }
 \examples{
-\donttest{
-
 data(ex_dta)
 dta_ps <- rwe_ps_est(ex_dta,
        v_covs = paste("V", 1:7, sep = ""),
@@ -42,6 +43,6 @@ dta_ps <- rwe_ps_est(ex_dta,
 ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
 ps_rst <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")
 rst <- rwe_ps_ci(ps_rst)
-}
+rst$CI
 
 }

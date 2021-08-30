@@ -48,6 +48,13 @@ dta_ps <- rwe_ps_est(ex_dta,
                      v_covs = paste("V", 1:7, sep = ""),
                      v_grp = "Group",
                      cur_grp_level = "current")
+
 ps_borrow <- rwe_ps_borrow(total_borrow = 20, dta_ps)
+ps_borrow
+
+## Use different similarity metric
+ps_borrow_omkss <- rwe_ps_borrow(total_borrow = 20, dta_ps,
+                                 metric = "omkss")
+ps_borrow_omkss
 
 }
