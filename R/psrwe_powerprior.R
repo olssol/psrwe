@@ -166,6 +166,7 @@ rwe_ps_powerp <- function(dta_psbor, v_outcome = "Y",
                  Borrow    = dta_psbor$Borrow,
                  Total_borrow = dta_psbor$Total_borrow,
                  Method       = "ps_pp",
+                 Outcome_type = type,
                  is_rct       = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
