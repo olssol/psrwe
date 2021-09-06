@@ -4,15 +4,15 @@
 #' number of subjects to be borrowed from the external data source to each
 #' stratum
 #'
-#' @param dtaps  A class \code{RWE_PS_DTA} or \code{RWE_PS_DTA_MAT} object.
+#' @param dtaps  A class \code{PS_RWE_DTA} or \code{PS_RWE_DTA_MAT} object.
 #' @param total_borrow Total number of subjects to be borrowed
 #' @param method Method to split \code{total_borrow} for a class
-#'     \code{RWE_PS_DTA} object, which can be based on distance (\code{method =
+#'     \code{PS_RWE_DTA} object, which can be based on distance (\code{method =
 #'     "distance"}) or inverse distance (\code{method = "inverse_distance"}).
-#'     Ignored for class \code{RWE_PS_DTA_MAT} object.
-#' @param ... Additional parameters for \code{\link{summary.RWE_PS_DTA}}.
+#'     Ignored for class \code{PS_RWE_DTA_MAT} object.
+#' @param ... Additional parameters for \code{\link{summary.PS_RWE_DTA}}.
 #'
-#' @return A class \code{RWE_PS_BORR} list. It appends the following items to
+#' @return A class \code{PS_RWE_BORR} list. It appends the following items to
 #'     the \code{dtaps}:
 #'
 #'   \itemize{
@@ -27,23 +27,23 @@
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- ps_rwe_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
 #'
-#' ps_borrow <- rwe_ps_borrow(total_borrow = 20, dta_ps)
+#' ps_borrow <- ps_rwe_borrow(total_borrow = 20, dta_ps)
 #' ps_borrow
 #'
 #' ## Use different similarity metric
-#' ps_borrow_omkss <- rwe_ps_borrow(total_borrow = 20, dta_ps,
+#' ps_borrow_omkss <- ps_rwe_borrow(total_borrow = 20, dta_ps,
 #'                                  metric = "omkss")
 #' ps_borrow_omkss
 #'
 #' @export
 #'
 #'
-rwe_ps_borrow <- function(dtaps, total_borrow,
+ps_rwe_borrow <- function(dtaps, total_borrow,
                           method = c("distance", "inverse_distance"),
                           ...) {
 
@@ -84,19 +84,19 @@ rwe_ps_borrow <- function(dtaps, total_borrow,
 #'
 #' @description Print summary information of borrowing
 #'
-#' @param x A list of class \code{RWE_PS_BOR} that is generated using
-#'   the \code{\link{rwe_ps_borrow}} function.
+#' @param x A list of class \code{PS_RWE_BOR} that is generated using
+#'   the \code{\link{ps_rwe_borrow}} function.
 #'
 #' @param ... Additional parameters
 #'
-#' @seealso  \code{\link{rwe_ps_borrow}}
+#' @seealso  \code{\link{ps_rwe_borrow}}
 #'
-#' @method print RWE_PS_BOR
+#' @method print PS_RWE_BOR
 #'
 #'
 #' @export
 #'
-print.RWE_PS_BOR <- function(x, ...) {
+print.PS_RWE_BOR <- function(x, ...) {
     ss <- paste("A total of ",
                 x$Total_borrow,
                 " subjects will be borrowed from the RWD. ",

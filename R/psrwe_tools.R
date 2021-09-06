@@ -3,13 +3,13 @@
 #' @noRd
 get_rwe_class <- function(c_str) {
   switch(c_str,
-         DWITHPS   = "RWE_PS_DTA",
-         DPSMATCH  = "RWE_PS_DTA_MAT",
-         PSDIST    = "RWE_PS_BOR",
-         PSRST     = "RWE_PS_RST",
+         DWITHPS   = "PS_RWE_DTA",
+         DPSMATCH  = "PS_RWE_DTA_MAT",
+         PSDIST    = "PS_RWE_BOR",
+         PSRST     = "PS_RWE_RST",
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
-         ANARST    = "RWE_PS_RST",
+         ANARST    = "PS_RWE_RST",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",

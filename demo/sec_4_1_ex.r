@@ -6,7 +6,7 @@ data(ex_dta)
 head(ex_dta)
 
 ### Obtain PSs.
-dta_ps_single <- rwe_ps_est(ex_dta,
+dta_ps_single <- ps_rwe_est(ex_dta,
                      v_covs = paste("V", 1:7, sep = ""),
                      v_grp = "Group", cur_grp_level = "current",
                      ps_method = "logistic", nstrata = 5)
@@ -18,13 +18,13 @@ plot(dta_ps_single, "diff")
 plot(dta_ps_single, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
-ps_bor_single <- rwe_ps_borrow(dta_ps_single, total_borrow = 30)
+ps_bor_single <- ps_rwe_borrow(dta_ps_single, total_borrow = 30)
 ps_bor_single
 
 ### PSPP, single arm study, binary outcome.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
-rst_pp <- rwe_ps_powerp(ps_bor_single,
+rst_pp <- ps_rwe_powerp(ps_bor_single,
                         outcome_type = "binary",
                         v_outcome    = "Y_Bin",
                         seed         = 1234)
@@ -36,12 +36,12 @@ plot(rst_pp)
 plot(rst_pp, add_stratum = TRUE)
 
 ### PSCL, single arm study, binary outcome.
-rst_cl <- rwe_ps_compl(ps_bor_single,
+rst_cl <- ps_rwe_compl(ps_bor_single,
                        outcome_type = "binary",
                        v_outcome    = "Y_Bin")
 rst_cl
 
 ### 95% two-sided CI.
-rst_cl <- rwe_ps_ci(rst_cl)
+rst_cl <- ps_rwe_ci(rst_cl)
 rst_cl$CI$Control$Overall_Estimate
 

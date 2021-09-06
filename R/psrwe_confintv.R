@@ -2,29 +2,29 @@
 #'
 #' Estimate the confidence interval for he PS-integrated approach.
 #'
-#' @param dta_psrst a returned object with class \code{RWE_PS_EST}
+#' @param dta_psrst a returned object with class \code{PS_RWE_EST}
 #' @param method_ci a method name for confidence interval (default Wald)
 #' @param conf_type a type name of transformation for the confidence interal
 #'        of PSKM approach (default log_log)
 #' @param conf_int a two-sided level of confidence limits (default 0.95)
 #' @param ... other options
 #'
-#' @return A list with class name \code{RWE_PS_EST}.
+#' @return A list with class name \code{PS_RWE_EST}.
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- ps_rwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' ps_rst <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")
-#' rst <- rwe_ps_ci(ps_rst)
+#' ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
+#' ps_rst <- ps_rwe_compl(ps_borrow, v_outcome = "Y_Con")
+#' rst <- ps_rwe_ci(ps_rst)
 #' rst$CI
 #'
 #' @export
 #'
-rwe_ps_ci <- function(dta_psrst,
+ps_rwe_ci <- function(dta_psrst,
                       method_ci = c("wald", "wilson"),
                       conf_type = c("log_log", "plain"),
                       conf_int = 0.95,

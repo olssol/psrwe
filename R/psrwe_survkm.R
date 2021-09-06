@@ -4,7 +4,7 @@
 #' PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
 #' method. Applies to the case when there is only one external data source.
 #'
-#' @inheritParams rwe_ps_powerp
+#' @inheritParams ps_rwe_powerp
 #'
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
@@ -12,7 +12,7 @@
 #'
 #' @param ... Additional Parameters.
 #'
-#' @return A data frame with class name \code{RWE_PS_RST}. It contains the
+#' @return A data frame with class name \code{PS_RWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
 #'     jackknife estimation. The results should be further
 #'     summarized by its S3 method \code{summary}.
@@ -20,19 +20,19 @@
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- ps_rwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_survkm(ps_borrow,
+#' ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
+#' rst       <- ps_rwe_survkm(ps_borrow,
 #'                            v_time = "Y_Surv",
 #'                            v_event = "Status")
 #' rst
 #'
 #' @export
 #'
-rwe_ps_survkm <- function(dta_psbor,
+ps_rwe_survkm <- function(dta_psbor,
                           v_time     = "time",
                           v_event    = "event",
                           pred_tp    = 1,
