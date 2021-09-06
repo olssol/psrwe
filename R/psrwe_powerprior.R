@@ -337,6 +337,28 @@ summary.PS_RWE_RST <- function(object, ...) {
                           StdErr = dtype[1, "StdErr"])
 
     rst <- list(Overall = Overall)
+
+    ## for CI
+    if (exists("CI", object)) {
+        citype <- cbind(object$CI[[type]]$Overall_Estimate)
+
+        if (is.data.frame(citype)) {
+            if ("ps_km" == object$Method) {
+                citype <- cbind(citype,
+                                T = object[[type]]$Overall_Estimate$T)
+                citype <- data.frame(citype) %>%
+                    filter(object$pred_tp == T)
+            }
+
+            rst$CI <- data.frame(Lower = citype[1, "Lower"],
+                                 Upper = citype[1, "Upper"],
+                                 ConfLvl = object$CI$Conf_int,
+                                 ConfType = object$CI$Conf_type,
+                                 MethodCI = object$CI$Method_ci)
+        }
+    }
+
+    return(rst)
 }
 
 #' @title Print estimation results
@@ -358,7 +380,9 @@ summary.PS_RWE_RST <- function(object, ...) {
 #'
 print.PS_RWE_RST <- function(x, ...) {
 
-    rst_sum <- summary(x, ...)$Overall
+    rst <- summary(x, ...)
+    rst_sum <- rst$Overall
+    rst_sum_ci <- rst$CI
 
     extra_1 <- ""
     if ("ps_km" == x$Method) {
@@ -378,6 +402,32 @@ print.PS_RWE_RST <- function(x, ...) {
         ## seed and rstan version."
     }
 
+    ## for CI
+    extra_4 <- ""
+    if (exists("CI", x)) {
+        extra_4 <- paste("Confidence interval: ",
+                         "(",
+                         sprintf("%5.3f", rst_sum_ci[1, "Lower"]),
+                         ", ",
+                         sprintf("%5.3f", rst_sum_ci[1, "Upper"]),
+                         ") with level of ",
+                         sprintf("%5.3f", rst_sum_ci[1, "ConfLvl"]),
+                         " by ",
+                         rst_sum_ci[1, "MethodCI"],
+                         " method",
+                         sep = "")
+
+        if (!is.na(rst_sum_ci[1, "ConfType"])) {
+            extra_4 <- paste(extra_4,
+                             " and ",
+                             rst_sum_ci[1, "ConfType"],
+                             " transformation",
+                             sep = "")			      
+        }
+
+        extra_4 <- paste(extra_4, ".", sep = "")
+    }
+
     ss <- paste("With a total of ", x$Total_borrow,
                 " subject borrowed from the RWD,",
                 extra_1, " the ", extra_2,
@@ -386,6 +436,7 @@ print.PS_RWE_RST <- function(x, ...) {
                 " with standard error ",
                 sprintf("%5.3f", rst_sum[1, "StdErr"]),
                 ". ", extra_3,
+                " ", extra_4,
                 sep = "")
 
     cat_paste(ss)
