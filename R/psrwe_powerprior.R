@@ -346,15 +346,17 @@ summary.PS_RWE_RST <- function(object, ...) {
             if ("ps_km" == object$Method) {
                 citype <- cbind(citype,
                                 T = object[[type]]$Overall_Estimate$T)
+
                 citype <- data.frame(citype) %>%
                     filter(object$pred_tp == T)
             }
 
-            rst$CI <- data.frame(Lower = citype[1, "Lower"],
-                                 Upper = citype[1, "Upper"],
-                                 ConfLvl = object$CI$Conf_int,
+            rst$CI <- data.frame(Lower    = citype[1, "Lower"],
+                                 Upper    = citype[1, "Upper"],
+                                 ConfLvl  = object$CI$Conf_int,
                                  ConfType = object$CI$Conf_type,
-                                 MethodCI = object$CI$Method_ci)
+                                 MethodCI = object$CI$Method_ci,
+                                 Method   = object$Method)
         }
     }
 
@@ -410,7 +412,7 @@ print.PS_RWE_RST <- function(x, ...) {
                          sprintf("%5.3f", rst_sum_ci[1, "Lower"]),
                          ", ",
                          sprintf("%5.3f", rst_sum_ci[1, "Upper"]),
-                         ") with level of ",
+                         ") with two-sided level of ",
                          sprintf("%5.3f", rst_sum_ci[1, "ConfLvl"]),
                          " by ",
                          rst_sum_ci[1, "MethodCI"],

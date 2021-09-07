@@ -1,12 +1,13 @@
-#' @title Confidence Interval for PS-Integrated Estimation
+#' @title Confidence/Credible Interval for PS-Integrated Estimation
 #'
-#' Estimate the confidence interval for he PS-integrated approach.
+#' Estimate the confidence/credible interval for he PS-integrated approach.
 #'
 #' @param dta_psrst a returned object with class \code{PS_RWE_EST}
 #' @param method_ci a method name for confidence interval (default Wald)
 #' @param conf_type a type name of transformation for the confidence interal
 #'        of PSKM approach (default log_log)
-#' @param conf_int a two-sided level of confidence limits (default 0.95)
+#' @param conf_int a two-sided level of confidence/credible limits
+#'        (default 0.95)
 #' @param ... other options
 #'
 #' @return A list with class name \code{PS_RWE_EST}.
@@ -35,6 +36,8 @@ ps_rwe_ci <- function(dta_psrst,
                        what = get_rwe_class("PSRST")))
 
     stopifnot(dta_psrst$Method %in% c("ps_cl", "ps_km"))
+
+    ## TODO: Bayesian credible interval
 
     method_ci <- match.arg(method_ci)
     outcome_type <- dta_psrst$Outcome_type
