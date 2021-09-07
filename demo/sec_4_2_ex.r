@@ -36,7 +36,7 @@ rst_cl_rct$Control
 
 ### 95% two-sided CI
 rst_cl_rct <- ps_rwe_ci(rst_cl_rct)
-rst_cl_rct$CI$Effect$Overall_Estimate
+rst_cl_rct
 
 ### PSPP, two-arm RCT, continuous outcome.
 options(mc.cores = 1)

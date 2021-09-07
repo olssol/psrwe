@@ -43,5 +43,5 @@ rst_cl
 
 ### 95% two-sided CI.
 rst_cl <- ps_rwe_ci(rst_cl)
-rst_cl$CI$Control$Overall_Estimate
+rst_cl
 

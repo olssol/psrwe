@@ -32,7 +32,7 @@ plot(rst_km, conf_type = "plain")
 
 ### 95% two-sided CI
 rst_km_log <- ps_rwe_ci(rst_km)
-head(rst_km_log$CI$Control$Overall_Estimate)
+rst_km_log
 rst_km_pln <- ps_rwe_ci(rst_km, conf_type = "plain")
-head(rst_km_pln$CI$Control$Overall_Estimate)
+rst_km_pln
 
