@@ -2,9 +2,9 @@
 % Please edit documentation in R/psrwe_confintv.R
 \name{ps_rwe_ci}
 \alias{ps_rwe_ci}
-\title{Confidence Interval for PS-Integrated Estimation
+\title{Confidence/Credible Interval for PS-Integrated Estimation
 
-Estimate the confidence interval for he PS-integrated approach.}
+Estimate the confidence/credible interval for he PS-integrated approach.}
 \usage{
 ps_rwe_ci(
   dta_psrst,
@@ -22,7 +22,8 @@ ps_rwe_ci(
 \item{conf_type}{a type name of transformation for the confidence interal
 of PSKM approach (default log_log)}
 
-\item{conf_int}{a two-sided level of confidence limits (default 0.95)}
+\item{conf_int}{a two-sided level of confidence/credible limits
+(default 0.95)}
 
 \item{...}{other options}
 }
@@ -30,9 +31,12 @@ of PSKM approach (default log_log)}
 A list with class name \code{PS_RWE_EST}.
 }
 \description{
-Confidence Interval for PS-Integrated Estimation
+Confidence/Credible Interval for PS-Integrated Estimation
 
-Estimate the confidence interval for he PS-integrated approach.
+Estimate the confidence/credible interval for he PS-integrated approach.
+}
+\details{
+\code{method_ci = "wilson"} is for binary outcomes only.
 }
 \examples{
 data(ex_dta)

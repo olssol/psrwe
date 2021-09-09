@@ -12,6 +12,8 @@
 #'
 #' @return A list with class name \code{PS_RWE_EST}.
 #'
+#' @details \code{method_ci = "wilson"} is for binary outcomes only.
+#'
 #' @examples
 #' data(ex_dta)
 #' dta_ps <- ps_rwe_est(ex_dta,
@@ -35,15 +37,121 @@ ps_rwe_ci <- function(dta_psrst,
     stopifnot(inherits(dta_psrst,
                        what = get_rwe_class("PSRST")))
 
-    stopifnot(dta_psrst$Method %in% c("ps_cl", "ps_km"))
-
-    ## TODO: Bayesian credible interval
+    stopifnot(dta_psrst$Method %in% c("ps_pp", "ps_cl", "ps_km"))
 
     method_ci <- match.arg(method_ci)
     outcome_type <- dta_psrst$Outcome_type
 
     stopifnot(!(method_ci == "wilson" && outcome_type != "binary"))
     conf_type <- ifelse(outcome_type == "tte", match.arg(conf_type), NA)
+
+    ## get ci by method
+    if (dta_psrst$Method == "ps_pp") {
+        rst_psci <- get_psci_bayesian(dta_psrst,
+                                      conf_int,
+                                      ...)
+    } else {
+        rst_psci <- get_psci_freq(dta_psrst,
+                                  method_ci,
+                                  conf_type,
+                                  conf_int,
+                                  ...)
+    }
+
+
+    ## return
+    rst <- dta_psrst
+    rst$CI <- rst_psci
+    rst
+}
+
+
+
+
+#' @title Bayesian credible interval
+#'
+#' @noRd
+get_psci_bayesian <- function(dta_psrst,
+                              conf_int,
+                              ...) {
+
+    ## prepare data
+    is_rct <- dta_psrst$is_rct 
+
+    ## prepare for the return object
+    rst_psci <- list(Control = NULL,
+                     Treatment = NULL,
+                     Effect = NULL,
+                     Method_ci = "Credible",
+                     Conf_type = NA,
+                     Conf_int = conf_int)
+
+    ## by study type
+    rst_psci$Control$Stratum_Estimate <-
+        get_bci(dta_psrst$Control$Stratum_Samples,
+                conf_int = conf_int,
+                ...)
+    rst_psci$Control$Overall_Estimate <-
+        get_bci(dta_psrst$Control$Overall_Samples,
+                conf_int = conf_int,
+                ...)
+
+    if (is_rct) {
+        rst_psci$Treatment$Stratum_Estimate <-
+            get_bci(dta_psrst$Treatment$Stratum_Samples,
+                    conf_int = conf_int,
+                    ...)
+        rst_psci$Treatment$Overall_Estimate <-
+            get_bci(dta_psrst$Treatment$Overall_Samples,
+                    conf_int = conf_int,
+                    ...)
+
+        rst_psci$Effect$Stratum_Estimate <-
+            get_bci(dta_psrst$Effect$Stratum_Samples,
+                    conf_int = conf_int,
+                    ...)
+        rst_psci$Effect$Overall_Estimate <-
+            get_bci(dta_psrst$Effect$Overall_Samples,
+                    conf_int = conf_int,
+                    ...)
+    }
+
+    return(rst_psci)
+}
+
+
+#' @title Credible interval
+#'
+#' @noRd
+get_bci <- function(x,
+                    conf_int = 0.95,
+                    ...) {
+
+    q_alphad2 <- (1 - conf_int) / 2
+
+    if (is.vector(x)) {
+        bci_lb <- quantile(x, q_alphad2)
+        bci_ub <- quantile(x, 1 - q_alphad2)
+    } else {
+        bci_lb <- apply(x, 1, quantile, q_alphad2) 
+        bci_ub <- apply(x, 1, quantile, 1 - q_alphad2) 
+    }
+
+    rst <- data.frame(Lower = bci_lb, Upper = bci_ub)
+    rst
+}
+
+
+
+
+#' @title Frequentist confidence interval
+#'
+#' @noRd
+get_psci_freq <- function(dta_psrst,
+                          method_ci,
+                          conf_type,
+                          conf_int,
+                          ...) {
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
@@ -137,10 +245,7 @@ ps_rwe_ci <- function(dta_psrst,
         }
     }
 
-    ## return
-    rst <- dta_psrst
-    rst$CI <- rst_psci
-    rst
+    return(rst_psci)
 }
 
 
