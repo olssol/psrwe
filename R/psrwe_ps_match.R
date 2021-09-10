@@ -209,7 +209,7 @@ print.PS_RWE_DTA_MAT <- function(x, ...) {
                 " current study subjects are matched by less than ",
                 rst_sum$ratio,
                 " RWD subjects. Please note unequal matching may cause",
-                " unblance in covariate distributions of the current",
+                " unbalance in covariate distributions of the current",
                 " and matched RWD subjects.", sep = "")
 
     cat_paste(ss)
