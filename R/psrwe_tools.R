@@ -797,6 +797,7 @@ plot_pp_rst <- function(x,
     } else {
         rst_plt <- ggplot(data = rst, aes(x = theta)) +
             stat_density(aes(group    = Arm_by_Stratum,
+                             color = Stratum,
                              linetype = Stratum),
                          position  = "identity",
                          geom      = "line",
