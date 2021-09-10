@@ -516,7 +516,8 @@ plot_astd <- function(data_withps,
                                         asd   = mean(std_ws)))
         }
 
-        dta_asd <- factor(dta_asd$Group, levels = c("Before PS", "After PS"))
+        dta_asd$Group <- factor(dta_asd$Group,
+                                levels = c("Before PS", "After PS"))
     }
 
     ## plot
