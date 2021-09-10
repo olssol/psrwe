@@ -415,7 +415,7 @@ print.PS_RWE_RST <- function(x, ...) {
         extra_2 <- "treatment effect"
         extra_2_param <- "theta_trt-theta_ctr"
     } else {
-        extra_2 <- "mean of the outcome"
+        extra_2 <- "point estimate"
         extra_2_param <- "theta"
     }
 
