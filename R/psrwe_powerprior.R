@@ -360,6 +360,24 @@ summary.PS_RWE_RST <- function(object, ...) {
         }
     }
 
+    ## for hypothesis inference
+    if (exists("INFER", object)) {
+        hitype <- object$INFER[[type]]$Overall_InferProb
+
+        if ("ps_km" == object$Method) {
+            hitype <- cbind(hitype,
+                            T = object[[type]]$Overall_Estimate$T)
+
+            hitype <- data.frame(hitype) %>%
+                filter(object$pred_tp == T)
+        }
+
+        rst$INFER <- data.frame(InferP   = hitype[1, "Infer_prob"],
+                                MethodHI = object$INFER$Method_infer,
+                                Alter    = object$INFER$Alternative,
+                                Mu       = object$INFER$Mu)
+    }
+
     return(rst)
 }
 
@@ -384,7 +402,8 @@ print.PS_RWE_RST <- function(x, ...) {
 
     rst <- summary(x, ...)
     rst_sum <- rst$Overall
-    rst_sum_ci <- rst$CI
+    rst_ci <- rst$CI
+    rst_infer <- rst$INFER
 
     extra_1 <- ""
     if ("ps_km" == x$Method) {
@@ -394,42 +413,58 @@ print.PS_RWE_RST <- function(x, ...) {
 
     if ("Effect" == rst_sum[1, "Type"]) {
         extra_2 <- "treatment effect"
+        extra_2_param <- "theta_trt-theta_ctr"
     } else {
         extra_2 <- "mean of the outcome"
-    }
-
-    extra_3 <- ""
-    if ("ps_pp" == x$Method) {
-        ## extra_3 <- "PS: MCMC discrepancy may occur due to different random
-        ## seed and rstan version."
+        extra_2_param <- "theta"
     }
 
     ## for CI
-    extra_4 <- ""
+    extra_ci <- ""
     if (exists("CI", x)) {
-        extra_4 <- paste("Confidence interval: ",
-                         "(",
-                         sprintf("%5.3f", rst_sum_ci[1, "Lower"]),
-                         ", ",
-                         sprintf("%5.3f", rst_sum_ci[1, "Upper"]),
-                         ") with two-sided level of ",
-                         sprintf("%5.3f", rst_sum_ci[1, "ConfLvl"]),
-                         " by ",
-                         rst_sum_ci[1, "MethodCI"],
-                         " method",
-                         sep = "")
+        extra_ci <- paste(" Confidence interval: ",
+                          "(",
+                          sprintf("%5.3f", rst_ci[1, "Lower"]),
+                          ", ",
+                          sprintf("%5.3f", rst_ci[1, "Upper"]),
+                          ")",
+                          " with two-sided level of ",
+                          sprintf("%5.3f", rst_ci[1, "ConfLvl"]),
+                          " by ",
+                          rst_ci[1, "MethodCI"],
+                          " method",
+                          sep = "")
 
-        if (!is.na(rst_sum_ci[1, "ConfType"])) {
-            extra_4 <- paste(extra_4,
-                             " and ",
-                             rst_sum_ci[1, "ConfType"],
-                             " transformation",
-                             sep = "")			      
+        if (!is.na(rst_ci[1, "ConfType"])) {
+            extra_ci <- paste(extra_ci,
+                              " and ",
+                              rst_ci[1, "ConfType"],
+                              " transformation",
+                              sep = "")                              
         }
 
-        extra_4 <- paste(extra_4, ".", sep = "")
+        extra_ci <- paste(extra_ci, ".", sep = "")
     }
 
+    ## for hypothesis inference
+    extra_hi <- ""
+    if (exists("INFER", x)) {
+        extra_hi <- paste(" Hypothesis inference: ",
+                          "H0: ", extra_2_param, " ",
+                          ifelse(rst_infer[1, "Alter"] == "less", ">=", "<="),
+                          " ", sprintf("%5.3f", rst_infer[1, "Mu"]),
+                          " vs. ",
+                          "Ha: ", extra_2_param, " ",
+                          ifelse(rst_infer[1, "Alter"] == "less", "<", ">"),
+                          " ", sprintf("%5.3f", rst_infer[1, "Mu"]),
+                          " with the ", rst_infer[1, "MethodHI"],
+                          " ",
+                          sprintf("%5.5f", rst_infer[1, "InferP"]),
+                          ".",
+                          sep = "")
+    }
+
+    ## combine all above
     ss <- paste("With a total of ", x$Total_borrow,
                 " subject borrowed from the RWD,",
                 extra_1, " the ", extra_2,
@@ -437,8 +472,9 @@ print.PS_RWE_RST <- function(x, ...) {
                 sprintf("%5.3f", rst_sum[1, "Mean"]),
                 " with standard error ",
                 sprintf("%5.3f", rst_sum[1, "StdErr"]),
-                ". ", extra_3,
-                " ", extra_4,
+                ".",
+                extra_ci,
+                extra_hi,
                 sep = "")
 
     cat_paste(ss)

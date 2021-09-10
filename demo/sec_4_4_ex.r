@@ -36,3 +36,7 @@ rst_km_log
 rst_km_pln <- ps_rwe_ci(rst_km, conf_type = "plain")
 rst_km_pln
 
+### Inference.
+rst_km <- ps_rwe_infer(rst_km, mu = 0.70, alternative = "greater")
+rst_km
+

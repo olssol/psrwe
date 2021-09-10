@@ -35,6 +35,14 @@ rst_pp
 plot(rst_pp)
 plot(rst_pp, add_stratum = TRUE)
 
+### 95% two-sided CI.
+rst_pp <- ps_rwe_ci(rst_pp)
+rst_pp
+
+### Inference.
+rst_pp <- ps_rwe_infer(rst_pp, mu = 0.4)
+rst_pp
+
 ### PSCL, single arm study, binary outcome.
 rst_cl <- ps_rwe_compl(ps_bor_single,
                        outcome_type = "binary",
@@ -43,5 +51,9 @@ rst_cl
 
 ### 95% two-sided CI.
 rst_cl <- ps_rwe_ci(rst_cl)
+rst_cl
+
+### Inference.
+rst_cl <- ps_rwe_infer(rst_cl, mu = 0.4)
 rst_cl
 

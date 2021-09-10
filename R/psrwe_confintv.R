@@ -62,7 +62,8 @@ ps_rwe_ci <- function(dta_psrst,
     ## return
     rst <- dta_psrst
     rst$CI <- rst_psci
-    rst
+
+    return(rst)
 }
 
 
@@ -82,7 +83,7 @@ get_psci_bayesian <- function(dta_psrst,
     rst_psci <- list(Control = NULL,
                      Treatment = NULL,
                      Effect = NULL,
-                     Method_ci = "Credible",
+                     Method_ci = "credible interval",
                      Conf_type = NA,
                      Conf_int = conf_int)
 
@@ -138,7 +139,8 @@ get_bci <- function(x,
     }
 
     rst <- data.frame(Lower = bci_lb, Upper = bci_ub)
-    rst
+
+    return(rst)
 }
 
 
@@ -152,6 +154,9 @@ get_psci_freq <- function(dta_psrst,
                           conf_type,
                           conf_int,
                           ...) {
+
+    ## check
+    outcome_type <- dta_psrst$Outcome_type
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
@@ -282,7 +287,7 @@ get_ci <- function(x,
         stop("Confidence interval method is not implemented.")
     }
 
-    rst
+    return(rst)
 }
 
 
@@ -300,7 +305,8 @@ get_ci_wald <- function(mean,
     ci_wl_ub <- mean + z_alphad2 * stderr
 
     rst <- data.frame(Lower = ci_wl_lb, Upper = ci_wl_ub)
-    rst
+
+    return(rst)
 }
 
 
@@ -329,7 +335,8 @@ get_ci_wilson <- function(mean,
     ci_ws_ub <- (minus_b + sqrt_b2_m_4ac) / two_a
 
     rst <- data.frame(Lower = ci_ws_lb, Upper = ci_ws_ub)
-    rst
+
+    return(rst)
 }
 
 
@@ -358,7 +365,8 @@ get_ci_km <- function(mean,
                  )
 
     rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
-    rst
+
+    return(rst)
 }
 
 
@@ -404,7 +412,7 @@ get_ci_2arms <- function(x,
         stop("Confidence interval method is not implemented.")
     }
 
-    rst
+    return(rst)
 }
 
 
@@ -425,7 +433,8 @@ get_ci_wald_2arms <- function(mean,
     ci_wl_ub <- (mean - mean_2) + z_alphad2 * stderr_p
 
     rst <- data.frame(Lower = ci_wl_lb, Upper = ci_wl_ub)
-    rst
+
+    return(rst)
 }
 
 
@@ -472,7 +481,8 @@ get_ci_wilson_2arms <- function(mean,
     ci_ws_ub <- (mean - mean_2) + z_alphad2 * stderr_e
 
     rst <- data.frame(Lower = ci_ws_lb, Upper = ci_ws_ub)
-    rst
+
+    return(rst)
 }
 
 
@@ -503,6 +513,7 @@ get_ci_km_2arms <- function(mean,
                  })
 
     rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
-    rst
+
+    return(rst)
 }
 

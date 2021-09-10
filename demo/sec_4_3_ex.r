@@ -49,3 +49,7 @@ rst_cl_opt <- ps_rwe_compl(ps_bor_match_opt,
                            v_outcome    = "Y_Bin")
 rst_cl_opt
 
+### Inference.
+rst_cl <- ps_rwe_infer(rst_cl, mu = 0.40)
+rst_cl
+

@@ -28,14 +28,14 @@ ps_bor_rct
 rst_cl_rct <- ps_rwe_compl(ps_bor_rct,
                            outcome_type = "continuous",
                            v_outcome = "Y_Con")
-
-### Results.
-rst_cl_rct$Effect
-rst_cl_rct$Treatment
-rst_cl_rct$Control
+rst_cl_rct
 
 ### 95% two-sided CI
 rst_cl_rct <- ps_rwe_ci(rst_cl_rct)
+rst_cl_rct
+
+### Inference.
+rst_cl_rct <- ps_rwe_infer(rst_cl_rct, alternative = "greater")
 rst_cl_rct
 
 ### PSPP, two-arm RCT, continuous outcome.
@@ -50,3 +50,12 @@ plot(rst_pp_rct)
 plot(rst_pp_rct, split_rct_arm = TRUE)
 plot(rst_pp_rct, add_stratum = TRUE)
 plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
+
+### 95% two-sided CI
+rst_pp_rct <- ps_rwe_ci(rst_pp_rct)
+rst_pp_rct
+
+### Inference.
+rst_pp_rct <- ps_rwe_infer(rst_pp_rct, alternative = "greater")
+rst_pp_rct
+
