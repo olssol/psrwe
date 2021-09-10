@@ -47,6 +47,6 @@ dta_ps <- ps_rwe_est(ex_dta,
 ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
 ps_rst <- ps_rwe_compl(ps_borrow, v_outcome = "Y_Con")
 rst <- ps_rwe_ci(ps_rst)
-rst$CI
+rst
 
 }

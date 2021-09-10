@@ -19,7 +19,7 @@
 #' ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
 #' ps_rst <- ps_rwe_compl(ps_borrow, v_outcome = "Y_Con")
 #' rst <- ps_rwe_infer(ps_rst)
-#' rst$INFER
+#' rst
 #'
 #' @export
 #'
@@ -64,35 +64,28 @@ get_psinfer_bayesian <- function(dta_psrst,
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
+    if (is_rct) {
+        type <- "Effect"
+    } else {
+        type <- "Control"
+    }
 
     ## prepare for the return object
     rst_psinfer <- list(Control = NULL,
-                        Treatment = NULL,
                         Effect = NULL,
                         Method_infer = "posterior probability",
                         Alternative = alternative,
                         Mu = mu)
 
     ## by study type
-    if (!is_rct) {
-        rst_psinfer$Control$Stratum_InferProb <-
-            get_bpostp(dta_psrst$Control$Stratum_Samples,
-                       alternative = alternative,
-                       mu = mu)
-        rst_psinfer$Control$Overall_InferProb <-
-            get_bpostp(dta_psrst$Control$Overall_Samples,
-                       alternative = alternative,
-                       mu = mu)
-    } else {
-        rst_psinfer$Effect$Stratum_InferProb <-
-            get_bpostp(dta_psrst$Effect$Stratum_Samples,
-                       alternative = alternative,
-                       mu = mu)
-        rst_psinfer$Effect$Overall_InferProb <-
-            get_bpostp(dta_psrst$Effect$Overall_Samples,
-                       alternative = alternative,
-                       mu = mu)
-    }
+    rst_psinfer[[type]]$Stratum_InferProb <-
+        get_bpostp(dta_psrst[[type]]$Stratum_Samples,
+                   alternative = alternative,
+                   mu = mu)
+    rst_psinfer[[type]]$Overall_InferProb <-
+        get_bpostp(dta_psrst[[type]]$Overall_Samples,
+                   alternative = alternative,
+                   mu = mu)
 
     return(rst_psinfer)
 }
@@ -116,10 +109,10 @@ get_bpostp <- function(x,
     } else {
         post_prob <- switch(alternative,
                             less = {
-                              apply(x < mu, 1, mean)
+                              rowMeans(x < mu)
                             },
                             greater = {
-                              apply(x > mu, 1, mean)
+                              rowMeans(x > mu)
                             })
     }
 
@@ -139,35 +132,28 @@ get_psinfer_freq <- function(dta_psrst,
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
+    if (is_rct) {
+        type <- "Effect"
+    } else {
+        type <- "Control"
+    }
 
     ## prepare for the return object
     rst_psinfer <- list(Control = NULL,
-                        Treatment = NULL,
                         Effect = NULL,
                         Method_infer = "p_value (wald)",
                         Alternative = alternative,
                         Mu = mu)
 
     ## by study type
-    if (!is_rct) {
-        rst_psinfer$Control$Stratum_InferProb <-
-            get_fpval(dta_psrst$Control$Stratum_Estimate,
-                      alternative = alternative,
-                      mu = mu)
-        rst_psinfer$Control$Overall_InferProb <-
-            get_fpval(dta_psrst$Control$Overall_Estimate,
-                      alternative = alternative,
-                      mu = mu)
-    } else {
-        rst_psinfer$Effect$Stratum_InferProb <-
-            get_fpval(dta_psrst$Effect$Stratum_Estimate,
-                      alternative = alternative,
-                      mu = mu)
-        rst_psinfer$Effect$Overall_InferProb <-
-            get_fpval(dta_psrst$Effect$Overall_Estimate,
-                      alternative = alternative,
-                      mu = mu)
-    }
+    rst_psinfer[[type]]$Stratum_InferProb <-
+        get_fpval(dta_psrst[[type]]$Stratum_Estimate,
+                  alternative = alternative,
+                  mu = mu)
+    rst_psinfer[[type]]$Overall_InferProb <-
+        get_fpval(dta_psrst[[type]]$Overall_Estimate,
+                  alternative = alternative,
+                  mu = mu)
 
     return(rst_psinfer)
 }
