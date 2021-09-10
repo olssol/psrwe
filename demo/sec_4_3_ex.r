@@ -40,6 +40,10 @@ rst_cl_ws_p <- ps_rwe_ci(rst_cl, method_ci = "wilson",
                          method_stderr = "plain")
 rst_cl_ws_p
 
+### Inference.
+rst_cl <- ps_rwe_infer(rst_cl, mu = 0.40)
+rst_cl
+
 ### Use optmatch with caliper
 dta_ps_match_opt <- ps_rwe_match(dta_ps_single, ratio = 2, strata_covs = "V2",
                                  mat_method = "optm", caliper = 0.5)
@@ -48,8 +52,4 @@ rst_cl_opt <- ps_rwe_compl(ps_bor_match_opt,
                            outcome_type = "binary",
                            v_outcome    = "Y_Bin")
 rst_cl_opt
-
-### Inference.
-rst_cl <- ps_rwe_infer(rst_cl, mu = 0.40)
-rst_cl
 
