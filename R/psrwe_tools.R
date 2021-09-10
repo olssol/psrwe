@@ -485,7 +485,7 @@ plot_astd <- function(data_withps,
         std_all <- get_distance(cov0, cov1, metric = d_metric)
         dta_asd <- rbind(dta_asd,
                          data.frame(v_cov = v,
-                                    Group = "Before PS",
+                                    Group = "Before Stratification",
                                     asd   = std_all))
 
         ## PS stratified data with trimming
@@ -512,12 +512,13 @@ plot_astd <- function(data_withps,
         if (avg_only) {
             dta_asd <- rbind(dta_asd,
                              data.frame(v_cov = v,
-                                        Group = "After PS",
+                                        Group = "After Stratification",
                                         asd   = mean(std_ws)))
-        }
 
-        dta_asd$Group <- factor(dta_asd$Group,
-                                levels = c("Before PS", "After PS"))
+            dta_asd$Group <- factor(dta_asd$Group,
+                                    levels = c("Before Stratification",
+                                               "After Stratification"))
+        }
     }
 
     ## plot
