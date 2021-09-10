@@ -11,7 +11,7 @@
 
 \item{plot_type}{Types of plots. \itemize{\item{ps}{PS density plot}
 \item{balance}{Covariate balance plot}
-\item{diff}{Absolute standardized difference in means}}}
+\item{diff}{Standardized mean differences, metric = std or astd}}}
 
 \item{...}{Additional parameter for the plot}
 }

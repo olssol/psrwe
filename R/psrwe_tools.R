@@ -444,7 +444,7 @@ plot_balance <- function(data_withps,
 }
 
 
-#' @title Plot the absolute standardized difference in means of baseline
+#' @title Plot the standardized (absolute) mean differences of baseline
 #'     variables
 #'
 #' @noRd
@@ -458,10 +458,10 @@ plot_astd <- function(data_withps,
     ## check arguments
     d_metric <- match.arg(metric)
     if (d_metric == "astd") {
-        xlab       <- "Absolute Standardized Difference"
+        xlab       <- "Standardized Absolute Mean Difference"
         xintercept <- c(0.2, 0.4)
     } else {
-        xlab       <- "Standardized Difference"
+        xlab       <- "Standardized Mean Difference"
         xintercept <- c(-0.4, -0.2, 0.2, 0.4)
     }
 
