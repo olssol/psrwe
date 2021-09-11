@@ -29,7 +29,7 @@ ps_rwe_infer <- function(dta_psrst,
 
     ## check
     stopifnot(inherits(dta_psrst,
-                       what = get_rwe_class("PSRST")))
+                       what = get_rwe_class("ANARST")))
 
     stopifnot(dta_psrst$Method %in% c("ps_pp", "ps_cl", "ps_km"))
 

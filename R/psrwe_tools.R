@@ -10,6 +10,7 @@ get_rwe_class <- function(c_str) {
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
          ANARST    = "PS_RWE_RST",
+         OUTANA    = "PS_RWE_RST_OUTANA",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",
