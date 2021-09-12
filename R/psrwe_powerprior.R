@@ -413,7 +413,7 @@ print.PS_RWE_RST <- function(x, ...) {
 
     if ("Effect" == rst_sum[1, "Type"]) {
         extra_2 <- "treatment effect"
-        extra_2_param <- "theta_trt-theta_ctr"
+        extra_2_param <- "theta_trt-theta_ctl"
     } else {
         extra_2 <- "point estimate"
         extra_2_param <- "theta"
