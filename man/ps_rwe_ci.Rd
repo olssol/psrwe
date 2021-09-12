@@ -4,7 +4,7 @@
 \alias{ps_rwe_ci}
 \title{Confidence/Credible Interval for PS-Integrated Estimation
 
-Estimate the confidence/credible interval for he PS-integrated approach.}
+Estimate the confidence/credible interval for the PS-integrated approach.}
 \usage{
 ps_rwe_ci(
   dta_psrst,
@@ -33,7 +33,7 @@ A list with class name \code{PS_RWE_EST}.
 \description{
 Confidence/Credible Interval for PS-Integrated Estimation
 
-Estimate the confidence/credible interval for he PS-integrated approach.
+Estimate the confidence/credible interval for the PS-integrated approach.
 }
 \details{
 \code{method_ci = "wilson"} is for binary outcomes only.
