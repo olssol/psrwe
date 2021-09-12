@@ -51,7 +51,7 @@ ps_rwe_outana <- function(dta_psrst) {
     u_arm <- sort(unique(dta_psrst$Observed$Arm))
     u_stratum <- sort(dta_psrst$Borrow$Stratum)
 
-    ## configuration
+    ## study configuration
     rst_conf <- list(Method       = dta_psrst$Method,
                      Outcome_type = dta_psrst$Outcome_type)
     if (is_km) {
@@ -152,7 +152,7 @@ ps_rwe_outana <- function(dta_psrst) {
              list(Observed_Summary       = rst_obs,
                   Estimates_Summary      = rst_est,
                   Confidence_Interval    = rst_ci,
-                  Inferential_Statistics = rst_infer)
+                  Inferential_Statistics = rst_infer))
     class(rst) <- get_rwe_class("OUTANA")
     rst
 }
