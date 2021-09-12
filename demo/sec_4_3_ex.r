@@ -34,8 +34,8 @@ rst_cl
 ### 95% two-sided CI
 rst_cl_wl <- ps_rwe_ci(rst_cl)
 rst_cl_wl
-rst_cl_ws <- ps_rwe_ci(rst_cl, method_ci = "wilson")
-rst_cl_ws
+rst_cl <- ps_rwe_ci(rst_cl, method_ci = "wilson")
+rst_cl
 rst_cl_ws_p <- ps_rwe_ci(rst_cl, method_ci = "wilson",
                          method_stderr = "plain")
 rst_cl_ws_p

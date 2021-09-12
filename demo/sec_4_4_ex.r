@@ -31,8 +31,8 @@ plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
 plot(rst_km, conf_type = "plain")
 
 ### 95% two-sided CI
-rst_km_log <- ps_rwe_ci(rst_km)
-rst_km_log
+rst_km <- ps_rwe_ci(rst_km)
+rst_km
 rst_km_pln <- ps_rwe_ci(rst_km, conf_type = "plain")
 rst_km_pln
 
