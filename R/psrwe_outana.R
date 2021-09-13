@@ -216,7 +216,7 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
         ci <- x$Analysis_Setup$CI
         cat(paste("- Confidence Interval Method: ", ci$Method_ci,
 		  ", Level: ", ci$Conf_int,
-                  sep = "")
+                  sep = ""))
 
         if (!is.na(ci$Conf_type)) {
             cat(paste(", Type: ", ci$Conf_type,
