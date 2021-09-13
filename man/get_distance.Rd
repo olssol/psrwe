@@ -21,8 +21,8 @@ second distribution.}
 \describe{
   \item{\code{ovl}}{Overlapping area} (default)
   \item{\code{ksd}}{Kullback-Leibler distance}
-  \item{\code{astd}}{Absolute standardized difference in means}
-  \item{\code{std}}{Standardized difference in means}
+  \item{\code{astd}}{Standardized absolute mean difference}
+  \item{\code{std}}{Standardized mean difference}
   \item{\code{abd}}{Absolute difference in means}
   \item{\code{ley}}{Levy distance}
   \item{\code{mhb}}{Mahalanobis distance}

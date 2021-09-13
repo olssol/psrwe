@@ -10,7 +10,7 @@
 #' @import ggplot2
 #' @import knitr
 #' @importFrom stats approxfun as.formula binomial cov density ecdf glm
-#'     integrate optim predict quantile sd var ks.test qnorm
+#'     integrate optim predict quantile sd var ks.test qnorm pnorm
 #' @importFrom rstan sampling extract stanc rstan_options traceplot stan_rhat
 #' @importFrom randomForest randomForest
 #' @importFrom grDevices colors

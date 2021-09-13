@@ -3,8 +3,8 @@
 #' @description Match patients in external data source with patients in current
 #'     study based on PS using nearest neighbor method.
 #'
-#' @param dta_ps A list of class \code{RWE_PS_DAT} that is generated using the
-#'     \code{\link{rwe_ps_est}} function.
+#' @param dta_ps A list of class \code{PSRWE_DAT} that is generated using the
+#'     \code{\link{psrwe_est}} function.
 #' @param ratio Matching ratio (RWD : Current) with default value 3 meaning 3:1
 #'     matching.
 #' @param strata_covs Stratification covariates for matching.
@@ -14,7 +14,7 @@
 #' @param method matching algorithm for PS matching.
 #' @param ... Additional parameters for matching
 #'
-#' @return A list of class \code{RWE_PS_DTA_MAT} with items:
+#' @return A list of class \code{PSRWE_DTA_MAT} with items:
 #'
 #' \itemize{
 #'
@@ -29,22 +29,22 @@
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
-#' dta_ps_mat <- rwe_ps_match(dta_ps, ratio = 2, strata_covs = "V1",
+#' dta_ps_mat <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
 #'                            seed = 123)
 #' dta_ps_mat
 #'
 #' ## With optmatch
-#' dta_ps_opt <- rwe_ps_match(dta_ps, ratio = 2, strata_covs = "V1",
+#' dta_ps_opt <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
 #'                            method = "optm", seed = 123)
 #' dta_ps_opt
 #'
 #' @export
 #'
-rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
+psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
                          caliper = 1, seed = NULL,
                          method = c("nnwor", "optm"), ...) {
 
@@ -110,8 +110,8 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #'
 #' @description Get number of subjects for each PS stratum.
 #'
-#' @param object A list of class \code{RWE_PS_DTA_MAT} that is generated using
-#'     the \code{\link{rwe_ps_match}} function.
+#' @param object A list of class \code{PSRWE_DTA_MAT} that is generated using
+#'     the \code{\link{psrwe_match}} function.
 #'
 #' @param ... Additional parameters.
 #'
@@ -138,13 +138,13 @@ rwe_ps_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #'     \item{ratio}{Matching ratio.}
 #' }
 #'
-#' @method summary RWE_PS_DTA_MAT
+#' @method summary PSRWE_DTA_MAT
 #'
 #'
 #' @export
 #'
-summary.RWE_PS_DTA_MAT <- function(object, ...) {
-    rst_sum <- summary.RWE_PS_DTA(object, ...)
+summary.PSRWE_DTA_MAT <- function(object, ...) {
+    rst_sum <- summary.PSRWE_DTA(object, ...)
 
     ## adjust rst_sum
     rst_sum$Distance_metric  <- NULL
@@ -177,19 +177,19 @@ summary.RWE_PS_DTA_MAT <- function(object, ...) {
 #'
 #' @description Print summary information of PS estimation results
 #'
-#' @param x A list of class \code{RWE_PS_DTA_MAT} that is generated using
-#'   the \code{\link{rwe_ps_match}} function.
+#' @param x A list of class \code{PSRWE_DTA_MAT} that is generated using
+#'   the \code{\link{psrwe_match}} function.
 #' @param ... Additional parameters
 #'
-#' @seealso  \code{\link{summary.RWE_PS_DTA_MAT}}
+#' @seealso  \code{\link{summary.PSRWE_DTA_MAT}}
 #'
 #'
-#' @method print RWE_PS_DTA_MAT
+#' @method print PSRWE_DTA_MAT
 #'
 #'
 #' @export
 #'
-print.RWE_PS_DTA_MAT <- function(x, ...) {
+print.PSRWE_DTA_MAT <- function(x, ...) {
     rst_sum <- summary(x, ...)
 
     ## overall summary
@@ -209,7 +209,7 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
                 " current study subjects are matched by less than ",
                 rst_sum$ratio,
                 " RWD subjects. Please note unequal matching may cause",
-                " unblance in covariate distributions of the current",
+                " unbalance in covariate distributions of the current",
                 " and matched RWD subjects.", sep = "")
 
     cat_paste(ss)
@@ -227,17 +227,17 @@ print.RWE_PS_DTA_MAT <- function(x, ...) {
 #'
 #' S3 method for visualizing PS adjustment based on matching.
 #'
-#' @param x A list of class \code{RWE_PS_DTA_MAT} that is generated using
-#'   the \code{\link{rwe_ps_match}} function.
+#' @param x A list of class \code{PSRWE_DTA_MAT} that is generated using
+#'   the \code{\link{psrwe_match}} function.
 #'
-#' @param ... Parameters for \code{plot.RWE_PS_DAT}
+#' @param ... Parameters for \code{plot.PSRWE_DAT}
 #'
-#' @seealso  \code{\link{plot.RWE_PS_DTA}}
+#' @seealso  \code{\link{plot.PSRWE_DTA}}
 #'
-#' @method plot RWE_PS_DTA_MAT
+#' @method plot PSRWE_DTA_MAT
 #'
 #' @export
 #'
-plot.RWE_PS_DTA_MAT <- function(x, ...) {
-    plot.RWE_PS_DTA(x, ...)
+plot.PSRWE_DTA_MAT <- function(x, ...) {
+    plot.PSRWE_DTA(x, ...)
 }
