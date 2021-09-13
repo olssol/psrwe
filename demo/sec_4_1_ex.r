@@ -43,6 +43,10 @@ rst_pp
 rst_pp <- ps_rwe_infer(rst_pp, mu = 0.4)
 rst_pp
 
+### Outcome analysis.
+rst_pp_oa <- ps_rwe_outana(rst_pp)
+rst_pp_oa
+
 ### PSCL, single arm study, binary outcome.
 rst_cl <- ps_rwe_compl(ps_bor_single,
                        outcome_type = "binary",

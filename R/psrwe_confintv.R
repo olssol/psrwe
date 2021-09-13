@@ -131,8 +131,8 @@ get_bci <- function(x,
     q_alphad2 <- (1 - conf_int) / 2
 
     if (is.vector(x)) {
-        bci_lb <- quantile(x, q_alphad2)
-        bci_ub <- quantile(x, 1 - q_alphad2)
+        bci_lb <- quantile(x, q_alphad2, names = FALSE)
+        bci_ub <- quantile(x, 1 - q_alphad2, names = FALSE)
     } else {
         bci_lb <- apply(x, 1, quantile, q_alphad2) 
         bci_ub <- apply(x, 1, quantile, 1 - q_alphad2) 
