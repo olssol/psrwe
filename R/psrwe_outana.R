@@ -68,6 +68,7 @@ ps_rwe_outana <- function(dta_psrst) {
     if (is_km) {
         dtype <- data.frame(dtype) %>%
             filter(dta_psrst$pred_tp == T)
+        dtype <- data.frame(dtype[, colnames(dtype) != "T"])
     }
     rst_obs <- dtype
     if (!is_km) {
@@ -208,15 +209,19 @@ ps_rwe_outana <- function(dta_psrst) {
 #' @export
 #'
 print.PS_RWE_RST_OUTANA <- function(x, ...) {
+    args <- list(...) 
+
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
-              "\n", sep = ""))
+              sep = ""))
 
     if (exists("pred_tp", x$Analysis_Setup)) {
-        cat(paste("- Survival Predict Time Point: ",
+        cat(paste(", Predict Time: ",
                   x$Analysis_Setup$pred_tp,
-                  "\n", sep = ""))
+                  sep = ""))
     }
+
+    cat("\n")
 
     if (exists("CI", x$Analysis_Setup)) {
         ci <- x$Analysis_Setup$CI
@@ -226,10 +231,10 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
 
         if (!is.na(ci$Conf_type)) {
             cat(paste(", Type: ", ci$Conf_type,
-                      "\n", sep = ""))
-        } else {
-            cat("\n")
+                      sep = ""))
         }
+
+        cat("\n")
     }
 
     if (exists("INFER", x$Analysis_Setup)) {
@@ -241,13 +246,16 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
     }
 
     cat("- Observed Data Summary:\n")
-    print(x$Observed_Summary)
+    if (args[['show_details']]) {
+        print(x$Observed_Summary)
+    } else {
+        print(x$Observed_Summary[x$Observed_Summary$Stratum == "Overall",])
+    }
 
     cat("- Analysis Results:\n")
     print(x$Analysis_Summary)
 
     if (exists("RCT", x)) {
-        args <- list(...) 
         if (args[['show_rct']]) {
              cat("- RCT Treatment Arm:\n")
              print(x$RCT$Treatment)
