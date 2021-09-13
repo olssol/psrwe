@@ -53,16 +53,14 @@ ps_rwe_outana <- function(dta_psrst) {
         rst_conf$pred_tp <- dta_psrst$pred_tp
     }
     if (is_ci) {
-       rst_conf <- c(rst_conf,
-                     CI = dta_psrst$CI[c("Method_ci",
-                                         "Conf_type",
-                                         "Conf_int")])
+       rst_conf$CI <- dta_psrst$CI[c("Method_ci",
+                                     "Conf_type",
+                                     "Conf_int")]
     }
     if (is_infer) {
-       rst_conf <- c(rst_conf,
-                     INFER = dta_psrst$INFER[c("Method_infer",
-                                               "Alternative",
-                                               "Mu")])
+       rst_conf$INFER <- dta_psrst$INFER[c("Method_infer",
+                                           "Alternative",
+                                           "Mu")]
     }
 
     ## summary observed
@@ -72,6 +70,9 @@ ps_rwe_outana <- function(dta_psrst) {
             filter(dta_psrst$pred_tp == T)
     }
     rst_obs <- dtype
+    if (!is_km) {
+        colnames(rst_obs)[colnames(rst_obs) == "StdErr"] <- "SD"
+    }
 
     ## summary estimation
     col_est <- c("Mean", "StdErr")
@@ -201,9 +202,40 @@ ps_rwe_outana <- function(dta_psrst) {
 #' @export
 #'
 print.PS_RWE_RST_OUTANA <- function(x, ...) {
-    print(x$Analysis_Setup)
+    cat(paste("- Method: ", x$Analysis_Setup$Method,
+              ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
+	      "\n", sep = ""))
+
+    if (exists("CI", x)) {
+        cat(paste("- Confidence Interval Method: ", x$CI$Method_ci, "\n",
+		  "    Type: ", x$CI$Conf_type,
+		  ", Level: ", x$CI$Conf_int,
+		  "\n", sep = ""))
+    }
+
+    if (exists("INFER", x)) {
+        cat(paste("- Inference Method: ", x$INFER$Method_infer, "\n",
+		  "    Alternative: ", x$INFER$Alternative,
+		  ", Mu: ", x$INFER$Mu,
+		  "\n", sep = ""))
+    }
+
+    cat("- Observed Summary:\n")
     print(x$Observed_Summary)
+
+    cat("- Analysis Summary:\n")
     print(x$Analysis_Summary)
+
+    if (exists("RCT", x)) {
+        args <- list(...) 
+        if (args[['show_rct']]) {
+             cat("- RCT Treatment Arm:\n")
+             print(x$RCT$Treatment)
+
+             cat("- RCT Control Arm:\n")
+             print(x$RCT$Control)
+        }
+    }
     invisible()
 }
 
