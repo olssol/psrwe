@@ -39,5 +39,5 @@ rwe_stan(
 Result from STAN sampling
 }
 \description{
-Call STAN models. Called by \code{rwe_ps_powerp}.
+Call STAN models. Called by \code{psrwe_powerp}.
 }
