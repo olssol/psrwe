@@ -7,7 +7,7 @@ data(ex_dta)
 head(ex_dta)
 
 ### Obtain PSs.
-dta_ps_single <- ps_rwe_est(ex_dta,
+dta_ps_single <- psrwe_est(ex_dta,
                      v_covs = paste("V", 1:7, sep = ""),
                      v_grp = "Group", cur_grp_level = "current",
                      ps_method = "logistic", nstrata = 5)
@@ -17,10 +17,10 @@ dta_ps_single <- ps_rwe_est(ex_dta,
 
 ### Obtain discounting parameters.
 ### See "sec_4_1_ex" for details.
-ps_bor_single <- ps_rwe_borrow(dta_ps_single, total_borrow = 30)
+ps_bor_single <- psrwe_borrow(dta_ps_single, total_borrow = 30)
 
 ### PSKM, single arm study, time-to-event outcome.
-rst_km <- ps_rwe_survkm(ps_bor_single,
+rst_km <- psrwe_survkm(ps_bor_single,
                         v_time    = "Y_Surv",
                         v_event   = "Status",
                         pred_tp  = 365)
@@ -32,16 +32,16 @@ plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
 plot(rst_km, conf_type = "plain")
 
 ### 95% two-sided CI
-rst_km <- ps_rwe_ci(rst_km)
+rst_km <- psrwe_ci(rst_km)
 rst_km
-rst_km_pln <- ps_rwe_ci(rst_km, conf_type = "plain")
+rst_km_pln <- psrwe_ci(rst_km, conf_type = "plain")
 rst_km_pln
 
 ### Inference.
-rst_km <- ps_rwe_infer(rst_km, mu = 0.70, alternative = "greater")
+rst_km <- psrwe_infer(rst_km, mu = 0.70, alternative = "greater")
 rst_km
 
 ### Outcome analysis.
-oa_km <- ps_rwe_outana(rst_km)
+oa_km <- psrwe_outana(rst_km)
 oa_km
 

@@ -7,7 +7,7 @@ data(ex_dta_rct)
 head(ex_dta_rct)
 
 ### Obtain PSs.
-dta_ps_rct <- ps_rwe_est(ex_dta_rct,
+dta_ps_rct <- psrwe_est(ex_dta_rct,
                          v_covs = paste("V", 1:7, sep = ""),
                          v_grp = "Group", cur_grp_level = "current",
                          v_arm = "Arm", ctl_arm_level = "control",
@@ -22,31 +22,31 @@ plot(dta_ps_rct, "diff")
 plot(dta_ps_rct, "diff", metric = "astd", avg_only = TRUE)
 
 ### Obtain discounting parameters.
-ps_bor_rct <- ps_rwe_borrow(dta_ps_rct, total_borrow = 30)
+ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 ps_bor_rct
 
 ### PSCL, two-arm RCT, continuous outcome.
-rst_cl_rct <- ps_rwe_compl(ps_bor_rct,
+rst_cl_rct <- psrwe_compl(ps_bor_rct,
                            outcome_type = "continuous",
                            v_outcome = "Y_Con")
 rst_cl_rct
 
 ### 95% two-sided CI
-rst_cl_rct <- ps_rwe_ci(rst_cl_rct)
+rst_cl_rct <- psrwe_ci(rst_cl_rct)
 rst_cl_rct
 
 ### Inference.
-rst_cl_rct <- ps_rwe_infer(rst_cl_rct, alternative = "greater")
+rst_cl_rct <- psrwe_infer(rst_cl_rct, alternative = "greater")
 rst_cl_rct
 
 ### Outcome analysis.
-oa_cl_rct <- ps_rwe_outana(rst_cl_rct)
+oa_cl_rct <- psrwe_outana(rst_cl_rct)
 print(oa_cl_rct, show_rct = TRUE)
 
 ### PSPP, two-arm RCT, continuous outcome.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
-rst_pp_rct <- ps_rwe_powerp(ps_bor_rct,
+rst_pp_rct <- psrwe_powerp(ps_bor_rct,
                             outcome_type = "continuous",
                             v_outcome    = "Y_Con",
                             seed         = 1234)
@@ -57,14 +57,14 @@ plot(rst_pp_rct, add_stratum = TRUE)
 plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
 
 ### 95% two-sided CI
-rst_pp_rct <- ps_rwe_ci(rst_pp_rct)
+rst_pp_rct <- psrwe_ci(rst_pp_rct)
 rst_pp_rct
 
 ### Inference.
-rst_pp_rct <- ps_rwe_infer(rst_pp_rct, alternative = "greater")
+rst_pp_rct <- psrwe_infer(rst_pp_rct, alternative = "greater")
 rst_pp_rct
 
 ### Outcome analysis.
-oa_pp_rct <- ps_rwe_outana(rst_pp_rct)
+oa_pp_rct <- psrwe_outana(rst_pp_rct)
 print(oa_pp_rct, show_rct = TRUE)
 

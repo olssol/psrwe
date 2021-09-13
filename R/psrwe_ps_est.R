@@ -26,7 +26,7 @@
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
-#' @return A list of class \code{PS_RWE_DAT} with items:
+#' @return A list of class \code{PSRWE_DAT} with items:
 #'
 #' \itemize{
 #'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
@@ -38,14 +38,14 @@
 #'
 #' @examples
 #' data(ex_dta)
-#' ps_rwe_est(ex_dta,
+#' psrwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
 #'
 #' @export
 #'
-ps_rwe_est <- function(data,
+psrwe_est <- function(data,
                        ps_fml        = NULL,
                        ps_method     = c("logistic", "randomforest"),
                        v_covs        = "V1",
@@ -152,8 +152,8 @@ ps_rwe_est <- function(data,
 #'
 #' @inheritParams get_distance
 #'
-#' @param object A list of class \code{PS_RWE_DAT} that is generated using
-#'   the \code{\link{ps_rwe_est}} function.
+#' @param object A list of class \code{PSRWE_DAT} that is generated using
+#'   the \code{\link{psrwe_est}} function.
 #' @param min_n0 threshold for number of external subjects, below which the
 #'   external data in the current stratum will be ignored by setting the PS
 #'   distance to 0. Default value 10.
@@ -177,11 +177,11 @@ ps_rwe_est <- function(data,
 #'     \item{Distance_metric}{Metric used for calculating the distance.}
 #' }
 #'
-#' @method summary PS_RWE_DTA
+#' @method summary PSRWE_DTA
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- ps_rwe_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
@@ -193,7 +193,7 @@ ps_rwe_est <- function(data,
 #'
 #' @export
 #'
-summary.PS_RWE_DTA <- function(object,
+summary.PSRWE_DTA <- function(object,
                                 metric = c("ovl", "ksd", "std", "abd",
                                            "ley", "mhb", "omkss"),
                                 min_n0 = 10, ...) {
@@ -296,19 +296,19 @@ summary.PS_RWE_DTA <- function(object,
 #'
 #' @description Print summary information of PS estimation results
 #'
-#' @param x A list of class \code{PS_RWE_DTA} that is generated using
-#'   the \code{\link{ps_rwe_est}} function.
-#' @param ... Parameters for \code{summery.PS_RWE_DTA}
+#' @param x A list of class \code{PSRWE_DTA} that is generated using
+#'   the \code{\link{psrwe_est}} function.
+#' @param ... Parameters for \code{summery.PSRWE_DTA}
 #'
-#' @seealso  \code{\link{summary.PS_RWE_DTA}}
+#' @seealso  \code{\link{summary.PSRWE_DTA}}
 #'
 #'
-#' @method print PS_RWE_DTA
+#' @method print PSRWE_DTA
 #'
 #'
 #' @export
 #'
-print.PS_RWE_DTA <- function(x, ...) {
+print.PSRWE_DTA <- function(x, ...) {
     rst_sum <- summary(x, ...)
 
     ## overall summary
@@ -335,17 +335,17 @@ print.PS_RWE_DTA <- function(x, ...) {
 #'
 #' @description S3 method for visualizing PS adjustment
 #'
-#' @param x Class \code{RWE_DWITHPS} created by \code{ps_rwe_*} functions
+#' @param x Class \code{RWE_DWITHPS} created by \code{psrwe_*} functions
 #' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
 #'     \item{balance}{Covariate balance plot}
 #'     \item{diff}{Standardized mean differences, metric = std or astd}}
 #' @param ... Additional parameter for the plot
 #'
-#' @method plot PS_RWE_DTA
+#' @method plot PSRWE_DTA
 #'
 #' @export
 #'
-plot.PS_RWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
+plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
     type <- match.arg(plot_type)
     switch(type,
            ps      = plot_ps(x, ...),

@@ -2,32 +2,32 @@
 #'
 #' Report outcome analysis for the PS-integrated approach.
 #'
-#' @param dta_psrst a returned object with class \code{PS_RWE_EST}
+#' @param dta_psrst a returned object with class \code{PSRWE_EST}
 #' @param ... other options
 #'
-#' @return A list with class name \code{PS_RWE_EST_OUTANA}.
+#' @return A list with class name \code{PSRWE_EST_OUTANA}.
 #'
 #' @details This function is mainly for summarizing and reporting the
 #'     outcome analysis for the PS-integrated estimation.
 #'     The input \code{dta_psrst} can be generated from the functions
-#'     \code{\link{ps_rwe_powerp}}, \code{\link{ps_rwe_compl}},
-#'     \code{\link{ps_rwe_survkm}}, \code{\link{ps_rwe_ci}}, and.
-#'     \code{\link{ps_rwe_infer}}.
+#'     \code{\link{psrwe_powerp}}, \code{\link{psrwe_compl}},
+#'     \code{\link{psrwe_survkm}}, \code{\link{psrwe_ci}}, and.
+#'     \code{\link{psrwe_infer}}.
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- ps_rwe_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
-#' ps_rst <- ps_rwe_compl(ps_borrow, v_outcome = "Y_Con")
-#' rst <- ps_rwe_outana(ps_rst)
+#' ps_borrow <- psrwe_borrow(total_borrow = 30, dta_ps)
+#' ps_rst <- psrwe_compl(ps_borrow, v_outcome = "Y_Con")
+#' rst <- psrwe_outana(ps_rst)
 #' rst
 #'
 #' @export
 #'
-ps_rwe_outana <- function(dta_psrst) {
+psrwe_outana <- function(dta_psrst) {
     ## check
     stopifnot(inherits(dta_psrst,
                        what = get_rwe_class("ANARST")))
@@ -208,17 +208,17 @@ ps_rwe_outana <- function(dta_psrst) {
 #'
 #' @description Print summary information of outcome analysis results
 #'
-#' @param x A list of class \code{PS_RWE_RST_OUTANA} that is generated using the
-#'     \code{\link{ps_rwe_outana}} function.
+#' @param x A list of class \code{PSRWE_RST_OUTANA} that is generated using the
+#'     \code{\link{psrwe_outana}} function.
 #' @param ... Additional parameters
 #'
 #'
-#' @method print PS_RWE_RST_OUTANA
+#' @method print PSRWE_RST_OUTANA
 #'
 #'
 #' @export
 #'
-print.PS_RWE_RST_OUTANA <- function(x,
+print.PSRWE_RST_OUTANA <- function(x,
                                     show_details = FALSE,
                                     show_rct = FALSE,
                                     ...) {

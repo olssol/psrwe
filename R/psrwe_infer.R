@@ -2,28 +2,28 @@
 #'
 #' Inference for the PS-integrated approach.
 #'
-#' @param dta_psrst a returned object with class \code{PS_RWE_EST}
+#' @param dta_psrst a returned object with class \code{PSRWE_EST}
 #' @param alternative a character string for the alternative hypothesis that
 #'        must be one of \code{"less"} (default) or \code{"greater"}
 #' @param mu a number indicating the true value of the parameter of interest
 #'        (or the difference in means for two arms)
 #'
-#' @return A list with class name \code{PS_RWE_EST}.
+#' @return A list with class name \code{PSRWE_EST}.
 #'
 #' @examples
 #' data(ex_dta)
-#' dta_ps <- ps_rwe_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- ps_rwe_borrow(total_borrow = 30, dta_ps)
-#' ps_rst <- ps_rwe_compl(ps_borrow, v_outcome = "Y_Con")
-#' rst <- ps_rwe_infer(ps_rst)
+#' ps_borrow <- psrwe_borrow(total_borrow = 30, dta_ps)
+#' ps_rst <- psrwe_compl(ps_borrow, v_outcome = "Y_Con")
+#' rst <- psrwe_infer(ps_rst)
 #' rst
 #'
 #' @export
 #'
-ps_rwe_infer <- function(dta_psrst,
+psrwe_infer <- function(dta_psrst,
 			 alternative = c("less", "greater"),
                          mu = 0) {
 
