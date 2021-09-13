@@ -1,5 +1,6 @@
 ### Example of Section 4.3.
 suppressMessages(library(psrwe, quietly = TRUE))
+options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.
@@ -43,6 +44,10 @@ rst_cl_ws_p
 ### Inference.
 rst_cl <- ps_rwe_infer(rst_cl, mu = 0.40)
 rst_cl
+
+### Outcome analysis.
+oa_cl <- ps_rwe_outana(rst_cl)
+oa_cl
 
 ### Use optmatch with caliper
 dta_ps_match_opt <- ps_rwe_match(dta_ps_single, ratio = 2, strata_covs = "V2",

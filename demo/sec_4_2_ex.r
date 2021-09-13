@@ -1,5 +1,6 @@
 ### Example of Section 4.2.
 suppressMessages(library(psrwe, quietly = TRUE))
+options(digits = 3)
 data(ex_dta_rct)
 
 ### First parts of Data.
@@ -38,6 +39,10 @@ rst_cl_rct
 rst_cl_rct <- ps_rwe_infer(rst_cl_rct, alternative = "greater")
 rst_cl_rct
 
+### Outcome analysis.
+oa_cl_rct <- ps_rwe_outana(rst_cl_rct)
+print(oa_cl_rct, show_rct = TRUE)
+
 ### PSPP, two-arm RCT, continuous outcome.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
@@ -58,4 +63,8 @@ rst_pp_rct
 ### Inference.
 rst_pp_rct <- ps_rwe_infer(rst_pp_rct, alternative = "greater")
 rst_pp_rct
+
+### Outcome analysis.
+oa_pp_rct <- ps_rwe_outana(rst_pp_rct)
+print(oa_pp_rct, show_rct = TRUE)
 

@@ -1,5 +1,6 @@
 ### Example of Section 4.1.
 suppressMessages(library(psrwe, quietly = TRUE))
+options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.
@@ -44,8 +45,8 @@ rst_pp <- ps_rwe_infer(rst_pp, mu = 0.4)
 rst_pp
 
 ### Outcome analysis.
-rst_pp_oa <- ps_rwe_outana(rst_pp)
-rst_pp_oa
+oa_pp <- ps_rwe_outana(rst_pp)
+oa_pp
 
 ### PSCL, single arm study, binary outcome.
 rst_cl <- ps_rwe_compl(ps_bor_single,
@@ -61,3 +62,6 @@ rst_cl
 rst_cl <- ps_rwe_infer(rst_cl, mu = 0.4)
 rst_cl
 
+### Outcome analysis.
+oa_cl <- ps_rwe_outana(rst_cl)
+oa_cl

@@ -206,17 +206,19 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
 	      "\n", sep = ""))
 
-    if (exists("CI", x)) {
-        cat(paste("- Confidence Interval Method: ", x$CI$Method_ci, "\n",
-		  "    Type: ", x$CI$Conf_type,
-		  ", Level: ", x$CI$Conf_int,
+    if (exists("CI", x$Analysis_Setup)) {
+        ci <- x$Analysis_Setup$CI
+        cat(paste("- Confidence Interval Method: ", ci$Method_ci, "\n",
+		  "  - Type: ", ci$Conf_type,
+		  ", Level: ", ci$Conf_int,
 		  "\n", sep = ""))
     }
 
-    if (exists("INFER", x)) {
-        cat(paste("- Inference Method: ", x$INFER$Method_infer, "\n",
-		  "    Alternative: ", x$INFER$Alternative,
-		  ", Mu: ", x$INFER$Mu,
+    if (exists("INFER", x$Analysis_Setup)) {
+        infer <- x$Analysis_Setup$INFER
+        cat(paste("- Inference Method: ", infer$Method_infer, "\n",
+		  "  - Alternative: ", infer$Alternative,
+		  ", Mu: ", infer$Mu,
 		  "\n", sep = ""))
     }
 
