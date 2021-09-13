@@ -208,12 +208,15 @@ ps_rwe_outana <- function(dta_psrst) {
 #' @export
 #'
 print.PS_RWE_RST_OUTANA <- function(x, ...) {
-    cat("- Observed Data Summary:\n")
-    print(x$Observed_Summary)
-
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
-	      "\n", sep = ""))
+              "\n", sep = ""))
+
+    if (exists("pred_tp", x$Analysis_Setup)) {
+        cat(paste("- Survival Predict Time Point: ",
+                  x$Analysis_Setup$pred_tp,
+                  "\n", sep = ""))
+    }
 
     if (exists("CI", x$Analysis_Setup)) {
         ci <- x$Analysis_Setup$CI
@@ -236,6 +239,9 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
 		  ", Mu: ", infer$Mu,
 		  "\n", sep = ""))
     }
+
+    cat("- Observed Data Summary:\n")
+    print(x$Observed_Summary)
 
     cat("- Analysis Results:\n")
     print(x$Analysis_Summary)
