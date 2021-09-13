@@ -208,9 +208,10 @@ ps_rwe_outana <- function(dta_psrst) {
 #'
 #' @export
 #'
-print.PS_RWE_RST_OUTANA <- function(x, ...) {
-    args <- list(...) 
-
+print.PS_RWE_RST_OUTANA <- function(x,
+                                    show_details = FALSE,
+                                    show_rct = FALSE,
+                                    ...) {
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
               sep = ""))
@@ -246,7 +247,7 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
     }
 
     cat("- Observed Data Summary:\n")
-    if (args[['show_details']]) {
+    if (show_details) {
         print(x$Observed_Summary)
     } else {
         print(x$Observed_Summary[x$Observed_Summary$Stratum == "Overall",])
@@ -255,14 +256,12 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
     cat("- Analysis Results:\n")
     print(x$Analysis_Summary)
 
-    if (exists("RCT", x)) {
-        if (args[['show_rct']]) {
-             cat("- RCT Treatment Arm:\n")
-             print(x$RCT$Treatment)
+    if (exists("RCT", x) && show_rct) {
+         cat("- RCT Treatment Arm:\n")
+         print(x$RCT$Treatment)
 
-             cat("- RCT Control Arm:\n")
-             print(x$RCT$Control)
-        }
+         cat("- RCT Control Arm:\n")
+         print(x$RCT$Control)
     }
     invisible()
 }
