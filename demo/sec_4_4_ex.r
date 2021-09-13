@@ -1,5 +1,6 @@
 ### Example of Section 4.4.
 suppressMessages(library(psrwe, quietly = TRUE))
+options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.

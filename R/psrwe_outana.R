@@ -248,20 +248,25 @@ print.PS_RWE_RST_OUTANA <- function(x,
 
     cat("- Observed Data Summary:\n")
     if (show_details) {
-        print(x$Observed_Summary)
+        print(x$Observed_Summary,
+              row.names = FALSE)
     } else {
-        print(x$Observed_Summary[x$Observed_Summary$Stratum == "Overall",])
+        print(x$Observed_Summary[x$Observed_Summary$Stratum == "Overall",],
+              row.names = FALSE)
     }
 
     cat("- Analysis Results:\n")
-    print(x$Analysis_Summary)
+    print(x$Analysis_Summary,
+          row.names = FALSE)
 
     if (exists("RCT", x) && show_rct) {
          cat("- RCT Treatment Arm:\n")
-         print(x$RCT$Treatment)
+         print(x$RCT$Treatment,
+               row.names = FALSE)
 
          cat("- RCT Control Arm:\n")
-         print(x$RCT$Control)
+         print(x$RCT$Control,
+               row.names = FALSE)
     }
     invisible()
 }
