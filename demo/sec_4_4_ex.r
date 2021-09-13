@@ -40,3 +40,7 @@ rst_km_pln
 rst_km <- ps_rwe_infer(rst_km, mu = 0.70, alternative = "greater")
 rst_km
 
+### Outcome analysis.
+oa_km <- ps_rwe_outana(rst_km)
+oa_km
+
