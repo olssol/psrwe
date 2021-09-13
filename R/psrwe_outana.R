@@ -85,7 +85,7 @@ ps_rwe_outana <- function(dta_psrst) {
     if (is_km) {
         dtype <- data.frame(dtype) %>%
             filter(dta_psrst$pred_tp == T)
-        dtype <- dtype[, colnames(dtype) != "T"]
+        dtype <- data.frame(dtype[, colnames(dtype) != "T"])
     }
     rst_est <- data.frame(Stratum = c(dta_psrst$Borrow$Stratum,
                                       "Overall"))
@@ -97,7 +97,7 @@ ps_rwe_outana <- function(dta_psrst) {
         if (is_km) {
             dtype <- data.frame(dtype) %>%
                 filter(dta_psrst$pred_tp == T)
-            dtype <- dtype[, colnames(dtype) != "T"]
+            dtype <- data.frame(dtype[, colnames(dtype) != "T"])
         }
         rst_est_trt <- data.frame(Stratum = c(dta_psrst$Borrow$Stratum,
                                           "Overall"))
@@ -108,7 +108,7 @@ ps_rwe_outana <- function(dta_psrst) {
         if (is_km) {
             dtype <- data.frame(dtype) %>%
                 filter(dta_psrst$pred_tp == T)
-            dtype <- dtype[, colnames(dtype) != "T"]
+            dtype <- data.frame(dtype[, colnames(dtype) != "T"])
         }
         rst_est_ctl <- data.frame(Stratum = c(dta_psrst$Borrow$Stratum,
                                           "Overall"))
@@ -125,7 +125,7 @@ ps_rwe_outana <- function(dta_psrst) {
                                  dta_psrst[[type]]$Overall_Estimate$T))
             dtype <- data.frame(dtype) %>%
                 filter(dta_psrst$pred_tp == T)
-            dtype <- dtype[, colnames(dtype) != "T"]
+            dtype <- data.frame(dtype[, colnames(dtype) != "T"])
         }
         rst_est <- cbind(rst_est, dtype)
 
@@ -138,7 +138,7 @@ ps_rwe_outana <- function(dta_psrst) {
                                      dta_psrst$Treatment$Overall_Estimate$T))
                 dtype <- data.frame(dtype) %>%
                     filter(dta_psrst$pred_tp == T)
-                dtype <- dtype[, colnames(dtype) != "T"]
+                dtype <- data.frame(dtype[, colnames(dtype) != "T"])
             }
             rst_est_trt <- cbind(rst_est_trt, dtype)
 
@@ -150,7 +150,7 @@ ps_rwe_outana <- function(dta_psrst) {
                                      dta_psrst$Control$Overall_Estimate$T))
                 dtype <- data.frame(dtype) %>%
                     filter(dta_psrst$pred_tp == T)
-                dtype <- dtype[, colnames(dtype) != "T"]
+                dtype <- data.frame(dtype[, colnames(dtype) != "T"])
             }
             rst_est_ctl <- cbind(rst_est_ctl, dtype)
         }
@@ -166,13 +166,13 @@ ps_rwe_outana <- function(dta_psrst) {
                                  dta_psrst[[type]]$Overall_Estimate$T))
             dtype <- data.frame(dtype) %>%
                 filter(dta_psrst$pred_tp == T)
-            dtype <- dtype[, colnames(dtype) != "T"]
+            dtype <- data.frame(dtype[, colnames(dtype) != "T"])
         }
 
         if (dta_psrst$Method == "ps_pp") {
-            colnames(dtype)[colnames(dtype) == "Infer_prob"] <- "PostPr"
+            colnames(dtype) <- "PostPr"
 	} else {
-            colnames(dtype)[colnames(dtype) == "Infer_prob"] <- "p-value"
+            colnames(dtype) <- "p-value"
         }
         rst_est <- cbind(rst_est, dtype)
     }
