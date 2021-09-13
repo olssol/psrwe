@@ -75,6 +75,17 @@ ps_rwe_outana <- function(dta_psrst) {
         colnames(rst_obs)[colnames(rst_obs) == "StdErr"] <- "SD"
     }
 
+    rst_obs$Group <- factor(rst_obs$Group,
+                            levels = c(0, 1),
+                            labels = c("RWD", "Cur"))
+    if (is_rct) {
+        rst_obs$Arm <- factor(rst_obs$Arm,
+                              levels = c(0, 1),
+                              labels = c("ctl", "trt"))
+    } else {
+        rst_obs$Arm <- NULL
+    }
+
     ## summary estimation
     col_est <- c("Mean", "StdErr")
     if (is_km) {
@@ -84,8 +95,7 @@ ps_rwe_outana <- function(dta_psrst) {
     dtype <- rbind(dta_psrst[[type]]$Stratum_Estimate[, col_est],
                    dta_psrst[[type]]$Overall_Estimate[, col_est])
     if (is_km) {
-        dtype <- data.frame(dtype) %>%
-            filter(dta_psrst$pred_tp == T)
+        dtype <- data.frame(dtype) %>% filter(dta_psrst$pred_tp == T)
         dtype <- data.frame(dtype[, colnames(dtype) != "T"])
     }
     rst_est <- data.frame(Stratum = c(dta_psrst$Borrow$Stratum,
@@ -259,7 +269,7 @@ print.PS_RWE_RST_OUTANA <- function(x,
     print(x$Analysis_Summary,
           row.names = FALSE)
 
-    if (exists("RCT", x) && show_rct) {
+    if (exists("RCT_Summary", x) && show_rct) {
          cat("- RCT Treatment Arm:\n")
          print(x$RCT$Treatment,
                row.names = FALSE)
