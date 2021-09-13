@@ -208,13 +208,16 @@ ps_rwe_outana <- function(dta_psrst) {
 #' @export
 #'
 print.PS_RWE_RST_OUTANA <- function(x, ...) {
+    cat("- Observed Data Summary:\n")
+    print(x$Observed_Summary)
+
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
 	      "\n", sep = ""))
 
     if (exists("CI", x$Analysis_Setup)) {
         ci <- x$Analysis_Setup$CI
-        cat(paste("- Confidence Interval Method: ", ci$Method_ci,
+        cat(paste("- Confidence Interval: ", ci$Method_ci,
 		  ", Level: ", ci$Conf_int,
                   sep = ""))
 
@@ -234,10 +237,7 @@ print.PS_RWE_RST_OUTANA <- function(x, ...) {
 		  "\n", sep = ""))
     }
 
-    cat("- Observed Summary:\n")
-    print(x$Observed_Summary)
-
-    cat("- Analysis Summary:\n")
+    cat("- Analysis Results:\n")
     print(x$Analysis_Summary)
 
     if (exists("RCT", x)) {
