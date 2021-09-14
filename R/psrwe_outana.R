@@ -250,9 +250,22 @@ print.PSRWE_RST_OUTANA <- function(x,
 
     if (exists("INFER", x$Analysis_Setup)) {
         infer <- x$Analysis_Setup$INFER
-        cat(paste("- Inference Method: ", infer$Method_infer,
-		  ", Alternative: ", infer$Alternative,
-		  ", Mu: ", infer$Mu,
+        cat(paste("- Test Method: ", infer$Method_infer,
+		  "\n", sep = ""))
+
+        if (is_rct) {
+            poi <- "theta_trt-theta_ctl"
+        } else {
+            poi <- "theta"
+        }
+
+        cat(paste("- H0: ", poi, " ",
+		  ifelse(infer$Alternative == "less", ">=", "<="),
+                  " ", sprintf("%5.3f", infer$Mu),
+		  " vs. ", 
+                  "Ha: ", poi, " ",
+		  ifelse(infer$Alternative == "less", "<", ">"),
+                  " ", sprintf("%5.3f", infer$Mu),
 		  "\n", sep = ""))
     }
 
@@ -267,11 +280,11 @@ print.PSRWE_RST_OUTANA <- function(x,
     print(x$Analysis_Summary)
 
     if (exists("RCT_Summary", x) && show_rct) {
-         cat("- RCT Treatment Arm:\n")
-         print(x$RCT$Treatment)
+        cat("- RCT Treatment Arm:\n")
+        print(x$RCT$Treatment)
 
-         cat("- RCT Control Arm:\n")
-         print(x$RCT$Control)
+        cat("- RCT Control Arm:\n")
+        print(x$RCT$Control)
     }
     invisible()
 }
