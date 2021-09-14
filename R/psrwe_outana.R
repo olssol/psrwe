@@ -261,7 +261,7 @@ print.PSRWE_RST_OUTANA <- function(x,
             poi <- "theta"
         }
 
-        cat(paste("- H0: ", poi, " ",
+        cat(paste("  H0: ", poi, " ",
 		  ifelse(infer$Alternative == "less", ">=", "<="),
                   " ", sprintf("%5.3f", infer$Mu),
 		  " vs. ", 
