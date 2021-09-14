@@ -48,7 +48,8 @@ psrwe_outana <- function(dta_psrst) {
 
     ## analysis configuration
     rst_conf <- list(Method       = dta_psrst$Method,
-                     Outcome_type = dta_psrst$Outcome_type)
+                     Outcome_type = dta_psrst$Outcome_type,
+                     Study_type   = ifelse(is_rct, "RCT", "single-arm"))
     if (is_km) {
         rst_conf$pred_tp <- dta_psrst$pred_tp
     }
@@ -224,6 +225,7 @@ print.PSRWE_RST_OUTANA <- function(x,
                                     ...) {
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
+              ", Study Type: ", x$Analysis_Setup$Study_type,
               sep = ""))
 
     if (exists("pred_tp", x$Analysis_Setup)) {
@@ -253,7 +255,7 @@ print.PSRWE_RST_OUTANA <- function(x,
         cat(paste("- Test Method: ", infer$Method_infer,
 		  "\n", sep = ""))
 
-        if (is_rct) {
+        if (x$Analysis_Setup$Study_type == "RCT") {
             poi <- "theta_trt-theta_ctl"
         } else {
             poi <- "theta"
