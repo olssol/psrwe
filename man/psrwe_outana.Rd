@@ -10,8 +10,6 @@ psrwe_outana(dta_psrst)
 }
 \arguments{
 \item{dta_psrst}{a returned object with class \code{PSRWE_EST}}
-
-\item{...}{other options}
 }
 \value{
 A list with class name \code{PSRWE_EST_OUTANA}.

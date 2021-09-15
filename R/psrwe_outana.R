@@ -3,7 +3,6 @@
 #' Report outcome analysis for the PS-integrated approach.
 #'
 #' @param dta_psrst a returned object with class \code{PSRWE_EST}
-#' @param ... other options
 #'
 #' @return A list with class name \code{PSRWE_EST_OUTANA}.
 #'
