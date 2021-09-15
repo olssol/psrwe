@@ -48,7 +48,8 @@ psrwe_outana <- function(dta_psrst) {
 
     ## analysis configuration
     rst_conf <- list(Method       = dta_psrst$Method,
-                     Outcome_type = dta_psrst$Outcome_type)
+                     Outcome_type = dta_psrst$Outcome_type,
+                     Study_type   = ifelse(is_rct, "RCT", "single-arm"))
     if (is_km) {
         rst_conf$pred_tp <- dta_psrst$pred_tp
     }
@@ -210,6 +211,8 @@ psrwe_outana <- function(dta_psrst) {
 #'
 #' @param x A list of class \code{PSRWE_RST_OUTANA} that is generated using the
 #'     \code{\link{psrwe_outana}} function.
+#' @param show_details print out more observed summary
+#' @param show_rct print out more analysis summary for RCT arms
 #' @param ... Additional parameters
 #'
 #'
@@ -224,6 +227,7 @@ print.PSRWE_RST_OUTANA <- function(x,
                                     ...) {
     cat(paste("- Method: ", x$Analysis_Setup$Method,
               ", Outcome Type: ", x$Analysis_Setup$Outcome_type,
+              ", Study Type: ", x$Analysis_Setup$Study_type,
               sep = ""))
 
     if (exists("pred_tp", x$Analysis_Setup)) {
@@ -250,9 +254,22 @@ print.PSRWE_RST_OUTANA <- function(x,
 
     if (exists("INFER", x$Analysis_Setup)) {
         infer <- x$Analysis_Setup$INFER
-        cat(paste("- Inference Method: ", infer$Method_infer,
-		  ", Alternative: ", infer$Alternative,
-		  ", Mu: ", infer$Mu,
+        cat(paste("- Test Method: ", infer$Method_infer,
+		  "\n", sep = ""))
+
+        if (x$Analysis_Setup$Study_type == "RCT") {
+            poi <- "theta_trt-theta_ctl"
+        } else {
+            poi <- "theta"
+        }
+
+        cat(paste("  H0: ", poi, " ",
+		  ifelse(infer$Alternative == "less", ">=", "<="),
+                  " ", sprintf("%5.3f", infer$Mu),
+		  " vs. ", 
+                  "Ha: ", poi, " ",
+		  ifelse(infer$Alternative == "less", "<", ">"),
+                  " ", sprintf("%5.3f", infer$Mu),
 		  "\n", sep = ""))
     }
 
@@ -267,11 +284,11 @@ print.PSRWE_RST_OUTANA <- function(x,
     print(x$Analysis_Summary)
 
     if (exists("RCT_Summary", x) && show_rct) {
-         cat("- RCT Treatment Arm:\n")
-         print(x$RCT$Treatment)
+        cat("- RCT Treatment Arm:\n")
+        print(x$RCT$Treatment)
 
-         cat("- RCT Control Arm:\n")
-         print(x$RCT$Control)
+        cat("- RCT Control Arm:\n")
+        print(x$RCT$Control)
     }
     invisible()
 }
