@@ -10,6 +10,10 @@
 \item{x}{A list of class \code{PSRWE_RST_OUTANA} that is generated using the
 \code{\link{psrwe_outana}} function.}
 
+\item{show_details}{print out more observed summary}
+
+\item{show_rct}{print out more analysis summary for RCT arms}
+
 \item{...}{Additional parameters}
 }
 \description{

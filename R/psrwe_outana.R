@@ -211,6 +211,8 @@ psrwe_outana <- function(dta_psrst) {
 #'
 #' @param x A list of class \code{PSRWE_RST_OUTANA} that is generated using the
 #'     \code{\link{psrwe_outana}} function.
+#' @param show_details print out more observed summary
+#' @param show_rct print out more analysis summary for RCT arms
 #' @param ... Additional parameters
 #'
 #'
