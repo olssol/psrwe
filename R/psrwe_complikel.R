@@ -4,28 +4,28 @@
 #' approach. Variance is estimated by Jack-Knife method. Applies to the case
 #' when there is only one external data source.
 #'
-#' @inheritParams rwe_ps_powerp
+#' @inheritParams psrwe_powerp
 #'
 #' @param ... Parameters for \code{rwe_cl}
 #'
-#' @return A data frame with class name \code{RWE_PS_RST}. It contains the
+#' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
 #'     jackknife estimation for each subject. The results should be further
 #'     summarized by its S3 method \code{summary}.
 #'
 #' @examples
-#' \donttest{
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_compl(ps_borrow, v_outcome = "Y_Con")}
+#' ps_borrow <- psrwe_borrow(total_borrow = 30, dta_ps)
+#' rst       <- psrwe_compl(ps_borrow, v_outcome = "Y_Con")
+#' rst
 #'
 #' @export
 #'
-rwe_ps_compl <- function(dta_psbor, v_outcome = "Y",
+psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
                       ...) {
 
@@ -60,7 +60,7 @@ rwe_ps_compl <- function(dta_psbor, v_outcome = "Y",
 #' Estimate parameter of interest based composite likelihood for a single PS
 #' stratum
 #'
-#' @inheritParams rwe_ps_powerp
+#' @inheritParams psrwe_powerp
 #'
 #' @param dta_cur Vector of outcome from a PS stratum in current study
 #' @param dta_ext Vector of outcome from a PS stratum in external data source

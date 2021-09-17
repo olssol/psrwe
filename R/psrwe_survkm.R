@@ -4,7 +4,7 @@
 #' PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
 #' method. Applies to the case when there is only one external data source.
 #'
-#' @inheritParams rwe_ps_powerp
+#' @inheritParams psrwe_powerp
 #'
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
@@ -12,27 +12,27 @@
 #'
 #' @param ... Additional Parameters.
 #'
-#' @return A data frame with class name \code{RWE_PS_RST}. It contains the
+#' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
 #'     jackknife estimation. The results should be further
 #'     summarized by its S3 method \code{summary}.
 #'
 #'
 #' @examples
-#' \donttest{
 #' data(ex_dta)
-#' dta_ps <- rwe_ps_est(ex_dta,
+#' dta_ps <- psrwe_est(ex_dta,
 #'        v_covs = paste("V", 1:7, sep = ""),
 #'        v_grp = "Group",
 #'        cur_grp_level = "current")
-#' ps_borrow <- rwe_ps_borrow(total_borrow = 30, dta_ps)
-#' rst       <- rwe_ps_survkm(ps_borrow,
+#' ps_borrow <- psrwe_borrow(total_borrow = 30, dta_ps)
+#' rst       <- psrwe_survkm(ps_borrow,
 #'                            v_time = "Y_Surv",
-#'                            v_event = "Status")}
+#'                            v_event = "Status")
+#' rst
 #'
 #' @export
 #'
-rwe_ps_survkm <- function(dta_psbor,
+psrwe_survkm <- function(dta_psbor,
                           v_time     = "time",
                           v_event    = "event",
                           pred_tp    = 1,
@@ -66,7 +66,7 @@ rwe_ps_survkm <- function(dta_psbor,
     rst$Method   <- "ps_km"
     rst$Outcome_type <- "tte"
     class(rst)   <- get_rwe_class("ANARST")
-    rst
+    return(rst)
 }
 
 #' Get estimation for each stratum
@@ -173,7 +173,7 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
     }
 
     colnames(rst) <- c("Mean", "StdErr", "T")
-    rst
+    return(rst)
 }
 
 #' Get observed KM
@@ -182,6 +182,7 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
 #'
 get_km_observed <- function(dta, v_time, v_event, pred_tp) {
     rst <- NULL
+    rst_overall <- NULL
     for (g in unique(dta[["_grp_"]])) {
         for (a in unique(dta[["_arm_"]])) {
             cur_d <- dta %>%
@@ -190,16 +191,6 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
 
             if (0 == nrow(cur_d))
                 next
-
-            est <- rwe_km(cur_d[, c(v_time, v_event)], pred_tp = pred_tp)
-            rst <- rbind(rst,
-                         data.frame(Group   = g,
-                                    Arm     = a,
-                                    Stratum = "Overall",
-                                    N       = nrow(cur_d),
-                                    Mean    = est[, 1],
-                                    StdErr  = est[, 2],
-                                    T       = est[, 3]))
 
             for (s in levels(dta[["_strata_"]])) {
                 cur_s <- cur_d %>%
@@ -220,9 +211,19 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                         StdErr  = est[, 2],
                                         T       = est[, 3]))
             }
+
+            est <- rwe_km(cur_d[, c(v_time, v_event)], pred_tp = pred_tp)
+            rst_overall <- rbind(rst_overall,
+                                 data.frame(Group   = g,
+                                            Arm     = a,
+                                            Stratum = "Overall",
+                                            N       = nrow(cur_d),
+                                            Mean    = est[, 1],
+                                            StdErr  = est[, 2],
+                                            T       = est[, 3]))
         }
     }
 
-    rst
-
+    rst <- rbind(rst, rst_overall)
+    return(rst)
 }

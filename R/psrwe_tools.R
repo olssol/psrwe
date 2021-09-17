@@ -3,13 +3,14 @@
 #' @noRd
 get_rwe_class <- function(c_str) {
   switch(c_str,
-         DWITHPS   = "RWE_PS_DTA",
-         DPSMATCH  = "RWE_PS_DTA_MAT",
-         PSDIST    = "RWE_PS_BOR",
-         PSRST     = "RWE_PS_RST",
+         DWITHPS   = "PSRWE_DTA",
+         DPSMATCH  = "PSRWE_DTA_MAT",
+         PSDIST    = "PSRWE_BOR",
+         PSRST     = "PSRWE_RST",
          CLRST     = "RWE_CL_RST",
          PPRST     = "RWE_POWERPRST",
-         ANARST    = "RWE_PS_RST",
+         ANARST    = "PSRWE_RST",
+         OUTANA    = "PSRWE_RST_OUTANA",
          ovl       = "overlapping area",
          ksd       = "Kullback-Leibler distance",
          std       = "standardized difference in means",
@@ -444,7 +445,7 @@ plot_balance <- function(data_withps,
 }
 
 
-#' @title Plot the absolute standardized difference in means of baseline
+#' @title Plot the standardized (absolute) mean differences of baseline
 #'     variables
 #'
 #' @noRd
@@ -458,10 +459,10 @@ plot_astd <- function(data_withps,
     ## check arguments
     d_metric <- match.arg(metric)
     if (d_metric == "astd") {
-        xlab       <- "Absolute Standardized Difference"
+        xlab       <- "Standardized Absolute Mean Difference"
         xintercept <- c(0.2, 0.4)
     } else {
-        xlab       <- "Standardized Difference"
+        xlab       <- "Standardized Mean Difference"
         xintercept <- c(-0.4, -0.2, 0.2, 0.4)
     }
 
@@ -485,7 +486,7 @@ plot_astd <- function(data_withps,
         std_all <- get_distance(cov0, cov1, metric = d_metric)
         dta_asd <- rbind(dta_asd,
                          data.frame(v_cov = v,
-                                    Group = "Observed",
+                                    Group = "Before Stratification",
                                     asd   = std_all))
 
         ## PS stratified data with trimming
@@ -512,8 +513,12 @@ plot_astd <- function(data_withps,
         if (avg_only) {
             dta_asd <- rbind(dta_asd,
                              data.frame(v_cov = v,
-                                        Group = "Averaged",
+                                        Group = "After Stratification",
                                         asd   = mean(std_ws)))
+
+            dta_asd$Group <- factor(dta_asd$Group,
+                                    levels = c("Before Stratification",
+                                               "After Stratification"))
         }
     }
 
@@ -797,6 +802,7 @@ plot_pp_rst <- function(x,
     } else {
         rst_plt <- ggplot(data = rst, aes(x = theta)) +
             stat_density(aes(group    = Arm_by_Stratum,
+                             color = Stratum,
                              linetype = Stratum),
                          position  = "identity",
                          geom      = "line",
