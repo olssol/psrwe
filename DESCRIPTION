@@ -35,7 +35,8 @@ LinkingTo:
     rstan (>= 2.19.3),
     Rcpp (>= 1.0.5),
     RcppEigen (>= 0.3.3.7.0),
-    StanHeaders (>= 2.21.0-5)
+    StanHeaders (>= 2.21.0-5),
+    RcppParallel (>= 5.0.2)
 RcppModules:
     stan_fit4powerp_mod,
     stan_fit4powerps_mod,
@@ -49,12 +50,13 @@ Imports:
     randomForest (>= 4.6-14),
     survival,
     knitr,
-    optmatch
+    optmatch,
+    rstantools (>= 2.1.1)
 Suggests:
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 SystemRequirements: GNU make
 NeedsCompilation: yes
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
