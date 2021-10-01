@@ -28,10 +28,10 @@
 #' @export
 #'
 psrwe_ci <- function(dta_psrst,
-                      method_ci = c("wald", "wilson"),
-                      conf_type = c("log_log", "plain"),
-                      conf_int = 0.95,
-                      ...) {
+                     method_ci = c("wald", "wilson"),
+                     conf_type = c("log_log", "plain"),
+                     conf_int = 0.95,
+                     ...) {
 
     ## check
     stopifnot(inherits(dta_psrst,
