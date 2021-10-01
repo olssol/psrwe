@@ -306,12 +306,12 @@ print.PSRWE_RST_OUTANA <- function(x,
     cat("- Analysis Results:\n")
     print(x_outana$Analysis_Summary)
 
-    if (exists("RCT_Summary", x) && show_rct) {
+    if (exists("RCT_Summary", x_outana) && show_rct) {
         cat("- RCT Treatment Arm:\n")
-        print(x_outana$RCT$Treatment)
+        print(x_outana$RCT_Summary$Treatment)
 
         cat("- RCT Control Arm:\n")
-        print(x_outana$RCT$Control)
+        print(x_outana$RCT_Summary$Control)
     }
     invisible()
 }
