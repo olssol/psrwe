@@ -22,7 +22,7 @@
 #'     \code{\link{psrwe_powerp}}, \code{\link{psrwe_compl}}, and
 #'     \code{\link{psrwe_survkm}}.
 #'     See the functions \code{\link{psrwe_ci}} and \code{\link{psrwe_infer}}
-#'     for more details of outcome analyses.
+#'     for the options of outcome analyses.
 #'
 #' @examples
 #' data(ex_dta)
@@ -251,7 +251,7 @@ print.PSRWE_RST_OUTANA <- function(x,
               sep = ""))
 
     if (exists("pred_tp", x_outana$Analysis_Setup)) {
-        cat(paste(", Predict Time: ",
+        cat(paste("\n- Predict Time Point: ",
                   x_outana$Analysis_Setup$pred_tp,
                   sep = ""))
     }

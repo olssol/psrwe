@@ -50,7 +50,7 @@ This function is mainly for summarizing and reporting the
     \code{\link{psrwe_powerp}}, \code{\link{psrwe_compl}}, and
     \code{\link{psrwe_survkm}}.
     See the functions \code{\link{psrwe_ci}} and \code{\link{psrwe_infer}}
-    for more details of outcome analyses.
+    for the options of outcome analyses.
 }
 \examples{
 data(ex_dta)
