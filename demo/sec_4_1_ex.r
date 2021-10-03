@@ -26,9 +26,9 @@ ps_bor_single
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp <- psrwe_powerp(ps_bor_single,
-                        outcome_type = "binary",
-                        v_outcome    = "Y_Bin",
-                        seed         = 1234)
+                       outcome_type = "binary",
+                       v_outcome    = "Y_Bin",
+                       seed         = 1234)
 }) })
 rst_pp
 
@@ -36,32 +36,16 @@ rst_pp
 plot(rst_pp)
 plot(rst_pp, add_stratum = TRUE)
 
-### 95% two-sided CI.
-rst_pp <- psrwe_ci(rst_pp)
-rst_pp
-
-### Inference.
-rst_pp <- psrwe_infer(rst_pp, mu = 0.4)
-rst_pp
-
 ### Outcome analysis.
-oa_pp <- psrwe_outana(rst_pp)
+oa_pp <- psrwe_outana(rst_pp, mu = 0.4)
 oa_pp
 
 ### PSCL, single arm study, binary outcome.
 rst_cl <- psrwe_compl(ps_bor_single,
-                       outcome_type = "binary",
-                       v_outcome    = "Y_Bin")
-rst_cl
-
-### 95% two-sided CI.
-rst_cl <- psrwe_ci(rst_cl)
-rst_cl
-
-### Inference.
-rst_cl <- psrwe_infer(rst_cl, mu = 0.4)
+                      outcome_type = "binary",
+                      v_outcome    = "Y_Bin")
 rst_cl
 
 ### Outcome analysis.
-oa_cl <- psrwe_outana(rst_cl)
+oa_cl <- psrwe_outana(rst_cl, mu = 0.4)
 oa_cl

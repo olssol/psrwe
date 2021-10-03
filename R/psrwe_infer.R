@@ -24,8 +24,8 @@
 #' @export
 #'
 psrwe_infer <- function(dta_psrst,
-			 alternative = c("less", "greater"),
-                         mu = 0) {
+                        alternative = c("less", "greater"),
+                        mu = 0) {
 
     ## check
     stopifnot(inherits(dta_psrst,
