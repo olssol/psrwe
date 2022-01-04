@@ -8,7 +8,6 @@
 #' @import Rcpp
 #' @import methods
 #' @import ggplot2
-#' @import knitr
 #' @import optmatch
 #' @import rstantools
 #' @importFrom stats approxfun as.formula binomial cov density ecdf glm

@@ -1,5 +1,5 @@
 ---
-title: "psrwe: Propensity Score-Integrated Approaches for Incorporating Real-World Evidence in Clinical Studies "
+title: "psrwe: Propensity Score-Integrated Methods for Incorporating Real-World Evidence in Clinical Studies"
 author: "Chenguang Wang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -112,7 +112,7 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30,
 ps_bor_rct
 
 rst_cl_rct <- psrwe_compl(ps_bor_rct, v_outcome = "Y_Con",
-                           outcome_type = "binary")
+                           outcome_type = "continuous")
 
 rst_cl_rct$Effect
 ```
