@@ -3,11 +3,13 @@ Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
 Version: 2.2
 Authors@R: c(
     person(given = "Chenguang", family = "Wang",
-           email = "cwang68@jhmi.edu",
+           email = "chenguang.wang.0517@gmail.com",
            role = c("aut", "cre")),
     person(given = "Trustees of Columbia University",
            role = "cph",
-           comment = "tools/make_cpp.R, R/stanmodels.R"))
+           comment = "tools/make_cpp.R, R/stanmodels.R"),
+    person(given = "Wei-Chen", family = "Chen",
+           role = c("aut")))
 Description: High-quality real-world data can be transformed into scientific
     real-world evidence (RWE) for regulatory and healthcare decision-making
     using proven analytical methods and techniques. For example, propensity
