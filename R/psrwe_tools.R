@@ -919,12 +919,12 @@ get_match_optm <- function(data, ratio, caliper, ...) {
                           sid = data[["_strata_"]])
 
     ## build distance matrix by stratum and within caliper distance
-    mat_dm <- match_on(gid ~ psv + strata(sid), data = dta_sub,
-                       method = "euclidean")
-    mat_dm <- mat_dm + caliper(mat_dm, width = caliper)
+    mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
+                                 method = "euclidean")
+    mat_dm <- mat_dm + optmatch::caliper(mat_dm, width = caliper)
 
     ## optmatch
-    pm <- pairmatch(mat_dm, data = dta_sub, controls = ratio)
+    pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
 
     ## match
     id_matched <- !is.na(pm)
