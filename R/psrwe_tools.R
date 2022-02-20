@@ -913,48 +913,54 @@ plot_km_rst <- function(x,
 #' @noRd
 #'
 get_match_optm <- function(data, ratio, caliper, ...) {
-    ## prepare data
-    dta_sub <- data.frame(gid = data[["_grp_"]],
-                          psv = data[["_ps_"]],
-                          sid = data[["_strata_"]])
+    if (requireNamespace("optmatch", quietly = TRUE)) {
+        ## prepare data
+        dta_sub <- data.frame(gid = data[["_grp_"]],
+                              psv = data[["_ps_"]],
+                              sid = data[["_strata_"]])
 
-    ## build distance matrix by stratum and within caliper distance
-    mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
-                                 method = "euclidean")
-    mat_dm <- mat_dm + optmatch::caliper(mat_dm, width = caliper)
+        ## build distance matrix by stratum and within caliper distance
+        mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
+                                     method = "euclidean")
+        mat_dm <- mat_dm + optmatch::caliper(mat_dm, width = caliper)
 
-    ## optmatch
-    pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
+        ## optmatch
+        pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
 
-    ## match
-    id_matched <- !is.na(pm)
-    to_match   <- data %>%
-        dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
+        ## match
+        id_matched <- !is.na(pm)
+        to_match   <- data %>%
+            dplyr::filter(1 == `_grp_` & 0 == `_arm_`)
 
-    data[["_matchn_"]]   <- NA
-    data[["_matchid_"]]  <- NA
+        data[["_matchn_"]]   <- NA
+        data[["_matchid_"]]  <- NA
 
-    for (i in seq_len(nrow(to_match))) {
-        cur_id    <- to_match[i, "_id_"]
-        cur_match <- data[id_matched &
-                          pm == pm[cur_id] &
-                          data$"_id_" != cur_id, ]
+        for (i in seq_len(nrow(to_match))) {
+            cur_id    <- to_match[i, "_id_"]
+            cur_match <- data[id_matched &
+                              pm == pm[cur_id] &
+                              data$"_id_" != cur_id, ]
 
-        cur_matchn <- nrow(cur_match)
+            cur_matchn <- nrow(cur_match)
 
-        ## update
-        data[cur_id, "_matchn_"] <- cur_matchn
-        if (cur_matchn > 0) {
-            cur_matchid <- cur_match[1:cur_matchn, "_id_"]
-            data[cur_matchid, "_matchid_"] <- cur_id
+            ## update
+            data[cur_id, "_matchn_"] <- cur_matchn
+            if (cur_matchn > 0) {
+                cur_matchid <- cur_match[1:cur_matchn, "_id_"]
+                data[cur_matchid, "_matchid_"] <- cur_id
+            }
         }
+
+        data[which(0 == data[["_grp_"]] &
+                   is.na(data[["_matchid_"]])),
+             "_strata_"] <- NA
+
+        return(data)
+    } else {
+        print("optmatch is not available.")
+        print("Nearest neighbor without replacement matching method by CG is used.")
+        get_match_nnwor(data, ratio, caliper, ...)
     }
-
-    data[which(0 == data[["_grp_"]] &
-               is.na(data[["_matchid_"]])),
-         "_strata_"] <- NA
-
-    return(data)
 }
 
 

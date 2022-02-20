@@ -1,0 +1,24 @@
+image: r-base
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - apt-get update -q
+    - apt-get install r-cran-rstan
+    - apt-get install r-cran-dplyr
+    - apt-get install r-cran-ggplt2
+    - apt-get install r-cran-kintr
+    - apt-get install r-cran-rmarkdown
+    - apt-get install r-cran-randomforest
+    - apt-get install r-cran-cowplot
+    - apt-get install r-cran-remotes
+    - Rscript -e "sessionInfo()"
+    # - R CMD build --no-build-vignettes --no-manual --no-resave-data .
+    # - R CMD check psrwe*.tar.gz --as-cran --no-build-vignettes --no-manual --no-resave-data
+    - R CMD build .
+    - R CMD check psrwe*.tar.gz --as-cran
+    - cat ./psrwe.Rcheck/psrwe-Ex.Rout
+    - cat ./psrwe.Rcheck/psrwe-Ex.timings

@@ -37,11 +37,16 @@ oa_cl <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40)
 oa_cl
 
 ### Use optmatch with caliper
-dta_ps_match_opt <- psrwe_match(dta_ps_single, ratio = 2, strata_covs = "V2",
-                                mat_method = "optm", caliper = 0.5)
-ps_bor_match_opt <- psrwe_borrow(dta_ps_match_opt, total_borrow = 30)
-rst_cl_opt <- psrwe_compl(ps_bor_match_opt,
-                          outcome_type = "binary",
-                          v_outcome    = "Y_Bin")
-rst_cl_opt
+if (requireNamespace("optmatch", quietly = TRUE)) {
+    dta_ps_match_opt <- psrwe_match(dta_ps_single, ratio = 2,
+                                    strata_covs = "V2",
+                                    mat_method = "optm", caliper = 0.5)
+    ps_bor_match_opt <- psrwe_borrow(dta_ps_match_opt, total_borrow = 30)
+    rst_cl_opt <- psrwe_compl(ps_bor_match_opt,
+                              outcome_type = "binary",
+                              v_outcome    = "Y_Bin")
+    rst_cl_opt
+} else {
+    print("optmatch is not available.")
+}
 
