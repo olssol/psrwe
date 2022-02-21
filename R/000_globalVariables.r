@@ -13,5 +13,6 @@ if (getRversion() >= "2.15.1") {
                              "_matchid_",   "_ps_",    "dif_ps",
                              "_matchn_",    "asd",     "Design",
                              "Strata",      "Lower",   "Upper",
-                             "Mean",        "Arm_by_Stratum"))
+                             "Mean",        "Arm_by_Stratum",
+                             "pm"))
 }

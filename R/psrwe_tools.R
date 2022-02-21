@@ -913,24 +913,25 @@ plot_km_rst <- function(x,
 #' @noRd
 #'
 get_match_optm <- function(data, ratio, caliper, ...) {
-    if (requireNamespace("optmatch", quietly = TRUE)) {
-        warning("The optmatch package may restrict use.")
+    .pkg_all <- .packages(all.available = TRUE)
+
+    if ("optmatch" %in% .pkg_all) {
+        warning("The optmatch package may restrict use (academic license).")
 
         ## prepare data
         dta_sub <- data.frame(gid = data[["_grp_"]],
                               psv = data[["_ps_"]],
                               sid = data[["_strata_"]])
 
-.code_optmatch <- '
-        ## build distance matrix by stratum and within caliper distance
-        mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
-                                     method = "euclidean")
-        mat_dm <- mat_dm + optmatch::caliper(mat_dm, width = caliper)
+        .code_optmatch <- '
+            ## build distance matrix by stratum and within caliper distance
+            mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
+                                         method = "euclidean")
+            mat_dm <- mat_dm + optmatch::caliper(mat_dm, width = caliper)
 
-        ## optmatch
-        pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
-' # End of .code_optmatch
-
+            ## optmatch
+            pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
+        ' # End of .code_optmatch
         invisible(eval(parse(text = .code_optmatch)))
 
         ## match

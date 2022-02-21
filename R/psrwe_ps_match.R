@@ -38,15 +38,15 @@
 #' dta_ps_mat
 #'
 #' ## With optmatch
-#' if (requireNamespace("optmatch", quietly = TRUE)) {
+#' .remark_optmatch <- function() {
 #'     warning("The optmatch package may restrict use (academic license).")
 #'     dta_ps_opt <- psrwe_match(dta_ps, ratio = 2,
 #'                                strata_covs = "V1",
 #'                                method = "optm", seed = 123)
 #'     dta_ps_opt
-#' } else {
-#'     cat("The optmatch package is not available.\n")
 #' }
+#' ## Unmark below to run if optmatch is available.
+#' # .remark_optmatch()
 #'
 #' @export
 #'
