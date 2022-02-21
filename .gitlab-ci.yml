@@ -17,6 +17,7 @@ test:
     - apt-get -y install r-cran-cowplot
     - apt-get -y install r-cran-remotes
     - apt-get -y install texinfo
+    - apt-get -y install texlive-recommended
     - apt-get -y install texlive-latex-base
     - apt-get -y install texlive-fonts-extra
     - apt-get -y install qpdf
