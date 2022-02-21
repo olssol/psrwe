@@ -7,14 +7,14 @@ test:
   stage: test
   script:
     - apt-get update -q
-    - apt-get install r-cran-rstan
-    - apt-get install r-cran-dplyr
-    - apt-get install r-cran-ggplt2
-    - apt-get install r-cran-kintr
-    - apt-get install r-cran-rmarkdown
-    - apt-get install r-cran-randomforest
-    - apt-get install r-cran-cowplot
-    - apt-get install r-cran-remotes
+    - apt-get --yes --force-yes install r-cran-rstan
+    - apt-get --yes --force-yes install r-cran-dplyr
+    - apt-get --yes --force-yes install r-cran-ggplt2
+    - apt-get --yes --force-yes install r-cran-kintr
+    - apt-get --yes --force-yes install r-cran-rmarkdown
+    - apt-get --yes --force-yes install r-cran-randomforest
+    - apt-get --yes --force-yes install r-cran-cowplot
+    - apt-get --yes --force-yes install r-cran-remotes
     - Rscript -e "sessionInfo()"
     # - R CMD build --no-build-vignettes --no-manual --no-resave-data .
     # - R CMD check psrwe*.tar.gz --as-cran --no-build-vignettes --no-manual --no-resave-data
