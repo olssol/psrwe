@@ -62,7 +62,7 @@ dta_ps_mat
 
 ## With optmatch
 if (requireNamespace("optmatch", quietly = TRUE)) {
-    warning("The optmatch may have an academic license which restricts use.")
+    warning("The optmatch may restrict use.")
     dta_ps_opt <- psrwe_match(dta_ps, ratio = 2,
                                strata_covs = "V1",
                                method = "optm", seed = 123)

@@ -55,8 +55,6 @@ Imports:
 Suggests:
     knitr,
     rmarkdown
-Enhances:
-    optmatch
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true

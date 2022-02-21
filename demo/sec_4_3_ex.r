@@ -38,7 +38,8 @@ oa_cl
 
 ### Use optmatch with caliper
 if (requireNamespace("optmatch", quietly = TRUE)) {
-    warning("The 'optmatch' may have an academic license which restricts use.")
+    warning("The optmatch may restrict use.")
+
     dta_ps_match_opt <- psrwe_match(dta_ps_single, ratio = 2,
                                     strata_covs = "V2",
                                     mat_method = "optm", caliper = 0.5)
