@@ -11,7 +11,7 @@ test:
     - apt-get -y install r-cran-rstantools
     - apt-get -y install r-cran-dplyr
     - apt-get -y install r-cran-ggplot2
-    - apt-get -y install r-cran-kintr
+    - apt-get -y install r-cran-knitr
     - apt-get -y install r-cran-rmarkdown
     - apt-get -y install r-cran-randomforest
     - apt-get -y install r-cran-cowplot
