@@ -61,8 +61,14 @@ dta_ps_mat <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
 dta_ps_mat
 
 ## With optmatch
-dta_ps_opt <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
-                           method = "optm", seed = 123)
-dta_ps_opt
+if (requireNamespace("optmatch", quietly = TRUE)) {
+    warning("The 'optmatch' has an academic license which restricts use.")
+    dta_ps_opt <- psrwe_match(dta_ps, ratio = 2,
+                               strata_covs = "V1",
+                               method = "optm", seed = 123)
+    dta_ps_opt
+} else {
+    print("optmatch is not available.")
+}
 
 }

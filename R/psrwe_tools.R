@@ -914,6 +914,8 @@ plot_km_rst <- function(x,
 #'
 get_match_optm <- function(data, ratio, caliper, ...) {
     if (requireNamespace("optmatch", quietly = TRUE)) {
+        warning("The 'optmatch' has an academic license which restricts use.")
+
         ## prepare data
         dta_sub <- data.frame(gid = data[["_grp_"]],
                               psv = data[["_ps_"]],
