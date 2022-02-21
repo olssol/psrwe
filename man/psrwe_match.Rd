@@ -62,13 +62,13 @@ dta_ps_mat
 
 ## With optmatch
 if (requireNamespace("optmatch", quietly = TRUE)) {
-    warning("The optmatch may restrict use.")
+    warning("The optmatch package may restrict use (academic license).")
     dta_ps_opt <- psrwe_match(dta_ps, ratio = 2,
                                strata_covs = "V1",
                                method = "optm", seed = 123)
     dta_ps_opt
 } else {
-    print("optmatch is not available.")
+    cat("The optmatch package is not available.\n")
 }
 
 }

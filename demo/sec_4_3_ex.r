@@ -38,7 +38,7 @@ oa_cl
 
 ### Use optmatch with caliper
 if (requireNamespace("optmatch", quietly = TRUE)) {
-    warning("The optmatch may restrict use.")
+    warning("The optmatch may restrict use (academic license).")
 
     dta_ps_match_opt <- psrwe_match(dta_ps_single, ratio = 2,
                                     strata_covs = "V2",
@@ -49,6 +49,6 @@ if (requireNamespace("optmatch", quietly = TRUE)) {
                               v_outcome    = "Y_Bin")
     rst_cl_opt
 } else {
-    print("optmatch is not available.")
+    cat("optmatch is not available.\n")
 }
 

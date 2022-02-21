@@ -914,14 +914,14 @@ plot_km_rst <- function(x,
 #'
 get_match_optm <- function(data, ratio, caliper, ...) {
     if (requireNamespace("optmatch", quietly = TRUE)) {
-        warning("The optmatch may restrict use.")
+        warning("The optmatch package may restrict use.")
 
         ## prepare data
         dta_sub <- data.frame(gid = data[["_grp_"]],
                               psv = data[["_ps_"]],
                               sid = data[["_strata_"]])
 
-.code_optmatch <- "
+.code_optmatch <- '
         ## build distance matrix by stratum and within caliper distance
         mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
                                      method = "euclidean")
@@ -929,8 +929,9 @@ get_match_optm <- function(data, ratio, caliper, ...) {
 
         ## optmatch
         pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
-"
-        invisible(eval(parse(text = .code_optmatch))))
+' # End of .code_optmatch
+
+        invisible(eval(parse(text = .code_optmatch)))
 
         ## match
         id_matched <- !is.na(pm)
@@ -962,8 +963,8 @@ get_match_optm <- function(data, ratio, caliper, ...) {
 
         return(data)
     } else {
-        warning("optmatch is not available.")
-        warning("Nearest neighbor without replacement matching method by CG is used.")
+        cat("The optmatch package is not available.\n")
+        cat("Nearest neighbor without replacement matching method by CG is used.\n")
         get_match_nnwor(data, ratio, caliper, ...)
     }
 }
