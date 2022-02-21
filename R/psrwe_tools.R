@@ -921,6 +921,7 @@ get_match_optm <- function(data, ratio, caliper, ...) {
                               psv = data[["_ps_"]],
                               sid = data[["_strata_"]])
 
+.code_optmatch <- "
         ## build distance matrix by stratum and within caliper distance
         mat_dm <- optmatch::match_on(gid ~ psv + strata(sid), data = dta_sub,
                                      method = "euclidean")
@@ -928,6 +929,8 @@ get_match_optm <- function(data, ratio, caliper, ...) {
 
         ## optmatch
         pm <- optmatch::pairmatch(mat_dm, data = dta_sub, controls = ratio)
+"
+        invisible(eval(parse(text = .code_optmatch))))
 
         ## match
         id_matched <- !is.na(pm)
@@ -959,8 +962,8 @@ get_match_optm <- function(data, ratio, caliper, ...) {
 
         return(data)
     } else {
-        print("optmatch is not available.")
-        print("Nearest neighbor without replacement matching method by CG is used.")
+        warning("optmatch is not available.")
+        warning("Nearest neighbor without replacement matching method by CG is used.")
         get_match_nnwor(data, ratio, caliper, ...)
     }
 }
