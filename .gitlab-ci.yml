@@ -18,6 +18,7 @@ test:
     - apt-get -y install r-cran-remotes
     - apt-get -y install texinfo
     - apt-get -y install texlive-latex-base
+    - apt-get -y install texlive-fonts-extra
     - apt-get -y install qpdf
     - apt-get -y install devscripts
     - Rscript -e "sessionInfo()"
