@@ -1,0 +1,31 @@
+image: r-base
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - apt-get update -q
+    - apt-get -y install r-cran-rstan
+    - apt-get -y install r-cran-rstantools
+    - apt-get -y install r-cran-dplyr
+    - apt-get -y install r-cran-ggplot2
+    - apt-get -y install r-cran-knitr
+    - apt-get -y install r-cran-rmarkdown
+    - apt-get -y install r-cran-randomforest
+    - apt-get -y install r-cran-cowplot
+    - apt-get -y install r-cran-remotes
+    - apt-get -y install qpdf
+    - apt-get -y install devscripts
+    - Rscript -e "sessionInfo()"
+    - R CMD build --no-build-vignettes --no-manual --no-resave-data .
+    - R CMD check psrwe*.tar.gz --as-cran --no-build-vignettes --no-manual
+    # - apt-get -y install texinfo
+    # - apt-get -y install texlive-latex-base
+    # - apt-get -y install texlive-latex-recommended
+    # - apt-get -y install texlive-fonts-extra
+    # - R CMD build --no-build-vignettes .
+    # - R CMD check psrwe*.tar.gz --as-cran
+    # - cat ./psrwe.Rcheck/psrwe-Ex.Rout
+    # - cat ./psrwe.Rcheck/psrwe-Ex.timings
