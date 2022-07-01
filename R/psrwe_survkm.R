@@ -161,16 +161,10 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
                         data    = cur_data,
                         weights = cur_weights)
 
-    rst <- summary(cur_surv, time = pred_tp)
+    ## summary.survfit() need to be extend to longer time points
+    ## Last values will be carried over for predictions
+    rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
     rst <- cbind(rst$surv, rst$std.err, pred_tp)
-
-    if (nrow(rst) < length(pred_tp)) {
-        inx <- seq_len(nrow(rst))
-        inx <- c(inx,
-                 rep(nrow(rst), length(pred_tp) - nrow(rst)))
-
-        rst <- rst[inx, ]
-    }
 
     colnames(rst) <- c("Mean", "StdErr", "T")
     return(rst)

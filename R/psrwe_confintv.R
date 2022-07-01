@@ -50,12 +50,16 @@ psrwe_ci <- function(dta_psrst,
         rst_psci <- get_psci_bayesian(dta_psrst,
                                       conf_int,
                                       ...)
-    } else {
+    } else if (dta_psrst$Method == "ps_cl") {
         rst_psci <- get_psci_freq(dta_psrst,
                                   method_ci,
-                                  conf_type,
                                   conf_int,
                                   ...)
+    } else {
+        rst_psci <- get_psci_km(dta_psrst,
+                                conf_type,
+                                conf_int,
+                                ...)
     }
 
 
@@ -69,7 +73,7 @@ psrwe_ci <- function(dta_psrst,
 
 
 
-#' @title Bayesian credible interval
+#' @title Bayesian credible interval (PSPP)
 #'
 #' @noRd
 get_psci_bayesian <- function(dta_psrst,
@@ -146,17 +150,13 @@ get_bci <- function(x,
 
 
 
-#' @title Frequentist confidence interval
+#' @title Frequentist confidence interval (PSCL)
 #'
 #' @noRd
 get_psci_freq <- function(dta_psrst,
                           method_ci,
-                          conf_type,
                           conf_int,
                           ...) {
-
-    ## check
-    outcome_type <- dta_psrst$Outcome_type
 
     ## prepare data
     is_rct <- dta_psrst$is_rct 
@@ -178,7 +178,7 @@ get_psci_freq <- function(dta_psrst,
                      Treatment = NULL,
                      Effect = NULL,
                      Method_ci = method_ci,
-                     Conf_type = conf_type,
+                     Conf_type = NA,
                      Conf_int = conf_int)
 
     ## by study type
@@ -186,14 +186,12 @@ get_psci_freq <- function(dta_psrst,
         get_ci(dta_psrst$Control$Stratum_Estimate,
                n_ctl_s,
                method_ci = method_ci,
-               conf_type = conf_type,
                conf_int = conf_int,
                ...)
     rst_psci$Control$Overall_Estimate <-
         get_ci(dta_psrst$Control$Overall_Estimate,
                n_ctl,
                method_ci = method_ci,
-               conf_type = conf_type,
                conf_int = conf_int,
                ...)
 
@@ -202,14 +200,12 @@ get_psci_freq <- function(dta_psrst,
             get_ci(dta_psrst$Treatment$Stratum_Estimate,
                    n_trt_s,
                    method_ci = method_ci,
-                   conf_type = conf_type,
                    conf_int = conf_int,
                    ...)
         rst_psci$Treatment$Overall_Estimate <-
             get_ci(dta_psrst$Treatment$Overall_Estimate,
                    n_trt,
                    method_ci = method_ci,
-                   conf_type = conf_type,
                    conf_int = conf_int,
                    ...)
 
@@ -218,22 +214,14 @@ get_psci_freq <- function(dta_psrst,
                 get_ci(dta_psrst$Effect$Stratum_Estimate,
                        n_eff_s,
                        method_ci = method_ci,
-                       conf_type = conf_type,
                        conf_int = conf_int,
                        ...)
-
-            if (outcome_type != "tte" || conf_type == "plain") {
-                rst_psci$Effect$Overall_Estimate <-
-                    get_ci(dta_psrst$Effect$Overall_Estimate,
-                           n_eff,
-                           method_ci = method_ci,
-                           conf_type = conf_type,
-                           conf_int = conf_int,
-                           ...)
-            } else {
-                ## TODO: Difference of two KMs with log-log.
-                rst_psci$Effect$Overall_Estimate <- NA
-            }
+            rst_psci$Effect$Overall_Estimate <-
+                get_ci(dta_psrst$Effect$Overall_Estimate,
+                       n_eff,
+                       method_ci = method_ci,
+                       conf_int = conf_int,
+                       ...)
         } else {
             rst_psci$Effect$Stratum_Estimate <-
                 get_ci_2arms(dta_psrst$Treatment$Stratum_Estimate,
@@ -241,7 +229,6 @@ get_psci_freq <- function(dta_psrst,
                              n_trt_s,
                              n_ctl_s,
                              method_ci = method_ci,
-                             conf_type = conf_type,
                              conf_int = conf_int,
                              ...)
 
@@ -260,23 +247,14 @@ get_psci_freq <- function(dta_psrst,
 get_ci <- function(x,
                    n = NULL,
                    method_ci = c("wald", "wilson"),
-                   conf_type = c("log_log", "plain"),
                    conf_int = 0.95,
                    ...) {
 
     if (method_ci == "wald") {
-        if (!any("T" %in% names(x))) {
-            rst <- get_ci_wald(x$Mean,
-                               x$StdErr,
-                               conf_int = conf_int,
-                               ...)
-        } else {
-            rst <- get_ci_km(x$Mean,
-                             x$StdErr,
-                             conf_type = conf_type,
-                             conf_int = conf_int,
-                             ...)
-        }
+        rst <- get_ci_wald(x$Mean,
+                           x$StdErr,
+                           conf_int = conf_int,
+                           ...)
     } else if (method_ci == "wilson") {
         rst <- get_ci_wilson(x$Mean,
                              x$StdErr,
@@ -340,34 +318,6 @@ get_ci_wilson <- function(mean,
 }
 
 
-#' @title Wald CI for KM and time-to-event (one arm)
-#'
-#' @noRd
-get_ci_km <- function(mean,
-                      stderr,
-                      conf_type = c("log_log", "plain"),
-                      conf_int = 0.95,
-                      ...) {
-
-    conf_type <- match.arg(conf_type)
-    z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
-
-    ci <- switch(conf_type,
-                 log_log = {
-                     log_S        <- log(mean)
-                     se_log_log_S <- stderr / mean / log_S
-                     A <- cbind(-z_alphad2 * se_log_log_S,
-                                z_alphad2 * se_log_log_S)
-                     ci <- mean^exp(A)
-                 },
-                 plain = cbind(mean - z_alphad2 * stderr,
-                               mean + z_alphad2 * stderr)
-                 )
-
-    rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
-
-    return(rst)
-}
 
 
 #' @title Confidence interval (two arms, independent)
@@ -378,27 +328,16 @@ get_ci_2arms <- function(x,
                          n = NULL,
                          n_2 = NULL,
                          method_ci = c("wald", "wilson"),
-                         conf_type = c("log_log", "plain"),
                          conf_int = 0.95,
                          ...) {
 
     if (method_ci == "wald") {
-        if (!any("T" %in% names(x))) {
-            rst <- get_ci_wald_2arms(x$Mean,
-                                     x$StdErr,
-                                     x_2$Mean,
-                                     x_2$StdErr,
-                                     conf_int = conf_int,
-                                     ...)
-        } else {
-            rst <- get_ci_km_2arms(x$Mean,
-                                   x$StdErr,
-                                   x_2$Mean,
-                                   x_2$StdErr,
-                                   conf_int = conf_int,
-                                   conf_type = conf_type,
-                                   ...)
-        }
+        rst <- get_ci_wald_2arms(x$Mean,
+                                 x$StdErr,
+                                 x_2$Mean,
+                                 x_2$StdErr,
+                                 conf_int = conf_int,
+                                 ...)
     } else if (method_ci == "wilson") {
         rst <- get_ci_wilson_2arms(x$Mean,
                                    x$StdErr,
@@ -486,31 +425,98 @@ get_ci_wilson_2arms <- function(mean,
 }
 
 
-#' @title Wald CI for KM and time-to-event (two arms, independent)
+
+
+#' @title KM confidence interval (PSCL)
 #'
 #' @noRd
-get_ci_km_2arms <- function(mean,
-                            stderr,
-                            mean_2,
-                            stderr_2,
-                            conf_int = 0.95,
-                            conf_type = c("log_log", "plain"),
-                            ...) {
+get_psci_km <- function(dta_psrst,
+                        conf_type,
+                        conf_int,
+                        ...) {
+
+    ## prepare data
+    is_rct <- dta_psrst$is_rct 
+
+    ## prepare for the return object
+    rst_psci <- list(Control = NULL,
+                     Treatment = NULL,
+                     Effect = NULL,
+                     Method_ci = "Wald",
+                     Conf_type = conf_type,
+                     Conf_int = conf_int)
+
+    ## by study type
+    rst_psci$Control$Stratum_Estimate <-
+        get_ci_km(dta_psrst$Control$Stratum_Estimate,
+                  conf_type = conf_type,
+                  conf_int = conf_int,
+                  ...)
+    rst_psci$Control$Overall_Estimate <-
+        get_ci_km(dta_psrst$Control$Overall_Estimate,
+                  conf_type = conf_type,
+                  conf_int = conf_int,
+                  ...)
+    rst_psci$Control$Conf_type <- conf_type
+
+    if (is_rct) {
+        rst_psci$Treatment$Stratum_Estimate <-
+            get_ci_km(dta_psrst$Treatment$Stratum_Estimate,
+                      conf_type = conf_type,
+                      conf_int = conf_int,
+                      ...)
+        rst_psci$Treatment$Overall_Estimate <-
+            get_ci_km(dta_psrst$Treatment$Overall_Estimate,
+                      conf_type = conf_type,
+                      conf_int = conf_int,
+                      ...)
+        rst_psci$Treatment$Conf_type <- conf_type
+
+        rst_psci$Effect$Stratum_Estimate <-
+            get_ci_km(dta_psrst$Effect$Stratum_Estimate,
+                      conf_type = "plain",
+                      conf_int = conf_int,
+                      ...)
+        rst_psci$Effect$Overall_Estimate <-
+            get_ci_km(dta_psrst$Effect$Overall_Estimate,
+                      conf_type = "plain",
+                      conf_int = conf_int,
+                      ...)
+        rst_psci$Effect$Conf_type <- "plain"
+
+        ## Only "plain" ci is available for treatment effect in RCT.
+        rst_psci$Conf_type <- "plain"
+    }
+
+    return(rst_psci)
+}
+
+
+#' @title Wald CI for KM and time-to-event (one arm)
+#'
+#' @noRd
+get_ci_km <- function(x,
+                      conf_type = c("log_log", "plain"),
+                      conf_int = 0.95,
+                      ...) {
 
     conf_type <- match.arg(conf_type)
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
+    mean <- x$Mean
+    stderr <- x$StdErr
+
     ci <- switch(conf_type,
                  log_log = {
-                     ## TODO: Difference of two KMs with log-log.
-                     cbind(rep(NA, length(mean)),
-                           rep(NA, length(mean)))
+                     log_S        <- log(mean)
+                     se_log_log_S <- stderr / mean / log_S
+                     A <- cbind(-z_alphad2 * se_log_log_S,
+                                z_alphad2 * se_log_log_S)
+                     ci <- mean^exp(A)
                  },
-                 plain = {
-                     stderr_p <- sqrt(stderr^2 + stderr_2^2)
-                     cbind((mean - mean_2) - z_alphad2 * stderr_p,
-                           (mean - mean_2) + z_alphad2 * stderr_p)
-                 })
+                 plain = cbind(mean - z_alphad2 * stderr,
+                               mean + z_alphad2 * stderr)
+                 )
 
     rst <- data.frame(Lower = ci[, 1], Upper = ci[, 2])
 
