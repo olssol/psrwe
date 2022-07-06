@@ -249,6 +249,8 @@ get_fci <- function(x,
                     conf_int = 0.95,
                     ...) {
 
+    method_ci <- match.arg(method_ci)
+
     if (method_ci == "wald") {
         rst <- get_fci_wald(x$Mean,
                             x$StdErr,
@@ -329,6 +331,8 @@ get_fci_2arms <- function(x,
                           method_ci = c("wald", "wilson"),
                           conf_int = 0.95,
                           ...) {
+
+    method_ci <- match.arg(method_ci)
 
     if (method_ci == "wald") {
         rst <- get_fci_2arms_wald(x$Mean,
@@ -498,6 +502,8 @@ get_kmci <- function(x,
                      conf_int = 0.95,
                      conf_type = c("log_log", "plain"),
                      ...) {
+
+    conf_type <- match.arg(conf_type)
 
     if (conf_type == "log_log" || conf_type == "log_plain") {
         rst <- get_kmci_wald(x$Mean,
