@@ -9,7 +9,6 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
-#'
 #' @param ... Additional Parameters.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the

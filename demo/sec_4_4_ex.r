@@ -34,4 +34,5 @@ plot(rst_km, conf_type = "plain")
 ### Outcome analysis.
 oa_km <- psrwe_outana(rst_km, mu = 0.70, alternative = "greater")
 oa_km
-
+print(oa_km, show_details = TRUE)
+summary(oa_km, pred_tps = c(180, 365))

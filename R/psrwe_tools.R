@@ -698,7 +698,7 @@ get_overall_est <- function(ts1, weights, ts2 = NULL) {
         sds0   <- ts1[, 2]
     } else {
         theta0 <- ts1[, 1] - ts2[, 1]
-        sds0   <- sqrt(ts1[, 2] + ts2[, 2])
+        sds0   <- sqrt(ts1[, 2]^2 + ts2[, 2]^2)
     }
 
     ws         <- weights / sum(weights)

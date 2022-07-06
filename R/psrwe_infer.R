@@ -2,10 +2,10 @@
 #'
 #' Inference for the PS-integrated approach.
 #'
-#' @param dta_psrst a returned object with class \code{PSRWE_EST}
-#' @param alternative a character string for the alternative hypothesis that
+#' @param dta_psrst A returned object with class \code{PSRWE_EST}
+#' @param alternative A character string for the alternative hypothesis that
 #'        must be one of \code{"less"} (default) or \code{"greater"}
-#' @param mu a number indicating the true value of the parameter of interest
+#' @param mu A number indicating the true value of the parameter of interest
 #'        (or the difference in means for two arms)
 #'
 #' @return A list with class name \code{PSRWE_EST}.

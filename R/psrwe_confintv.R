@@ -2,13 +2,13 @@
 #'
 #' Estimate the confidence/credible interval for the PS-integrated approach.
 #'
-#' @param dta_psrst a returned object with class \code{PSRWE_EST}
-#' @param method_ci a method name for confidence interval (default Wald)
-#' @param conf_type a type name of transformation for the confidence interal
-#'        of PSKM approach (default log_log)
-#' @param conf_int a two-sided level of confidence/credible limits
+#' @param dta_psrst A returned object with class \code{PSRWE_EST}
+#' @param method_ci A method name for confidence interval (default Wald)
+#' @param conf_int A two-sided level of confidence/credible limits
 #'        (default 0.95)
-#' @param ... other options
+#' @param conf_type A type name of transformation for the confidence interal
+#'        of PSKM approach (default log_log)
+#' @param ... Other options
 #'
 #' @return A list with class name \code{PSRWE_EST}.
 #'
@@ -29,8 +29,8 @@
 #'
 psrwe_ci <- function(dta_psrst,
                      method_ci = c("wald", "wilson"),
-                     conf_type = c("log_log", "plain"),
                      conf_int = 0.95,
+                     conf_type = c("log_log", "plain"),
                      ...) {
 
     ## check
@@ -57,11 +57,10 @@ psrwe_ci <- function(dta_psrst,
                                   ...)
     } else {
         rst_psci <- get_psci_km(dta_psrst,
-                                conf_type,
                                 conf_int,
+                                conf_type,
                                 ...)
     }
-
 
     ## return
     rst <- dta_psrst
@@ -431,8 +430,8 @@ get_ci_wilson_2arms <- function(mean,
 #'
 #' @noRd
 get_psci_km <- function(dta_psrst,
-                        conf_type,
                         conf_int,
+                        conf_type,
                         ...) {
 
     ## prepare data
@@ -443,44 +442,44 @@ get_psci_km <- function(dta_psrst,
                      Treatment = NULL,
                      Effect = NULL,
                      Method_ci = "Wald",
-                     Conf_type = conf_type,
-                     Conf_int = conf_int)
+                     Conf_int = conf_int,
+                     Conf_type = conf_type)
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
         get_ci_km(dta_psrst$Control$Stratum_Estimate,
-                  conf_type = conf_type,
                   conf_int = conf_int,
+                  conf_type = conf_type,
                   ...)
     rst_psci$Control$Overall_Estimate <-
         get_ci_km(dta_psrst$Control$Overall_Estimate,
-                  conf_type = conf_type,
                   conf_int = conf_int,
+                  conf_type = conf_type,
                   ...)
     rst_psci$Control$Conf_type <- conf_type
 
     if (is_rct) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_ci_km(dta_psrst$Treatment$Stratum_Estimate,
-                      conf_type = conf_type,
                       conf_int = conf_int,
+                      conf_type = conf_type,
                       ...)
         rst_psci$Treatment$Overall_Estimate <-
             get_ci_km(dta_psrst$Treatment$Overall_Estimate,
-                      conf_type = conf_type,
                       conf_int = conf_int,
+                      conf_type = conf_type,
                       ...)
         rst_psci$Treatment$Conf_type <- conf_type
 
         rst_psci$Effect$Stratum_Estimate <-
             get_ci_km(dta_psrst$Effect$Stratum_Estimate,
-                      conf_type = "plain",
                       conf_int = conf_int,
+                      conf_type = "plain",
                       ...)
         rst_psci$Effect$Overall_Estimate <-
             get_ci_km(dta_psrst$Effect$Overall_Estimate,
-                      conf_type = "plain",
                       conf_int = conf_int,
+                      conf_type = "plain",
                       ...)
         rst_psci$Effect$Conf_type <- "plain"
 
@@ -496,8 +495,8 @@ get_psci_km <- function(dta_psrst,
 #'
 #' @noRd
 get_ci_km <- function(x,
-                      conf_type = c("log_log", "plain"),
                       conf_int = 0.95,
+                      conf_type = c("log_log", "plain"),
                       ...) {
 
     conf_type <- match.arg(conf_type)
