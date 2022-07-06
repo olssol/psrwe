@@ -182,54 +182,54 @@ get_psci_freq <- function(dta_psrst,
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
-        get_ci(dta_psrst$Control$Stratum_Estimate,
-               n_ctl_s,
-               method_ci = method_ci,
-               conf_int = conf_int,
-               ...)
+        get_fci(dta_psrst$Control$Stratum_Estimate,
+                n_ctl_s,
+                method_ci = method_ci,
+                conf_int = conf_int,
+                ...)
     rst_psci$Control$Overall_Estimate <-
-        get_ci(dta_psrst$Control$Overall_Estimate,
-               n_ctl,
-               method_ci = method_ci,
-               conf_int = conf_int,
-               ...)
+        get_fci(dta_psrst$Control$Overall_Estimate,
+                n_ctl,
+                method_ci = method_ci,
+                conf_int = conf_int,
+                ...)
 
     if (is_rct) {
         rst_psci$Treatment$Stratum_Estimate <-
-            get_ci(dta_psrst$Treatment$Stratum_Estimate,
-                   n_trt_s,
-                   method_ci = method_ci,
-                   conf_int = conf_int,
-                   ...)
+            get_fci(dta_psrst$Treatment$Stratum_Estimate,
+                    n_trt_s,
+                    method_ci = method_ci,
+                    conf_int = conf_int,
+                    ...)
         rst_psci$Treatment$Overall_Estimate <-
-            get_ci(dta_psrst$Treatment$Overall_Estimate,
-                   n_trt,
-                   method_ci = method_ci,
-                   conf_int = conf_int,
-                   ...)
+            get_fci(dta_psrst$Treatment$Overall_Estimate,
+                    n_trt,
+                    method_ci = method_ci,
+                    conf_int = conf_int,
+                    ...)
 
         if (method_ci == "wald") {
             rst_psci$Effect$Stratum_Estimate <-
-                get_ci(dta_psrst$Effect$Stratum_Estimate,
-                       n_eff_s,
-                       method_ci = method_ci,
-                       conf_int = conf_int,
-                       ...)
+                get_fci(dta_psrst$Effect$Stratum_Estimate,
+                        n_eff_s,
+                        method_ci = method_ci,
+                        conf_int = conf_int,
+                        ...)
             rst_psci$Effect$Overall_Estimate <-
-                get_ci(dta_psrst$Effect$Overall_Estimate,
-                       n_eff,
-                       method_ci = method_ci,
-                       conf_int = conf_int,
-                       ...)
+                get_fci(dta_psrst$Effect$Overall_Estimate,
+                        n_eff,
+                        method_ci = method_ci,
+                        conf_int = conf_int,
+                        ...)
         } else {
             rst_psci$Effect$Stratum_Estimate <-
-                get_ci_2arms(dta_psrst$Treatment$Stratum_Estimate,
-                             dta_psrst$Control$Stratum_Estimate,
-                             n_trt_s,
-                             n_ctl_s,
-                             method_ci = method_ci,
-                             conf_int = conf_int,
-                             ...)
+                get_fci_2arms(dta_psrst$Treatment$Stratum_Estimate,
+                              dta_psrst$Control$Stratum_Estimate,
+                              n_trt_s,
+                              n_ctl_s,
+                              method_ci = method_ci,
+                              conf_int = conf_int,
+                              ...)
 
             ## TODO: Derive score method
             rst_psci$Effect$Overall_Estimate <- NA
@@ -243,23 +243,23 @@ get_psci_freq <- function(dta_psrst,
 #' @title Confidence interval (one arm)
 #'
 #' @noRd
-get_ci <- function(x,
-                   n = NULL,
-                   method_ci = c("wald", "wilson"),
-                   conf_int = 0.95,
-                   ...) {
+get_fci <- function(x,
+                    n = NULL,
+                    method_ci = c("wald", "wilson"),
+                    conf_int = 0.95,
+                    ...) {
 
     if (method_ci == "wald") {
-        rst <- get_ci_wald(x$Mean,
-                           x$StdErr,
-                           conf_int = conf_int,
-                           ...)
+        rst <- get_fci_wald(x$Mean,
+                            x$StdErr,
+                            conf_int = conf_int,
+                            ...)
     } else if (method_ci == "wilson") {
-        rst <- get_ci_wilson(x$Mean,
-                             x$StdErr,
-                             n,
-                             conf_int = conf_int,
-                             ...)
+        rst <- get_fci_wilson(x$Mean,
+                              x$StdErr,
+                              n,
+                              conf_int = conf_int,
+                              ...)
     } else {
         stop("Confidence interval method is not implemented.")
     }
@@ -271,10 +271,10 @@ get_ci <- function(x,
 #' @title Wald CI for continous outcomes (one arm)
 #'
 #' @noRd
-get_ci_wald <- function(mean,
-                        stderr,
-                        conf_int = 0.95,
-                        ...) {
+get_fci_wald <- function(mean,
+                         stderr,
+                         conf_int = 0.95,
+                         ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -290,12 +290,12 @@ get_ci_wald <- function(mean,
 #' @title Wilson CI for binary outcomes (one arm)
 #'
 #' @noRd
-get_ci_wilson <- function(mean,
-                          stderr,
-                          n,
-                          conf_int = 0.95,
-                          method_stderr = c("original", "plain"),
-                          ...) {
+get_fci_wilson <- function(mean,
+                           stderr,
+                           n,
+                           conf_int = 0.95,
+                           method_stderr = c("original", "plain"),
+                           ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -322,30 +322,30 @@ get_ci_wilson <- function(mean,
 #' @title Confidence interval (two arms, independent)
 #'
 #' @noRd
-get_ci_2arms <- function(x,
-                         x_2,
-                         n = NULL,
-                         n_2 = NULL,
-                         method_ci = c("wald", "wilson"),
-                         conf_int = 0.95,
-                         ...) {
+get_fci_2arms <- function(x,
+                          x_2,
+                          n = NULL,
+                          n_2 = NULL,
+                          method_ci = c("wald", "wilson"),
+                          conf_int = 0.95,
+                          ...) {
 
     if (method_ci == "wald") {
-        rst <- get_ci_wald_2arms(x$Mean,
-                                 x$StdErr,
-                                 x_2$Mean,
-                                 x_2$StdErr,
-                                 conf_int = conf_int,
-                                 ...)
+        rst <- get_fci_2arms_wald(x$Mean,
+                                  x$StdErr,
+                                  x_2$Mean,
+                                  x_2$StdErr,
+                                  conf_int = conf_int,
+                                  ...)
     } else if (method_ci == "wilson") {
-        rst <- get_ci_wilson_2arms(x$Mean,
-                                   x$StdErr,
-                                   x_2$Mean,
-                                   x_2$StdErr,
-                                   n,
-                                   n_2,
-                                   conf_int = conf_int,
-                                   ...)
+        rst <- get_fci_2arms_wilson(x$Mean,
+                                    x$StdErr,
+                                    x_2$Mean,
+                                    x_2$StdErr,
+                                    n,
+                                    n_2,
+                                    conf_int = conf_int,
+                                    ...)
     } else {
         stop("Confidence interval method is not implemented.")
     }
@@ -357,12 +357,12 @@ get_ci_2arms <- function(x,
 #' @title Wald CI for continous outcomes (two arms, independent)
 #'
 #' @noRd
-get_ci_wald_2arms <- function(mean,
-                              stderr,
-                              mean_2,
-                              stderr_2,
-                              conf_int = 0.95,
-                              ...) {
+get_fci_2arms_wald <- function(mean,
+                               stderr,
+                               mean_2,
+                               stderr_2,
+                               conf_int = 0.95,
+                               ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -379,15 +379,15 @@ get_ci_wald_2arms <- function(mean,
 #' @title Wilson CI for binary outcomes (two arms, independent)
 #'
 #' @noRd
-get_ci_wilson_2arms <- function(mean,
-                                stderr,
-                                mean_2,
-                                stderr_2,
-                                n,
-                                n_2,
-                                conf_int = 0.95,
-                                method_stderr = c("original", "plain"),
-                                ...) {
+get_fci_2arms_wilson <- function(mean,
+                                 stderr,
+                                 mean_2,
+                                 stderr_2,
+                                 n,
+                                 n_2,
+                                 conf_int = 0.95,
+                                 method_stderr = c("original", "plain"),
+                                 ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
@@ -426,7 +426,7 @@ get_ci_wilson_2arms <- function(mean,
 
 
 
-#' @title KM confidence interval (PSCL)
+#' @title KM confidence interval (PSKM)
 #'
 #' @noRd
 get_psci_km <- function(dta_psrst,
@@ -447,40 +447,40 @@ get_psci_km <- function(dta_psrst,
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
-        get_ci_km(dta_psrst$Control$Stratum_Estimate,
-                  conf_int = conf_int,
-                  conf_type = conf_type,
-                  ...)
+        get_kmci(dta_psrst$Control$Stratum_Estimate,
+                 conf_int = conf_int,
+                 conf_type = conf_type,
+                 ...)
     rst_psci$Control$Overall_Estimate <-
-        get_ci_km(dta_psrst$Control$Overall_Estimate,
-                  conf_int = conf_int,
-                  conf_type = conf_type,
-                  ...)
+        get_kmci(dta_psrst$Control$Overall_Estimate,
+                 conf_int = conf_int,
+                 conf_type = conf_type,
+                 ...)
     rst_psci$Control$Conf_type <- conf_type
 
     if (is_rct) {
         rst_psci$Treatment$Stratum_Estimate <-
-            get_ci_km(dta_psrst$Treatment$Stratum_Estimate,
-                      conf_int = conf_int,
-                      conf_type = conf_type,
-                      ...)
+            get_kmci(dta_psrst$Treatment$Stratum_Estimate,
+                     conf_int = conf_int,
+                     conf_type = conf_type,
+                     ...)
         rst_psci$Treatment$Overall_Estimate <-
-            get_ci_km(dta_psrst$Treatment$Overall_Estimate,
-                      conf_int = conf_int,
-                      conf_type = conf_type,
-                      ...)
+            get_kmci(dta_psrst$Treatment$Overall_Estimate,
+                     conf_int = conf_int,
+                     conf_type = conf_type,
+                     ...)
         rst_psci$Treatment$Conf_type <- conf_type
 
         rst_psci$Effect$Stratum_Estimate <-
-            get_ci_km(dta_psrst$Effect$Stratum_Estimate,
-                      conf_int = conf_int,
-                      conf_type = "plain",
-                      ...)
+            get_kmci(dta_psrst$Effect$Stratum_Estimate,
+                     conf_int = conf_int,
+                     conf_type = "plain",
+                     ...)
         rst_psci$Effect$Overall_Estimate <-
-            get_ci_km(dta_psrst$Effect$Overall_Estimate,
-                      conf_int = conf_int,
-                      conf_type = "plain",
-                      ...)
+            get_kmci(dta_psrst$Effect$Overall_Estimate,
+                     conf_int = conf_int,
+                     conf_type = "plain",
+                     ...)
         rst_psci$Effect$Conf_type <- "plain"
 
         ## Only "plain" ci is available for treatment effect in RCT.
@@ -491,19 +491,39 @@ get_psci_km <- function(dta_psrst,
 }
 
 
+#' @title KM confidence interval (one arm)
+#'
+#' @noRd
+get_kmci <- function(x,
+                     conf_int = 0.95,
+                     conf_type = c("log_log", "plain"),
+                     ...) {
+
+    if (conf_type == "log_log" || conf_type == "log_plain") {
+        rst <- get_kmci_wald(x$Mean,
+                             x$StdErr,
+                             conf_int = conf_int,
+                             conf_type = conf_type,
+                             ...)
+    } else {
+        stop("Confidence interval type is not implemented.")
+    }
+
+    return(rst)
+}
+
+
 #' @title Wald CI for KM and time-to-event (one arm)
 #'
 #' @noRd
-get_ci_km <- function(x,
-                      conf_int = 0.95,
-                      conf_type = c("log_log", "plain"),
-                      ...) {
+get_kmci_wald <- function(mean,
+                          stderr,
+                          conf_int = 0.95,
+                          conf_type = c("log_log", "plain"),
+                          ...) {
 
     conf_type <- match.arg(conf_type)
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
-
-    mean <- x$Mean
-    stderr <- x$StdErr
 
     ci <- switch(conf_type,
                  log_log = {
