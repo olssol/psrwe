@@ -17,23 +17,23 @@ psrwe_outana(
 )
 }
 \arguments{
-\item{dta_psrst}{a returned object with class \code{PSRWE_EST}}
+\item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{method_ci}{a method name for confidence interval (default Wald)}
+\item{method_ci}{A method name for confidence interval (default Wald)}
 
-\item{conf_type}{a type name of transformation for the confidence interal
+\item{conf_type}{A type name of transformation for the confidence interal
 of PSKM approach (default log_log)}
 
-\item{conf_int}{a two-sided level of confidence/credible limits
+\item{conf_int}{A two-sided level of confidence/credible limits
 (default 0.95)}
 
-\item{alternative}{a character string for the alternative hypothesis that
+\item{alternative}{A character string for the alternative hypothesis that
 must be one of \code{"less"} (default) or \code{"greater"}}
 
-\item{mu}{a number indicating the true value of the parameter of interest
+\item{mu}{A number indicating the true value of the parameter of interest
 (or the difference in means for two arms)}
 
-\item{...}{other options}
+\item{...}{Other options}
 }
 \value{
 A list with class name \code{PSRWE_EST_OUTANA}.

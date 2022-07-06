@@ -9,12 +9,12 @@ Inference for the PS-integrated approach.}
 psrwe_infer(dta_psrst, alternative = c("less", "greater"), mu = 0)
 }
 \arguments{
-\item{dta_psrst}{a returned object with class \code{PSRWE_EST}}
+\item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{alternative}{a character string for the alternative hypothesis that
+\item{alternative}{A character string for the alternative hypothesis that
 must be one of \code{"less"} (default) or \code{"greater"}}
 
-\item{mu}{a number indicating the true value of the parameter of interest
+\item{mu}{A number indicating the true value of the parameter of interest
 (or the difference in means for two arms)}
 }
 \value{
