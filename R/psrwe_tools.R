@@ -827,6 +827,9 @@ plot_km_rst <- function(x,
                         add_stratum = FALSE,
                         ...) {
 
+    ## check args
+    args <- list(...)
+
     ## prepare data
     if (x$is_rct){
       label_Arm <- "Control"
@@ -861,12 +864,23 @@ plot_km_rst <- function(x,
 
     ## CI
     if (add_ci) {
-      ci  <- get_kmci(rst$Mean, rst$StdErr, ...)
+      if ("conf_int" %in% names(args)) {
+          conf_int <- args[['conf_int']]
+      } else {
+          conf_int <- 0.95
+      }
+ 
+      if ("conf_type" %in% names(args)) {
+          conf_type <- args[['conf_type']]
+      } else {
+          conf_type <- "plain"
+      }
+
+      ci  <- get_kmci_wald(rst$Mean, rst$StdErr, conf_int, conf_type, ...)
       rst <- cbind(rst, Lower = ci$Lower, Upper = ci$Upper)
     }
 
     ## check arguments
-    args <- list(...)
     if ("xlim" %in% names(args)) {
         xlim <- args[['xlim']]
     } else {

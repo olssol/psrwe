@@ -505,7 +505,7 @@ get_kmci <- function(x,
 
     conf_type <- match.arg(conf_type)
 
-    if (conf_type == "log_log" || conf_type == "log_plain") {
+    if (conf_type == "log_log" || conf_type == "plain") {
         rst <- get_kmci_wald(x$Mean,
                              x$StdErr,
                              conf_int = conf_int,
