@@ -25,8 +25,7 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 rst_km_rct <- psrwe_survkm(ps_bor_rct,
                            v_time = "Y_Surv",
                            v_event = "Status",
-                           pred_tp = 365,
-                           extend_all_tps = TRUE)
+                           pred_tp = 365)
 rst_km_rct
 
 ### Plot PSKM
