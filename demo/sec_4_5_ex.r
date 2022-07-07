@@ -29,7 +29,7 @@ rst_km_rct <- psrwe_survkm(ps_bor_rct,
 rst_km_rct
 
 ### Plot PSKM
-plot(rst_km_rct)
+plot(rst_km_rct, xlim = c(0, 730))
 
 ### Outcome analysis.
 oa_km_rct <- psrwe_outana(rst_km_rct, alternative = "greater")
