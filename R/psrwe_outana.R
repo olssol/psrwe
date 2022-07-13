@@ -269,14 +269,14 @@ print.PSRWE_RST_OUTANA <- function(x,
     }
 
     ## Print summary statistics
-    cat("- Observed Data Summary:\n")
-    if (show_details) {
-        print(x_outana$Observed_Summary, row.names = FALSE)
-    } else {
-        print(x_outana$Observed_Summary[x_outana$Observed_Summary$Stratum ==
-                                        "Overall",],
-              row.names = FALSE)
-    }
+    # cat("- Observed Data Summary:\n")
+    # if (show_details) {
+    #     print(x_outana$Observed_Summary, row.names = FALSE)
+    # } else {
+    #     print(x_outana$Observed_Summary[x_outana$Observed_Summary$Stratum ==
+    #                                     "Overall",],
+    #           row.names = FALSE)
+    # }
 
     ## Print outcome analyses
     cat("- Analysis Results:\n")
