@@ -28,7 +28,7 @@ rst_km_rct <- psrwe_survkm(ps_bor_rct,
                            pred_tp = 365)
 rst_km_rct
 
-### Plot PSKM
+### Plot PSKM.
 plot(rst_km_rct, xlim = c(0, 730))
 
 ### Outcome analysis.
@@ -36,3 +36,13 @@ oa_km_rct <- psrwe_outana(rst_km_rct, alternative = "greater")
 oa_km_rct
 print(oa_km_rct, show_rct = TRUE)
 summary(oa_km_rct, pred_tps = c(180, 365))
+
+### Use Jackknife stderr. This may take a while.
+rst_km_rct_jk <- psrwe_survkm(ps_bor_rct,
+                              v_time = "Y_Surv",
+                              v_event = "Status",
+                              pred_tp = 365,
+                              stderr_method = "jk")
+oa_km_rct_jk <- psrwe_outana(rst_km_rct_jk, alternative = "greater")
+summary(oa_km_rct_jk, pred_tps = c(180, 365))
+
