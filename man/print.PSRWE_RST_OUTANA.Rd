@@ -4,7 +4,7 @@
 \alias{print.PSRWE_RST_OUTANA}
 \title{Print outcome analysis results}
 \usage{
-\method{print}{PSRWE_RST_OUTANA}(x, show_details = FALSE, show_rct = FALSE, pred_tps = NULL, ...)
+\method{print}{PSRWE_RST_OUTANA}(x, show_details = FALSE, show_rct = FALSE, show_pred_tps = NULL, ...)
 }
 \arguments{
 \item{x}{A list of class \code{PSRWE_RST_OUTANA} that is generated using the
@@ -14,7 +14,7 @@
 
 \item{show_rct}{Print out more analysis summary for RCT arms}
 
-\item{pred_tps}{Specified time points}
+\item{show_pred_tps}{Specified time points to be shown}
 
 \item{...}{Additional parameters}
 }
