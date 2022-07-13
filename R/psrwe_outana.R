@@ -105,31 +105,31 @@ psrwe_outana <- function(dta_psrst,
     }
 
     ## summary estimation
+    if (exists("Stratum", dta_psrst[[type]]$Stratum_Estimate)) {
+        ## i.e., ps_km
+        id_s <- factor(c(dta_psrst[[type]]$Stratum_Estimate$Stratum,
+                         rep(0, nrow(dta_psrst[[type]]$Overall_Estimate))),
+                       levels = c(1:nrow(dta_psrst$Borrow), 0),
+                       labels = c(dta_psrst$Borrow$Stratum, "Overall"))
+    } else {
+        ## i.e., ps_pp and ps_cl
+        id_s <- factor(c(1:nrow(dta_psrst$Borrow), 0),
+                       levels = c(1:nrow(dta_psrst$Borrow), 0),
+                       labels = c(dta_psrst$Borrow$Stratum, "Overall"))
+    }
     dtype <- rbind(dta_psrst[[type]]$Stratum_Estimate[, col_est],
                    dta_psrst[[type]]$Overall_Estimate[, col_est])
-    id_s <- factor(c(dta_psrst[[type]]$Stratum_Estimate$Stratum,
-                     rep(0, nrow(dta_psrst[[type]]$Overall_Estimate))),
-                   levels = c(1:nrow(dta_psrst$Borrow), 0),
-                   labels = c(dta_psrst$Borrow$Stratum, "Overall"))
     rst_est <- data.frame(Stratum = id_s)
     rst_est <- cbind(rst_est, dtype)
 
     if (is_rct) {
         dtype <- rbind(dta_psrst$Treatment$Stratum_Estimate[, col_est],
                        dta_psrst$Treatment$Overall_Estimate[, col_est])
-        id_s <- factor(c(dta_psrst$Treatment$Stratum_Estimate$Stratum,
-                         rep(0, nrow(dta_psrst$Treatment$Overall_Estimate))),
-                       levels = c(1:nrow(dta_psrst$Borrow), 0),
-                       labels = c(dta_psrst$Borrow$Stratum, "Overall"))
         rst_est_trt <- data.frame(Stratum = id_s)
         rst_est_trt <- cbind(rst_est_trt, dtype)
 
         dtype <- rbind(dta_psrst$Control$Stratum_Estimate[, col_est],
                        dta_psrst$Control$Overall_Estimate[, col_est])
-        id_s <- factor(c(dta_psrst$Control$Stratum_Estimate$Stratum,
-                         rep(0, nrow(dta_psrst$Control$Overall_Estimate))),
-                       levels = c(1:nrow(dta_psrst$Borrow), 0),
-                       labels = c(dta_psrst$Borrow$Stratum, "Overall"))
         rst_est_ctl <- data.frame(Stratum = id_s)
         rst_est_ctl <- cbind(rst_est_ctl, dtype)
     }
