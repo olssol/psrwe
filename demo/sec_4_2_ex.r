@@ -50,5 +50,5 @@ plot(rst_pp_rct, add_stratum = TRUE, split_rct_arm = TRUE)
 
 ### Outcome analysis.
 oa_pp_rct <- psrwe_outana(rst_pp_rct, alternative = "greater")
-summary(oa_pp_rct, show_rct = TRUE)
+print(oa_pp_rct, show_rct = TRUE)
 

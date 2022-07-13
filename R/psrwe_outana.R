@@ -184,7 +184,7 @@ psrwe_outana <- function(dta_psrst,
 #'     \code{\link{psrwe_outana}} function.
 #' @param show_details Print out more observed summary
 #' @param show_rct Print out more analysis summary for RCT arms
-#' @param pred_tps Specified time points
+#' @param show_pred_tps Specified time points to be shown
 #' @param ... Additional parameters
 #'
 #'
@@ -196,14 +196,16 @@ psrwe_outana <- function(dta_psrst,
 print.PSRWE_RST_OUTANA <- function(x,
                                    show_details = FALSE,
                                    show_rct = FALSE,
-                                   pred_tps = NULL,
+                                   show_pred_tps = NULL,
                                    ...) {
 
     ## check
     is_km <- x$Method == "ps_km"
     if (is_km) {
-        if (is.null(pred_tps)) {
+        if (is.null(show_pred_tps)) {
             pred_tps <- x$pred_tp
+        } else {
+            pred_tps <- show_pred_tps
         }
         x <- get_psrst_km_subset(x, pred_tps)
     }
