@@ -9,7 +9,10 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
-#' @param ... Additional Parameters.
+#' @param stderr_method Method for computing StdErr, \code{naive} as default,
+#'                      or \code{jk} for Jackknife which may be slow and
+#'                      need large memory
+#' @param ... Additional Parameters
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -35,6 +38,7 @@ psrwe_survkm <- function(dta_psbor,
                           v_time     = "time",
                           v_event    = "event",
                           pred_tp    = 1,
+                          stderr_method = c("naive", "jk"), 
                           ...) {
 
     ## check
@@ -45,6 +49,8 @@ psrwe_survkm <- function(dta_psbor,
                   colnames(dta_psbor$data)))
 
     stopifnot(is.numeric(pred_tp) & 1 == length(pred_tp))
+
+    stderr_method <- match.arg(stderr_method)
 
     ## all time points
     data    <- dta_psbor$data
@@ -57,11 +63,13 @@ psrwe_survkm <- function(dta_psbor,
     ## call estimation
     rst <- get_ps_cl_km(dta_psbor, v_event = v_event, v_time = v_time,
                         f_stratum = get_surv_stratum, pred_tp = all_tps,
+                        stderr_method = stderr_method,
                         ...)
 
     ## return
     rst$Observed <- rst_obs
     rst$pred_tp  <- pred_tp
+    rst$stderr_method <- stderr_method
     rst$Method   <- "ps_km"
     rst$Outcome_type <- "tte"
     class(rst)   <- get_rwe_class("ANARST")
@@ -73,7 +81,8 @@ psrwe_survkm <- function(dta_psbor,
 #'
 #' @noRd
 #'
-get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp, ...) {
+get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
+                             stderr_method, ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -89,39 +98,37 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp, ...) {
     ##  overall estimate
     overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tp)
 
-    return(overall)
-
-    if (0) {
-        ## instead of using jackknife, it is using the std.err from the surv
-        ## function with the same weights
-        if (0 == ns0) {
-            return(overall)
-        }
-
-        ##jackknife
+    ##jackknife stderr
+    if (stderr_method == "jk") {
         overall_theta <- overall[, 1, drop = TRUE]
-        overall_sd    <- overall[, 2]
+        # overall_sd    <- overall[, 2]
 
-        jk_theta      <- NULL
+        # jk_theta      <- NULL
+        jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
             cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tp)
-            jk_theta <- rbind(jk_theta, cur_jk[, 1])
+            # jk_theta <- rbind(jk_theta, cur_jk[, 1])
+            jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
-                cur_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp)
-                jk_theta <- rbind(jk_theta, cur_jk[, 1])
+                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp)
+                # jk_theta <- rbind(jk_theta, ext_jk[, 1])
+                jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
 
         ## summary
-        sd_theta <- apply(rbind(overall_theta, jk_theta),
-                          2,
-                          function(x) get_jk_sd(x[1], x[-1]))
+        # sd_theta <- apply(rbind(overall_theta, jk_theta),
+        #                   2,
+        #                   function(x) get_jk_sd(x[1], x[-1]))
+        sd_theta <- sqrt((ns1 + ns0 - 1) / (ns1 + ns0) * jk_theta)
 
-        return(cbind(overall_theta, sd_theta))
+        overall[, 2] <- sd_theta
     }
+
+    return(overall)
 }
 
 #' Kaplan-Meier Estimation

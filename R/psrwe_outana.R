@@ -89,7 +89,7 @@ psrwe_outana <- function(dta_psrst,
 
     ## summary observed
     rst_obs <- dta_psrst$Observed
-    if (dta_psrst$Method != "ps_km") {
+    if (!is_km) {
         ## Only ps_km returns StdErr for the observed values
         colnames(rst_obs)[colnames(rst_obs) == "StdErr"] <- "SD"
     }
@@ -217,9 +217,15 @@ print.PSRWE_RST_OUTANA <- function(x,
               ", Study Type: ", x_outana$Analysis_Setup$Study_type,
               sep = ""))
 
-    if (exists("pred_tp", x_outana$Analysis_Setup)) {
+    if (exists("pred_tp", x)) {
         cat(paste("\n- Predict Time Point: ",
-                  x_outana$Analysis_Setup$pred_tp,
+                  paste(x$pred_tp, collapse = " "),
+                  sep = ""))
+    }
+
+    if (exists("stderr_method", x)) {
+        cat(paste("\n- StdErr Method: ",
+                  x$stderr_method,
                   sep = ""))
     }
 
