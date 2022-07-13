@@ -10,8 +10,7 @@
 #' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
 #' @param stderr_method Method for computing StdErr, \code{naive} as default,
-#'                      or \code{jk} for Jackknife which may be slow and
-#'                      need large memory
+#'                      or \code{jk} for Jackknife which may be slow
 #' @param ... Additional Parameters
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
