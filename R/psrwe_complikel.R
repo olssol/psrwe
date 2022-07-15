@@ -6,7 +6,14 @@
 #'
 #' @inheritParams psrwe_powerp
 #'
+#' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Parameters for \code{rwe_cl}
+#'
+#' @details \code{stderr_method} include \code{jk} as default
+#      using Jackknife method within each stratum, or
+#'     \code{jkoverall} for Jackknife method for overall/combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT.
+#'     Note that \code{jkoverall} may take a while longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -27,6 +34,7 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
+                      stderr_method = c("jk", "jkoverall"), 
                       ...) {
 
     ## check
@@ -37,16 +45,26 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
 
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
 
+    stderr_method <- match.arg(stderr_method)
+
     ## observed
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## call estimation
-    rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
-                        outcome_type = outcome_type,
-                        f_stratum = get_cl_stratum, ...)
+    if (stderr_method == "jk") {
+        rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
+                            outcome_type = outcome_type,
+                            f_stratum = get_cl_stratum, ...)
+    } else {
+        rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
+                                      outcome_type = outcome_type,
+                                      f_stratum = get_cl_stratum,
+                                      ...)
+    }
 
     ## return
     rst$Observed <- rst_obs
+    rst$stderr_method <- stderr_method
     rst$Method   <- "ps_cl"
     rst$Outcome_type <- outcome_type
     class(rst)   <- get_rwe_class("ANARST")
@@ -159,11 +177,11 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
     ns1     <- length(dta_cur)
     if (0 == n_borrow | is.null(d0)) {
         theta    <- mean(dta_cur)
-        sd_theta <- switch(outcome_type,
-                           continuous = sd(dta_cur),
-                           binary     = sqrt(theta * (1 - theta) / ns1))
+        stderr_theta <- switch(outcome_type,
+                               continuous = sd(dta_cur) / sqrt(ns1),
+                               binary     = sqrt(theta * (1 - theta) / ns1))
 
-        return(c(theta, sd_theta))
+        return(c(theta, stderr_theta))
     }
 
     ## overall ps-cl
@@ -188,6 +206,6 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
     }
 
     ## summary
-    sd_theta <- get_jk_sd(overall_theta, jk_theta)
-    return(c(overall_theta, sd_theta))
+    stderr_theta <- get_jk_sd(overall_theta, jk_theta)
+    return(c(overall_theta, stderr_theta))
 }

@@ -46,3 +46,12 @@ rst_km_jk <- psrwe_survkm(ps_bor_single,
 oa_km_jk <- psrwe_outana(rst_km_jk, mu = 0.70, alternative = "greater")
 summary(oa_km_jk, pred_tps = c(180, 365))
 
+### Use Jackknife overall stderr. This may take a while longer.
+rst_km_jko <- psrwe_survkm(ps_bor_single,
+                           v_time    = "Y_Surv",
+                           v_event   = "Status",
+                           pred_tp  = 365,
+                           stderr_method = "jkoverall")
+oa_km_jko <- psrwe_outana(rst_km_jko, mu = 0.70, alternative = "greater")
+summary(oa_km_jko, pred_tps = c(180, 365))
+

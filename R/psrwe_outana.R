@@ -89,10 +89,6 @@ psrwe_outana <- function(dta_psrst,
 
     ## summary observed
     rst_obs <- dta_psrst$Observed
-    if (!is_km) {
-        ## Only ps_km returns StdErr for the observed values
-        colnames(rst_obs)[colnames(rst_obs) == "StdErr"] <- "SD"
-    }
     rst_obs$Group <- factor(rst_obs$Group,
                             levels = c(0, 1),
                             labels = c("RWD", "Cur"))

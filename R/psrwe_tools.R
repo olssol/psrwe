@@ -170,14 +170,14 @@ get_observed <- function(data, v_covs) {
         group_by(Group, Arm, Stratum) %>%
         summarize(N      = n(),
                   Mean   = mean(Y),
-                  StdErr = sd(Y))
+                  SD     = sd(Y))
 
     rst2 <- data %>%
         mutate(Stratum = "Overall") %>%
         group_by(Group, Arm, Stratum) %>%
         summarize(N      = n(),
                   Mean   = mean(Y),
-                  StdErr = sd(Y))
+                  SD     = sd(Y))
 
     rst <- data.frame(rbind(rst1, rst2))
     rst
@@ -684,6 +684,7 @@ get_ps_cl_km <- function(dta_psbor,
                  Borrow    = dta_psbor$Borrow,
                  Total_borrow = dta_psbor$Total_borrow,
                  is_rct       = is_rct)
+    return(rst)
 }
 
 #' Summarize overall theta

@@ -9,9 +9,15 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
-#' @param stderr_method Method for computing StdErr, \code{naive} as default,
-#'                      or \code{jk} for Jackknife which may be slow
+#' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Additional Parameters
+#'
+#' @details \code{stderr_method} include \code{naive} as default which
+#'     mostly follows Greenwood formula,
+#'     \code{jk} using Jackknife method within each stratum, or
+#'     \code{jkoverall} using Jackknife method for overall/combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT.
+#'     Note that \code{jkoverall} may take a while longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -37,7 +43,7 @@ psrwe_survkm <- function(dta_psbor,
                           v_time     = "time",
                           v_event    = "event",
                           pred_tp    = 1,
-                          stderr_method = c("naive", "jk"), 
+                          stderr_method = c("naive", "jk", "jkoverall"), 
                           ...) {
 
     ## check
@@ -60,10 +66,20 @@ psrwe_survkm <- function(dta_psbor,
     rst_obs <- get_km_observed(data, v_time, v_event, all_tps)
 
     ## call estimation
-    rst <- get_ps_cl_km(dta_psbor, v_event = v_event, v_time = v_time,
-                        f_stratum = get_surv_stratum, pred_tp = all_tps,
-                        stderr_method = stderr_method,
-                        ...)
+    if (stderr_method %in% c("naive", "jk")) {
+        rst <- get_ps_cl_km(dta_psbor,
+                            v_event = v_event, v_time = v_time,
+                            f_stratum = get_surv_stratum, pred_tp = all_tps,
+                            stderr_method = stderr_method,
+                            ...)
+    } else {
+        rst <- get_ps_cl_km_jkoverall(dta_psbor,
+                                      v_event = v_event, v_time = v_time,
+                                      f_stratum = get_surv_stratum,
+                                      stderr_method = "naive",
+                                      pred_tp = all_tps,
+                                      ...)
+    }
 
     ## return
     rst$Observed <- rst_obs
@@ -115,9 +131,9 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
         }
 
         ## summary
-        sd_theta <- sqrt((ns1 + ns0 - 1) / (ns1 + ns0) * jk_theta)
+        stderr_theta <- sqrt((ns1 + ns0 - 1) / (ns1 + ns0) * jk_theta)
 
-        overall[, 2] <- sd_theta
+        overall[, 2] <- stderr_theta
     }
 
     return(overall)
