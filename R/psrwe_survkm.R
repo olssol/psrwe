@@ -100,28 +100,21 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
     ##jackknife stderr
     if (stderr_method == "jk") {
         overall_theta <- overall[, 1, drop = TRUE]
-        # overall_sd    <- overall[, 2]
 
-        # jk_theta      <- NULL
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
             cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tp)
-            # jk_theta <- rbind(jk_theta, cur_jk[, 1])
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
                 ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp)
-                # jk_theta <- rbind(jk_theta, ext_jk[, 1])
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
 
         ## summary
-        # sd_theta <- apply(rbind(overall_theta, jk_theta),
-        #                   2,
-        #                   function(x) get_jk_sd(x[1], x[-1]))
         sd_theta <- sqrt((ns1 + ns0 - 1) / (ns1 + ns0) * jk_theta)
 
         overall[, 2] <- sd_theta
