@@ -8,6 +8,7 @@ psrwe_compl(
   dta_psbor,
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
+  stderr_method = c("jk", "jkoverall"),
   ...
 )
 }
@@ -18,6 +19,8 @@ psrwe_compl(
 \item{v_outcome}{Column name corresponding to the outcome.}
 
 \item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}.}
+
+\item{stderr_method}{Method for computing StdErr, see Details}
 
 \item{...}{Parameters for \code{rwe_cl}}
 }
@@ -31,6 +34,12 @@ A data frame with class name \code{PSRWE_RST}. It contains the
 Estimate the mean of the outcome based on PS-integrated composite likelihood
 approach. Variance is estimated by Jack-Knife method. Applies to the case
 when there is only one external data source.
+}
+\details{
+\code{stderr_method} include \code{jk} as default
+    \code{jkoverall} for Jackknife method for overall/combined estimates
+    such as point estimates in single arm or treatment effects in RCT.
+    Note that \code{jkoverall} may take a while longer to finish.
 }
 \examples{
 data(ex_dta)

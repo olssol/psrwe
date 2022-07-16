@@ -9,7 +9,7 @@ psrwe_survkm(
   v_time = "time",
   v_event = "event",
   pred_tp = 1,
-  stderr_method = c("naive", "jk"),
+  stderr_method = c("naive", "jk", "jkoverall"),
   ...
 )
 }
@@ -23,8 +23,7 @@ psrwe_survkm(
 
 \item{pred_tp}{Time of interest (e.g., 1 year)}
 
-\item{stderr_method}{Method for computing StdErr, \code{naive} as default,
-or \code{jk} for Jackknife which may be slow}
+\item{stderr_method}{Method for computing StdErr, see Details}
 
 \item{...}{Additional Parameters}
 }
@@ -38,6 +37,14 @@ A data frame with class name \code{PSRWE_RST}. It contains the
 Estimate the mean of a survival outcome at a given time point based on
 PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
 method. Applies to the case when there is only one external data source.
+}
+\details{
+\code{stderr_method} include \code{naive} as default which
+    mostly follows Greenwood formula,
+    \code{jk} using Jackknife method within each stratum, or
+    \code{jkoverall} using Jackknife method for overall/combined estimates
+    such as point estimates in single arm or treatment effects in RCT.
+    Note that \code{jkoverall} may take a while longer to finish.
 }
 \examples{
 data(ex_dta)
