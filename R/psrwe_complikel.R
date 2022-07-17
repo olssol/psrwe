@@ -59,6 +59,7 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
         rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
                                       outcome_type = outcome_type,
                                       f_stratum = get_cl_stratum,
+                                      f_stratum_wostderr = get_cl_stratum_wostderr,
                                       ...)
     }
 
@@ -165,7 +166,7 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
 }
 
 
-#' Get estimation for each stratum
+#' Get CL estimation for each stratum
 #'
 #'
 #' @noRd

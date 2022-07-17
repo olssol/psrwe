@@ -76,8 +76,9 @@ psrwe_survkm <- function(dta_psbor,
         rst <- get_ps_cl_km_jkoverall(dta_psbor,
                                       v_event = v_event, v_time = v_time,
                                       f_stratum = get_surv_stratum,
-                                      stderr_method = "naive",
+                                      f_stratum_wostderr = get_surv_stratum_wostderr,
                                       pred_tp = all_tps,
+                                      stderr_method = "jk",
                                       ...)
     }
 
@@ -91,7 +92,7 @@ psrwe_survkm <- function(dta_psbor,
     return(rst)
 }
 
-#' Get estimation for each stratum
+#' Get surv estimation for each stratum
 #'
 #'
 #' @noRd
