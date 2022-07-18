@@ -78,7 +78,7 @@ psrwe_survkm <- function(dta_psbor,
                                       f_stratum = get_surv_stratum,
                                       f_stratum_wostderr = get_surv_stratum_wostderr,
                                       pred_tp = all_tps,
-                                      stderr_method = "jk",
+                                      stderr_method = "naive",
                                       ...)
     }
 
