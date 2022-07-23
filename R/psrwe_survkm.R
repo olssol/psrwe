@@ -69,16 +69,15 @@ psrwe_survkm <- function(dta_psbor,
     if (stderr_method %in% c("naive", "jk")) {
         rst <- get_ps_cl_km(dta_psbor,
                             v_event = v_event, v_time = v_time,
-                            f_stratum = get_surv_stratum, pred_tp = all_tps,
+                            f_stratum = get_surv_stratum,
+                            pred_tp = all_tps,
                             stderr_method = stderr_method,
                             ...)
     } else {
         rst <- get_ps_cl_km_jkoverall(dta_psbor,
                                       v_event = v_event, v_time = v_time,
-                                      f_stratum = get_surv_stratum,
-                                      f_stratum_wostderr = get_surv_stratum_wostderr,
+                                      f_stratum = get_surv_stratum_wostderr,
                                       pred_tp = all_tps,
-                                      stderr_method = "naive",
                                       ...)
     }
 

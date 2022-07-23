@@ -58,8 +58,7 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
     } else {
         rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
                                       outcome_type = outcome_type,
-                                      f_stratum = get_cl_stratum,
-                                      f_stratum_wostderr = get_cl_stratum_wostderr,
+                                      f_stratum = get_cl_stratum_wostderr,
                                       ...)
     }
 
