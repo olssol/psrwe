@@ -119,7 +119,6 @@ get_cl_stratum_wostderr <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, .
 
     ## overall ps-cl
     dta_ext <- d0
-    ns0     <- length(dta_ext)
 
     ##  overall estimate
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
