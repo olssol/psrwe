@@ -55,7 +55,7 @@ psrwe_ci <- function(dta_psrst,
                                   method_ci,
                                   conf_int,
                                   ...)
-    } else {
+    } else if (dta_psrst$Method %in% c("ps_km", "ps_lrk", "ps_rmst")) {
         rst_psci <- get_psci_km(dta_psrst,
                                 conf_int,
                                 conf_type,
@@ -450,19 +450,21 @@ get_psci_km <- function(dta_psrst,
                      Conf_type = conf_type)
 
     ## by study type
-    rst_psci$Control$Stratum_Estimate <-
-        get_kmci(dta_psrst$Control$Stratum_Estimate,
-                 conf_int = conf_int,
-                 conf_type = conf_type,
-                 ...)
-    rst_psci$Control$Overall_Estimate <-
-        get_kmci(dta_psrst$Control$Overall_Estimate,
-                 conf_int = conf_int,
-                 conf_type = conf_type,
-                 ...)
-    rst_psci$Control$Conf_type <- conf_type
+    if (exists("Control", rst_psci)) {
+        rst_psci$Control$Stratum_Estimate <-
+            get_kmci(dta_psrst$Control$Stratum_Estimate,
+                     conf_int = conf_int,
+                     conf_type = conf_type,
+                     ...)
+        rst_psci$Control$Overall_Estimate <-
+            get_kmci(dta_psrst$Control$Overall_Estimate,
+                     conf_int = conf_int,
+                     conf_type = conf_type,
+                     ...)
+        rst_psci$Control$Conf_type <- conf_type
+    }
 
-    if (is_rct) {
+    if (exists("Treatment", rst_psci)) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_kmci(dta_psrst$Treatment$Stratum_Estimate,
                      conf_int = conf_int,
@@ -474,7 +476,9 @@ get_psci_km <- function(dta_psrst,
                      conf_type = conf_type,
                      ...)
         rst_psci$Treatment$Conf_type <- conf_type
+    }
 
+    if (exists("Effect", rst_psci)) {
         rst_psci$Effect$Stratum_Estimate <-
             get_kmci(dta_psrst$Effect$Stratum_Estimate,
                      conf_int = conf_int,

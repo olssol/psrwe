@@ -141,7 +141,7 @@ get_psinfer_freq <- function(dta_psrst,
     ## prepare for the return object
     rst_psinfer <- list(Control = NULL,
                         Effect = NULL,
-                        Method_infer = "p_value (wald)",
+                        Method_infer = "p_value",
                         Alternative = alternative,
                         Mu = mu)
 

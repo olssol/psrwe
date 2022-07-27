@@ -406,14 +406,24 @@ print.PSRWE_RST <- function(x, ...) {
     rst_infer <- rst$INFER
 
     extra_1 <- ""
-    if ("ps_km" == x$Method) {
+    if (any(c("ps_km", "ps_lrk", "ps_rmst") %in% x$Method)) {
         extra_1 <- paste(" based on the survival probability at time ",
                          x$pred_tp, ",", sep = "")
     }
 
     if ("Effect" == rst_sum[1, "Type"]) {
-        extra_2 <- "treatment effect"
-        extra_2_param <- "theta_trt-theta_ctl"
+        if (any(c("ps_pp", "ps_cl", "ps_km") %in% x$Method)) {
+            extra_2 <- "treatment effect"
+            extra_2_param <- "theta_trt-theta_ctl"
+        } else if("ps_lrk" == x$Method) {
+            extra_2 <- "log-rank statistic"
+            extra_2_param <- "sum[d_trt-E(d_trt|H0)]"
+        } else if("ps_rmst" == x$Method) {
+            extra_2 <- "RMST statistic"
+            extra_2_param <- "AUC(S_trt)-AUC(S_ctl)"
+        } else {
+          stop("The method is not implemented.")
+        }
     } else {
         extra_2 <- "point estimate"
         extra_2_param <- "theta"
@@ -503,6 +513,12 @@ plot.PSRWE_RST <- function(x, ...) {
                   ps_cl = {
                       stop("This method is currently unavailable
                             for composite likelihood analysis.")
+                  },
+                  ps_lrk = {
+                      stop("This method is currently unavailable.")
+                  },
+                  ps_rmst = {
+                      stop("This method is currently unavailable.")
                   })
 
     rst
