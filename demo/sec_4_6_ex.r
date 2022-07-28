@@ -31,6 +31,7 @@ rst_lrk
 ### Outcome analysis.
 oa_lrk <- psrwe_outana(rst_lrk)
 oa_lrk
+print(oa_lrk, show_details = TRUE)
 summary(oa_lrk, pred_tps = c(180, 365))
 
 ### Use Jackknife stderr. This may take a while.
