@@ -9,9 +9,11 @@
 #' @param conf_int A two-sided level of confidence/credible limits
 #'        (default 0.95)
 #' @param alternative A character string for the alternative hypothesis that
-#'        must be one of \code{"less"} (default) or \code{"greater"}
+#'        must be one of \code{"less"} (default) or \code{"greater"}, or
+#'        \code{"two_sided"} (for log-rank and RMST only)
 #' @param mu A number indicating the true value of the parameter of interest
-#'        (or the difference in means for two arms)
+#'        (or the difference in means for two arms),
+#'        \code{mu = 0} when the test is log-rank or RMST
 #' @param ... Other options
 #'
 #' @return A list with class name \code{PSRWE_EST_OUTANA}.
@@ -41,14 +43,18 @@ psrwe_outana <- function(dta_psrst,
                          method_ci = c("wald", "wilson"),
                          conf_type = c("log_log", "plain"),
                          conf_int = 0.95,
-                         alternative = c("less", "greater"),
+                         alternative = c("less", "greater", "two_sided"),
                          mu = 0,
                          ...) {
     ## check
     stopifnot(inherits(dta_psrst,
                        what = get_rwe_class("ANARST")))
 
-    stopifnot(dta_psrst$Method %in% c("ps_pp", "ps_cl", "ps_km"))
+    stopifnot(dta_psrst$Method %in% get_rwe_class("ANAMETHOD"))
+
+    method_ci <- match.arg(method_ci)
+    conf_type <- match.arg(conf_type)
+    alternative <- match.arg(alternative)
 
     ## check components
     outcome_type <- dta_psrst$Outcome_type
@@ -60,7 +66,7 @@ psrwe_outana <- function(dta_psrst,
         type <- "Control"
     }
 
-    is_km <- dta_psrst$Method == "ps_km"
+    is_km <- dta_psrst$Method %in% get_rwe_class("ANAMETHOD_KM")
     col_est <- c("Mean", "StdErr")
     if (is_km) {
         col_est <- c(col_est, "T")
@@ -68,13 +74,13 @@ psrwe_outana <- function(dta_psrst,
 
     ## add ci and infer
     dta_psrst <- psrwe_ci(dta_psrst,
-                          method_ci = method_ci[1],
-                          conf_type = conf_type[1],
-                          conf_int = conf_int[1],
+                          method_ci = method_ci,
+                          conf_type = conf_type,
+                          conf_int = conf_int,
                           ...)
     dta_psrst <- psrwe_infer(dta_psrst,
-                             alternative = alternative[1],
-                             mu = mu[1])
+                             alternative = alternative,
+                             mu = mu)
 
     ## analysis configuration
     rst_conf <- list(Method       = dta_psrst$Method,
@@ -86,7 +92,6 @@ psrwe_outana <- function(dta_psrst,
     rst_conf$INFER <- dta_psrst$INFER[c("Method_infer",
                                         "Alternative",
                                         "Mu")]
-
     ## summary observed
     rst_obs <- dta_psrst$Observed
     rst_obs$Group <- factor(rst_obs$Group,
@@ -102,7 +107,7 @@ psrwe_outana <- function(dta_psrst,
 
     ## summary estimation
     if (exists("Stratum", dta_psrst[[type]]$Stratum_Estimate)) {
-        ## i.e., ps_km
+        ## i.e., ps_km, ps_lrk, and ps_rmst
         id_s <- factor(c(dta_psrst[[type]]$Stratum_Estimate$Stratum,
                          rep(0, nrow(dta_psrst[[type]]$Overall_Estimate))),
                        levels = c(1:nrow(dta_psrst$Borrow), 0),
@@ -117,17 +122,23 @@ psrwe_outana <- function(dta_psrst,
                    dta_psrst[[type]]$Overall_Estimate[, col_est])
     rst_est <- data.frame(Stratum = id_s)
     rst_est <- cbind(rst_est, dtype)
+    rst_est_trt <- NULL
+    rst_est_ctl <- NULL
 
     if (is_rct) {
-        dtype <- rbind(dta_psrst$Treatment$Stratum_Estimate[, col_est],
-                       dta_psrst$Treatment$Overall_Estimate[, col_est])
-        rst_est_trt <- data.frame(Stratum = id_s)
-        rst_est_trt <- cbind(rst_est_trt, dtype)
+        if (exists("Treatment", dta_psrst) && !is.null(dta_psrst$Treatment)) {
+            dtype <- rbind(dta_psrst$Treatment$Stratum_Estimate[, col_est],
+                           dta_psrst$Treatment$Overall_Estimate[, col_est])
+            rst_est_trt <- data.frame(Stratum = id_s)
+            rst_est_trt <- cbind(rst_est_trt, dtype)
+        }
 
-        dtype <- rbind(dta_psrst$Control$Stratum_Estimate[, col_est],
-                       dta_psrst$Control$Overall_Estimate[, col_est])
-        rst_est_ctl <- data.frame(Stratum = id_s)
-        rst_est_ctl <- cbind(rst_est_ctl, dtype)
+        if (exists("Control", dta_psrst) && !is.null(dta_psrst$Control)) {
+            dtype <- rbind(dta_psrst$Control$Stratum_Estimate[, col_est],
+                           dta_psrst$Control$Overall_Estimate[, col_est])
+            rst_est_ctl <- data.frame(Stratum = id_s)
+            rst_est_ctl <- cbind(rst_est_ctl, dtype)
+        }
     }
 
     ## summary CI results
@@ -136,19 +147,22 @@ psrwe_outana <- function(dta_psrst,
     rst_est <- cbind(rst_est, dtype)
 
     if (is_rct) {
-        dtype <- rbind(dta_psrst$CI$Treatment$Stratum_Estimate,
-                       dta_psrst$CI$Treatment$Overall_Estimate)
-        rst_est_trt <- cbind(rst_est_trt, dtype)
+        if (exists("Treatment", dta_psrst) && !is.null(dta_psrst$Treatment)) {
+            dtype <- rbind(dta_psrst$CI$Treatment$Stratum_Estimate,
+                           dta_psrst$CI$Treatment$Overall_Estimate)
+            rst_est_trt <- cbind(rst_est_trt, dtype)
+        }
 
-        dtype <- rbind(dta_psrst$CI$Control$Stratum_Estimate,
-                       dta_psrst$CI$Control$Overall_Estimate)
-        rst_est_ctl <- cbind(rst_est_ctl, dtype)
+        if (exists("Control", dta_psrst) && !is.null(dta_psrst$Control)) {
+            dtype <- rbind(dta_psrst$CI$Control$Stratum_Estimate,
+                           dta_psrst$CI$Control$Overall_Estimate)
+            rst_est_ctl <- cbind(rst_est_ctl, dtype)
+        }
     }
 
     ## summary INFR results
     dtype <- rbind(dta_psrst$INFER[[type]]$Stratum_InferProb,
                    dta_psrst$INFER[[type]]$Overall_InferProb)
-
     if (dta_psrst$Method == "ps_pp") {
         colnames(dtype) <- "PostPr"
     } else {
@@ -196,7 +210,7 @@ print.PSRWE_RST_OUTANA <- function(x,
                                    ...) {
 
     ## check
-    is_km <- x$Method == "ps_km"
+    is_km <- x$Method %in% get_rwe_class("ANAMETHOD_KM")
     if (is_km) {
         if (is.null(show_pred_tps)) {
             pred_tps <- x$pred_tp
@@ -249,17 +263,35 @@ print.PSRWE_RST_OUTANA <- function(x,
 		  "\n", sep = ""))
 
         if (x_outana$Analysis_Setup$Study_type == "RCT") {
-            poi <- "theta_trt-theta_ctl"
+            if (x_outana$Analysis_Setup$Method %in%
+                c("ps_pp", "ps_cl", "ps_km")) {
+                poi <- "theta_trt-theta_ctl"
+            } else if(x_outana$Analysis_Setup$Method == "ps_lrk") {
+                poi <- "sum[d_trt-E(d_trt)]"
+            } else if(x_outana$Analysis_Setup$Method == "ps_rmst") {
+                poi <- "auc(S_trt)-auc(S_ctl)"
+            } else {
+              stop("The method is not implemented.")
+            }
         } else {
             poi <- "theta"
         }
 
-        cat(paste("  H0: ", poi, " ",
-		  ifelse(infer$Alternative == "less", ">=", "<="),
+        if (infer$Alternative == "less") {
+            sign_null <- ">="
+            sign_alter <- "<"
+        } else if (infer$Alternative == "greater") {
+            sign_null <- "<="
+            sign_alter <- ">"
+        } else {
+            sign_null <- "=="
+            sign_alter <- "!="
+        }
+
+        cat(paste("  H0: ", poi, " ", sign_null,
                   " ", sprintf("%5.3f", infer$Mu),
 		  " vs. ", 
-                  "Ha: ", poi, " ",
-		  ifelse(infer$Alternative == "less", "<", ">"),
+                  "Ha: ", poi, " ", sign_alter,
                   " ", sprintf("%5.3f", infer$Mu),
 		  "\n", sep = ""))
     }
@@ -286,21 +318,29 @@ print.PSRWE_RST_OUTANA <- function(x,
 
     if (exists("RCT_Summary", x_outana) && show_rct) {
         cat("- RCT Treatment Arm:\n")
-        if (show_details) {
-            print(x_outana$RCT_Summary$Treatment, row.names = FALSE)
+        if (!is.null(x_outana$RCT_Summary$Treatment)) {
+            if (show_details) {
+                print(x_outana$RCT_Summary$Treatment, row.names = FALSE)
+            } else {
+                print(x_outana$RCT_Summary$Treatment[x_outana$RCT_Summary$Treatment$Stratum ==
+                                                     "Overall",],
+                      row.names = FALSE)
+            }
         } else {
-            print(x_outana$RCT_Summary$Treatment[x_outana$RCT_Summary$Treatment$Stratum ==
-                                                 "Overall",],
-                  row.names = FALSE)
+            print(NA)
         }
 
         cat("- RCT Control Arm:\n")
-        if (show_details) {
-            print(x_outana$RCT_Summary$Control, row.names = FALSE)
+        if (!is.null(x_outana$RCT_Summary$Control)) {
+            if (show_details) {
+                print(x_outana$RCT_Summary$Control, row.names = FALSE)
+            } else {
+                print(x_outana$RCT_Summary$Control[x_outana$RCT_Summary$Control$Stratum ==
+                                                   "Overall",],
+                      row.names = FALSE)
+            }
         } else {
-            print(x_outana$RCT_Summary$Control[x_outana$RCT_Summary$Control$Stratum ==
-                                               "Overall",],
-                  row.names = FALSE)
+            print(NA)
         }
     }
 
@@ -327,7 +367,7 @@ summary.PSRWE_RST_OUTANA <- function(object,
                                      pred_tps = NULL,
                                      ...) {
     ## check
-    is_km <- object$Method == "ps_km"
+    is_km <- object$Method %in% get_rwe_class("ANAMETHOD_KM")
     if (is_km) {
         if (is.null(pred_tps)) {
             pred_tps <- object$pred_tp
@@ -395,41 +435,47 @@ get_psrst_km_subset <- function(dta_psrst, pred_tps = NULL) {
 
     ## subset estimates
     for (i_type in types_est) {
-        dta_psrst[[i_type]]$Stratum_Estimate <-
-            subset_replace(dta_psrst[[i_type]]$Stratum_Estimate,
-                           id_Stratum_T,
-                           time_table)
+        if (!is.null(dta_psrst[[i_type]])) {
+            dta_psrst[[i_type]]$Stratum_Estimate <-
+                subset_replace(dta_psrst[[i_type]]$Stratum_Estimate,
+                               id_Stratum_T,
+                               time_table)
 
-        dta_psrst[[i_type]]$Overall_Estimate <-
-            subset_replace(dta_psrst[[i_type]]$Overall_Estimate,
-                           id_Overall_T,
-                           time_table)
+            dta_psrst[[i_type]]$Overall_Estimate <-
+                subset_replace(dta_psrst[[i_type]]$Overall_Estimate,
+                               id_Overall_T,
+                               time_table)
+        }
     }
 
     ## subset CI
     for (i_type in types_est) {
-        dta_psrst$CI[[i_type]]$Stratum_Estimate <-
-            subset_replace(dta_psrst$CI[[i_type]]$Stratum_Estimate,
-                           id_Stratum_T,
-                           time_table)
+        if (!is.null(dta_psrst$CI[[i_type]])) {
+            dta_psrst$CI[[i_type]]$Stratum_Estimate <-
+                subset_replace(dta_psrst$CI[[i_type]]$Stratum_Estimate,
+                               id_Stratum_T,
+                               time_table)
 
-        dta_psrst$CI[[i_type]]$Overall_Estimate <-
-            subset_replace(dta_psrst$CI[[i_type]]$Overall_Estimate,
-                           id_Overall_T,
-                           time_table)
+            dta_psrst$CI[[i_type]]$Overall_Estimate <-
+                subset_replace(dta_psrst$CI[[i_type]]$Overall_Estimate,
+                               id_Overall_T,
+                               time_table)
+        }
     }
 
     ## subset INFR
     for (i_type in types_est) {
-        dta_psrst$INFR[[i_type]]$Stratum_Estimate <-
-            subset_replace(dta_psrst$INFR[[i_type]]$Stratum_Estimate,
-                           id_Stratum_T,
-                           time_table)
+        if (!is.null(dta_psrst$INFR[[i_type]])) {
+            dta_psrst$INFR[[i_type]]$Stratum_Estimate <-
+                subset_replace(dta_psrst$INFR[[i_type]]$Stratum_Estimate,
+                               id_Stratum_T,
+                               time_table)
 
-        dta_psrst$INFR[[i_type]]$Overall_Estimate <-
-            subset_replace(dta_psrst$INFR[[i_type]]$Overall_Estimate,
-                           id_Overall_T,
-                           time_table)
+            dta_psrst$INFR[[i_type]]$Overall_Estimate <-
+                subset_replace(dta_psrst$INFR[[i_type]]$Overall_Estimate,
+                               id_Overall_T,
+                               time_table)
+        }
     }
 
     ## subset OUTANA

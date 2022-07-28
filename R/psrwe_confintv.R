@@ -37,7 +37,7 @@ psrwe_ci <- function(dta_psrst,
     stopifnot(inherits(dta_psrst,
                        what = get_rwe_class("ANARST")))
 
-    stopifnot(dta_psrst$Method %in% c("ps_pp", "ps_cl", "ps_km"))
+    stopifnot(dta_psrst$Method %in% get_rwe_class("ANAMETHOD"))
 
     method_ci <- match.arg(method_ci)
     outcome_type <- dta_psrst$Outcome_type
@@ -55,7 +55,7 @@ psrwe_ci <- function(dta_psrst,
                                   method_ci,
                                   conf_int,
                                   ...)
-    } else if (dta_psrst$Method %in% c("ps_km", "ps_lrk", "ps_rmst")) {
+    } else if (dta_psrst$Method %in% get_rwe_class("ANAMETHOD_KM")) {
         rst_psci <- get_psci_km(dta_psrst,
                                 conf_int,
                                 conf_type,
@@ -450,7 +450,7 @@ get_psci_km <- function(dta_psrst,
                      Conf_type = conf_type)
 
     ## by study type
-    if (exists("Control", rst_psci)) {
+    if (exists("Control", dta_psrst)) {
         rst_psci$Control$Stratum_Estimate <-
             get_kmci(dta_psrst$Control$Stratum_Estimate,
                      conf_int = conf_int,
@@ -464,7 +464,7 @@ get_psci_km <- function(dta_psrst,
         rst_psci$Control$Conf_type <- conf_type
     }
 
-    if (exists("Treatment", rst_psci)) {
+    if (exists("Treatment", dta_psrst)) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_kmci(dta_psrst$Treatment$Stratum_Estimate,
                      conf_int = conf_int,
@@ -478,7 +478,7 @@ get_psci_km <- function(dta_psrst,
         rst_psci$Treatment$Conf_type <- conf_type
     }
 
-    if (exists("Effect", rst_psci)) {
+    if (exists("Effect", dta_psrst)) {
         rst_psci$Effect$Stratum_Estimate <-
             get_kmci(dta_psrst$Effect$Stratum_Estimate,
                      conf_int = conf_int,

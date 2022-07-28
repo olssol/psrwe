@@ -327,7 +327,7 @@ summary.PSRWE_RST <- function(object, ...) {
     }
 
     dtype <- object[[type]]$Overall_Estimate
-    if ("ps_km" == object$Method) {
+    if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
         dtype <- data.frame(dtype) %>%
             filter(object$pred_tp == T)
     }
@@ -343,7 +343,7 @@ summary.PSRWE_RST <- function(object, ...) {
         citype <- cbind(object$CI[[type]]$Overall_Estimate)
 
         if (is.data.frame(citype)) {
-            if ("ps_km" == object$Method) {
+            if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
                 citype <- cbind(citype,
                                 T = object[[type]]$Overall_Estimate$T)
 
@@ -364,7 +364,7 @@ summary.PSRWE_RST <- function(object, ...) {
     if (exists("INFER", object)) {
         hitype <- object$INFER[[type]]$Overall_InferProb
 
-        if ("ps_km" == object$Method) {
+        if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
             hitype <- cbind(hitype,
                             T = object[[type]]$Overall_Estimate$T)
 
@@ -406,21 +406,21 @@ print.PSRWE_RST <- function(x, ...) {
     rst_infer <- rst$INFER
 
     extra_1 <- ""
-    if (any(c("ps_km", "ps_lrk", "ps_rmst") %in% x$Method)) {
+    if (x$Method %in% get_rwe_class("ANAMETHOD_KM")) {
         extra_1 <- paste(" based on the survival probability at time ",
                          x$pred_tp, ",", sep = "")
     }
 
     if ("Effect" == rst_sum[1, "Type"]) {
-        if (any(c("ps_pp", "ps_cl", "ps_km") %in% x$Method)) {
+        if (x$Method %in% c("ps_pp", "ps_cl", "ps_km")) {
             extra_2 <- "treatment effect"
             extra_2_param <- "theta_trt-theta_ctl"
-        } else if("ps_lrk" == x$Method) {
+        } else if(x$Method == "ps_lrk") {
             extra_2 <- "log-rank statistic"
-            extra_2_param <- "sum[d_trt-E(d_trt|H0)]"
-        } else if("ps_rmst" == x$Method) {
+            extra_2_param <- "sum[d_trt-E(d_trt)]"
+        } else if(x$Method == "ps_rmst") {
             extra_2 <- "RMST statistic"
-            extra_2_param <- "AUC(S_trt)-AUC(S_ctl)"
+            extra_2_param <- "auc(S_trt)-auc(S_ctl)"
         } else {
           stop("The method is not implemented.")
         }

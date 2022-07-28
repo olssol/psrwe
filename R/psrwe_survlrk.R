@@ -66,6 +66,9 @@ psrwe_survlrk <- function(dta_psbor,
     obs_tps <- data[which(1 == data[[v_event]]), v_time]
     all_tps <- sort(unique(c(pred_tp, obs_tps)))
 
+    ## observed
+    rst_obs <- get_km_observed(data, v_time, v_event, all_tps)
+
     ## call estimation
     if (stderr_method %in% c("naive", "jk")) {
         rst <- get_ps_cl_lrk(dta_psbor,
@@ -83,6 +86,7 @@ psrwe_survlrk <- function(dta_psbor,
     }
 
     ## return
+    rst$Observed <- rst_obs
     rst$pred_tp  <- pred_tp
     rst$stderr_method <- stderr_method
     rst$Method   <- "ps_lrk"

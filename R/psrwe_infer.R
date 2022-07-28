@@ -4,9 +4,11 @@
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}
 #' @param alternative A character string for the alternative hypothesis that
-#'        must be one of \code{"less"} (default) or \code{"greater"}
+#'        must be one of \code{"less"} (default), \code{"greater"}, or
+#'        \code{"two_sided"} (for log-rank and RMST only)
 #' @param mu A number indicating the true value of the parameter of interest
-#'        (or the difference in means for two arms)
+#'        (or the difference in means for two arms),
+#'        \code{mu = 0} when the test is log-rank or RMST
 #'
 #' @return A list with class name \code{PSRWE_EST}.
 #'
@@ -24,23 +26,30 @@
 #' @export
 #'
 psrwe_infer <- function(dta_psrst,
-                        alternative = c("less", "greater"),
+                        alternative = c("less", "greater", "two_sided"),
                         mu = 0) {
 
     ## check
     stopifnot(inherits(dta_psrst,
                        what = get_rwe_class("ANARST")))
 
-    stopifnot(dta_psrst$Method %in% c("ps_pp", "ps_cl", "ps_km"))
+    stopifnot(dta_psrst$Method %in% get_rwe_class("ANAMETHOD"))
 
     alternative <- match.arg(alternative)
 
     ## get ci by method
     if (dta_psrst$Method == "ps_pp") {
+        if (alternative == "two_sided") {
+             stop("two_sided is not implemented for ps_pp")
+        }
         rst_psinfer <- get_psinfer_bayesian(dta_psrst,
                                             alternative,
                                             mu)
     } else {
+        if (dta_psrst$Method %in% c("ps_lrk", "ps_rmst")) {
+            alternative <- "two_sided"
+            mu <- 0
+        }
         rst_psinfer <- get_psinfer_freq(dta_psrst,
                                         alternative,
                                         mu)
@@ -166,12 +175,16 @@ get_fpval <- function(x,
                       alternative,
                       mu) {
 
+    tstat <- (x$Mean - mu) / x$StdErr
     p_value <- switch(alternative,
                       less = {
-                        pnorm((x$Mean - mu) / x$StdErr)
+                        pnorm(tstat)
                       },
                       greater = {
-                        pnorm((x$Mean - mu) / x$StdErr, lower.tail = FALSE)
+                        pnorm(tstat, lower.tail = FALSE)
+                      },
+                      two_sided = {
+                        pnorm(abs(tstat), lower.tail = FALSE) * 2
                       })
 
     rst <- data.frame(Infer_prob = p_value)
