@@ -11,7 +11,7 @@ psrwe_outana(
   method_ci = c("wald", "wilson"),
   conf_type = c("log_log", "plain"),
   conf_int = 0.95,
-  alternative = c("less", "greater"),
+  alternative = c("less", "greater", "two_sided"),
   mu = 0,
   ...
 )
@@ -28,10 +28,12 @@ of PSKM approach (default log_log)}
 (default 0.95)}
 
 \item{alternative}{A character string for the alternative hypothesis that
-must be one of \code{"less"} (default) or \code{"greater"}}
+must be one of \code{"less"} (default) or \code{"greater"}, or
+\code{"two_sided"} (for log-rank and RMST only)}
 
 \item{mu}{A number indicating the true value of the parameter of interest
-(or the difference in means for two arms)}
+(or the difference in means for two arms),
+\code{mu = 0} when the test is log-rank or RMST}
 
 \item{...}{Other options}
 }

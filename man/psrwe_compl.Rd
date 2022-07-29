@@ -27,8 +27,10 @@ psrwe_compl(
 \value{
 A data frame with class name \code{PSRWE_RST}. It contains the
     composite estimation of the mean for each stratum as well as the
-    jackknife estimation for each subject. The results should be further
+    jackknife estimation for each subject. The results can be further
     summarized by its S3 method \code{summary}.
+    The results can be also analyzed by \code{psrwe_outana} for outcome
+    analysis and inference.
 }
 \description{
 Estimate the mean of the outcome based on PS-integrated composite likelihood

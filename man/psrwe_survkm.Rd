@@ -30,13 +30,15 @@ psrwe_survkm(
 \value{
 A data frame with class name \code{PSRWE_RST}. It contains the
     composite estimation of the mean for each stratum as well as the
-    jackknife estimation. The results should be further
+    jackknife estimation. The results can be further
     summarized by its S3 method \code{summary}.
+    The results can be also analyzed by \code{psrwe_outana} for outcome
+    analysis and inference.
 }
 \description{
 Estimate the mean of a survival outcome at a given time point based on
-PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
-method. Applies to the case when there is only one external data source.
+PS-integrated Kaplan-Meier approach. Variance can be estimated by Jackknife
+methods. Applies to the case when there is only one external data source.
 }
 \details{
 \code{stderr_method} include \code{naive} as default which

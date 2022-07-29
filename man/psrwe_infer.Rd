@@ -6,16 +6,18 @@
 
 Inference for the PS-integrated approach.}
 \usage{
-psrwe_infer(dta_psrst, alternative = c("less", "greater"), mu = 0)
+psrwe_infer(dta_psrst, alternative = c("less", "greater", "two_sided"), mu = 0)
 }
 \arguments{
 \item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
 \item{alternative}{A character string for the alternative hypothesis that
-must be one of \code{"less"} (default) or \code{"greater"}}
+must be one of \code{"less"} (default), \code{"greater"}, or
+\code{"two_sided"} (for log-rank and RMST only)}
 
 \item{mu}{A number indicating the true value of the parameter of interest
-(or the difference in means for two arms)}
+(or the difference in means for two arms),
+\code{mu = 0} when the test is log-rank or RMST}
 }
 \value{
 A list with class name \code{PSRWE_EST}.

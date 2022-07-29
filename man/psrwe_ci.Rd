@@ -22,8 +22,8 @@ psrwe_ci(
 \item{conf_int}{A two-sided level of confidence/credible limits
 (default 0.95)}
 
-\item{conf_type}{A type name of transformation for the confidence interal
-of PSKM approach (default log_log)}
+\item{conf_type}{A type name of transformation for the confidence interval
+of PSKM approach}
 
 \item{...}{Other options}
 }
@@ -37,6 +37,7 @@ Estimate the confidence/credible interval for the PS-integrated approach.
 }
 \details{
 \code{method_ci = "wilson"} is for binary outcomes only.
+         \code{conf_type = "log_log"} is for \code{ps_km} only.
 }
 \examples{
 data(ex_dta)
