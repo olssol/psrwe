@@ -29,7 +29,6 @@ get_ps_lrk_rmst <- function(dta_psbor,
         cur_d1  <- cur_01$cur_d1    ## This is "cur_d1c"
         cur_d0  <- cur_01$cur_d0
         cur_d1t <- cur_01$cur_d1t
-print(nrow(cur_d1), nrow(cur_d0), nrow(cur_d1t))
 
         ## effect with borrowing
         cur_effect   <- f_stratum(cur_d1, cur_d0, cur_d1t,

@@ -76,14 +76,14 @@ psrwe_survrmst <- function(dta_psbor,
         rst <- get_ps_lrk_rmst(dta_psbor,
                                v_event = v_event, v_time = v_time,
                                f_stratum = get_surv_stratum_rmst,
-                               pred_tp = all_tps,
+                               pred_tps = all_tps,
                                stderr_method = stderr_method,
                               ...)
     } else {
         rst <- get_ps_lrk_rmst_jkoverall(dta_psbor,
                                          v_event = v_event, v_time = v_time,
                                          f_stratum = get_surv_stratum_rmst_wostderr,
-                                         pred_tp = all_tps,
+                                         pred_tps = all_tps,
                                          ...)
     }
 
@@ -102,7 +102,7 @@ psrwe_survrmst <- function(dta_psbor,
 #'
 #' @noRd
 #'
-get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
+get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
                                   stderr_method, ...) {
 
     ## treatment or control only
@@ -119,7 +119,7 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
     }
 
     ##  overall estimate
-    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
+    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps)
 
     ##jackknife stderr
     if (stderr_method == "jk") {
@@ -128,20 +128,20 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
             cur_jk   <- rwe_rmst(dta_cur[-j, ], dta_ext, dta_cur_trt, n_borrow,
-                                 pred_tp)
+                                 pred_tps)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         for (j in seq_len(ns1_trt)) {
             cur_jk   <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt[-j, ], n_borrow,
-                                 pred_tp)
+                                 pred_tps)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
                 ext_jk   <- rwe_rmst(dta_cur, dta_ext[-j, ], dta_cur_trt,
-                                     n_borrow, pred_tp)
+                                     n_borrow, pred_tps)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
@@ -169,7 +169,10 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tp Time points to be estimated
+#' @param pred_tps All time points of events
+#' @param stderr_method Method for computing StdErr (available for naive only)
+#' @param v_time Column name corresponding to event time
+#' @param v_event Column name corresponding to event status
 #'
 #' @return Estimation of RMST estimates at time \code{pred_tps}
 #'
@@ -177,7 +180,8 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 #' @export
 #'
 rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
-                     pred_tp = 1) {
+                     pred_tps = NULL, stderr_method = "naive",
+                     v_time = "time", v_event = "event") {
 
     ## current control and external control if available
     cur_data    <- dta_cur
@@ -212,13 +216,23 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
 
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions
-    rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
-    rst_trt <- summary(cur_surv_trt, time = pred_tp, extend = TRUE)
+    if (is.null(pred_tps)) {
+        data <- cbind(cur_data, cur_data_trt)
+        obs_tps <- data[which(1 == data[[v_event]]), v_time]
+        pred_tps <- sort(unique(obs_tps))
+    }
+
+    ## summary.survfit() only reports information for specified time points
+    ## so, pred_tps should be inputted will all time points before tau.
+    rst <- summary(cur_surv, time = pred_tps, extend = TRUE)
+    rst_trt <- summary(cur_surv_trt, time = pred_tps, extend = TRUE)
+
+    ## For naive stderr
 
     ## Info needed for RMST
-    surv_trt <- rst_trt$surv
-    surv_ctl <- rst$surv
-    time_diff <- diff(c(0, pred_tp))
+    surv_trt <- c(1, rst_trt$surv)
+    surv_ctl <- c(1, rst$surv)
+    time_diff <- diff(c(0, pred_tps, pred_tps[length(pred_tps)]))
     n_risk_trt <- rst_trt$n.risk
     n_risk_ctl <- rst$n.risk
     n_event_trt <- rst_trt$n.event
@@ -230,32 +244,35 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     area_diff <- area_trt - area_ctl
     auc_diff <- cumsum(area_diff)
 
-    ## RMST naive stderr
+    ## For RMST naive stderr
     ## For RMST2 naive stderr
     ## - see survival vignette page 13
     ## - \hat{\mu} = \int_0^T \hat{S}(t) dt
     ## - var(\hat{\mu}) =
     ##     \int_0^T (\int_t^T \hat{S}(u) du)^2 *
-    ##              \frac{d \bar{N}(t)}{\bar{Y}(t) * (\bar{Y}(t) - \bar{N}(t))}
-    ## - see also survRM2:::rmst1()
-    v_trt <- ifelse((n_risk_trt - n_event_trt) == 0, 0,
-                    n_event_trt / (n_risk_trt * (n_risk_trt - n_event_trt)))
-    v_ctl <- ifelse((n_risk_ctl - n_event_ctl) == 0, 0,
-                    n_event_ctl / (n_risk_ctl * (n_risk_ctl - n_event_ctl)))
-    f_get_auc_var <- function(i.tau, area, v) {
-        rev_auc <- rev(cumsum(rev(area[1:i.tau])))
-        auc_var <- sum(rev_auc^2 * v[1:i.tau])
-        auc_var
+    ##              \frac{d \bar{N}(t)}{\bar{Y}(t) *
+    ##                                  (\bar{Y}(t) - \bar{N}(t))}
+    ## - see also similarly in survRM2:::rmst1()
+    if (stderr_method == "naive") {
+        v_trt <- ifelse((n_risk_trt - n_event_trt) == 0, 0,
+                        n_event_trt / (n_risk_trt * (n_risk_trt - n_event_trt)))
+        v_ctl <- ifelse((n_risk_ctl - n_event_ctl) == 0, 0,
+                        n_event_ctl / (n_risk_ctl * (n_risk_ctl - n_event_ctl)))
+        f_get_auc_var <- function(i.tau, area, v) {
+            sum(rev(cumsum(rev(area[1:i.tau])))^2 * v[1:i.tau])
+        }
+        auc_var_trt <- do.call("c", lapply(1:length(pred_tps), f_get_auc_var,
+                                           area = area_trt, v = v_trt))
+        auc_var_ctl <- do.call("c", lapply(1:length(pred_tps), f_get_auc_var,
+                                           area = area_ctl, v = v_ctl))
+        auc_var_diff <- auc_var_trt + auc_var_ctl
+        auc_stderr_diff <- sqrt(auc_var_diff)
+    } else {
+        auc_stderr_diff <- rep(NA, length(auc_diff))
     }
-    auc_var_trt <- do.call("c", lapply(1:length(pred_tp), f_get_auc_var,
-                                       area = area_trt, v = v_trt))
-    auc_var_ctl <- do.call("c", lapply(1:length(pred_tp), f_get_auc_var,
-                                       area = area_ctl, v = v_ctl))
-    auc_var_diff <- auc_var_trt + auc_var_ctl
-    auc_stderr_diff <- sqrt(auc_var_diff)
 
     ## Compute RMST estimates
-    rst_rmst <- cbind(auc_diff, auc_stderr_diff, pred_tp)
+    rst_rmst <- cbind(auc_diff, auc_stderr_diff, pred_tps)
 
     colnames(rst_rmst) <- c("Mean", "StdErr", "T")
     return(rst_rmst)
@@ -270,7 +287,7 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
 #' @noRd
 #'
 get_surv_stratum_rmst_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
-                                           pred_tp, stderr_method, ...) {
+                                           pred_tps, stderr_method, ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -278,7 +295,7 @@ get_surv_stratum_rmst_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
     dta_cur_trt <- d1t
 
     ##  overall estimate
-    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
+    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps)
     return(overall)
 }
 

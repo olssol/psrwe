@@ -10,7 +10,7 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param pred_tp Time of interest (e.g., 1 year)
-#' @param stderr_method Method for computing StdErr, see Details
+#' @param stderr_method Method for computing StdErr (see Details)
 #' @param ... Additional Parameters
 #'
 #' @details \code{stderr_method} include \code{naive} as default which
@@ -76,14 +76,14 @@ psrwe_survlrk <- function(dta_psbor,
         rst <- get_ps_lrk_rmst(dta_psbor,
                                v_event = v_event, v_time = v_time,
                                f_stratum = get_surv_stratum_lrk,
-                               pred_tp = all_tps,
+                               pred_tps = all_tps,
                                stderr_method = stderr_method,
                                ...)
     } else {
         rst <- get_ps_lrk_rmst_jkoverall(dta_psbor,
                                          v_event = v_event, v_time = v_time,
                                          f_stratum = get_surv_stratum_lrk_wostderr,
-                                         pred_tp = all_tps,
+                                         pred_tps = all_tps,
                                          ...)
     }
 
@@ -102,7 +102,7 @@ psrwe_survlrk <- function(dta_psbor,
 #'
 #' @noRd
 #'
-get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
+get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
                                  stderr_method, ...) {
 
     ## treatment or control only
@@ -119,7 +119,7 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
     }
 
     ##  overall estimate
-    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp,
+    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps,
                         stderr_method)
 
     ##jackknife stderr
@@ -129,20 +129,20 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
             cur_jk   <- rwe_lrk(dta_cur[-j, ], dta_ext, dta_cur_trt, n_borrow,
-                                pred_tp, stderr_method)
+                                pred_tps, stderr_method)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         for (j in seq_len(ns1_trt)) {
             cur_jk   <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt[-j, ], n_borrow,
-                                pred_tp, stderr_method)
+                                pred_tps, stderr_method)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
                 ext_jk   <- rwe_lrk(dta_cur, dta_ext[-j, ], dta_cur_trt,
-                                    n_borrow, pred_tp, stderr_method)
+                                    n_borrow, pred_tps, stderr_method)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
@@ -170,7 +170,10 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tp Time points to be estimated
+#' @param pred_tps All time points of events
+#' @param stderr_method Method for computing StdErr (available for naive only)
+#' @param v_time Column name corresponding to event time
+#' @param v_event Column name corresponding to event status
 #'
 #' @return Estimation of log-rank estimates at time \code{pred_tps}
 #'
@@ -178,7 +181,8 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 #' @export
 #'
 rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
-                    pred_tp = 1, stderr_method = "naive") {
+                    pred_tps = NULL, stderr_method = "naive",
+                    v_time = "time", v_event = "event") {
 
     ## current control and external control if available
     cur_data    <- dta_cur
@@ -213,8 +217,16 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
 
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions
-    rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
-    rst_trt <- summary(cur_surv_trt, time = pred_tp, extend = TRUE)
+    if (is.null(pred_tps)) {
+        data <- cbind(cur_data, cur_data_trt)
+        obs_tps <- data[which(1 == data[[v_event]]), v_time]
+        pred_tps <- sort(unique(obs_tps))
+    }
+
+    ## summary.survfit() only reports information for specified time points
+    ## so, pred_tps should be inputted will all time points before tau.
+    rst <- summary(cur_surv, time = pred_tps, extend = TRUE)
+    rst_trt <- summary(cur_surv_trt, time = pred_tps, extend = TRUE)
 
     ## Info needed for LRK
     n_risk_trt <- rst_trt$n.risk
@@ -231,14 +243,18 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     mean_d <- n_event_trt - E_1_j
     mean_d <- cumsum(mean_d)
 
-    ## LRK naive stderr
-    stderr_d <- ifelse(n_risk <= 1, 0,
-                       E_1_j * (1 - p_event) *
-                       n_risk_ctl / (n_risk - 1))
-    stderr_d <- sqrt(cumsum(stderr_d))
+    ## For LRK naive stderr
+    if (stderr_method == "naive") {
+        stderr_d <- ifelse(n_risk <= 1, 0,
+                           E_1_j * (1 - p_event) *
+                           n_risk_ctl / (n_risk - 1))
+        stderr_d <- sqrt(cumsum(stderr_d))
+    } else {
+        stderr_d <- rep(NA, length(mean_d))
+    }
 
     ## Compute log-rank estimates
-    rst_lrk <- cbind(mean_d, stderr_d, pred_tp)
+    rst_lrk <- cbind(mean_d, stderr_d, pred_tps)
 
     colnames(rst_lrk) <- c("Mean", "StdErr", "T")
     return(rst_lrk)
@@ -253,7 +269,7 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
 #' @noRd
 #'
 get_surv_stratum_lrk_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
-                                          pred_tp, stderr_method, ...) {
+                                          pred_tps, stderr_method, ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -261,7 +277,7 @@ get_surv_stratum_lrk_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
     dta_cur_trt <- d1t
 
     ##  overall estimate
-    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp,
+    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps,
                         stderr_method)
     return(overall)
 }
