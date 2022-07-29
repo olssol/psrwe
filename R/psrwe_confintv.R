@@ -6,13 +6,14 @@
 #' @param method_ci A method name for confidence interval (default Wald)
 #' @param conf_int A two-sided level of confidence/credible limits
 #'        (default 0.95)
-#' @param conf_type A type name of transformation for the confidence interal
-#'        of PSKM approach (default log_log)
+#' @param conf_type A type name of transformation for the confidence interval
+#'        of PSKM approach
 #' @param ... Other options
 #'
 #' @return A list with class name \code{PSRWE_EST}.
 #'
 #' @details \code{method_ci = "wilson"} is for binary outcomes only.
+#'          \code{conf_type = "log_log"} is for \code{ps_km} only.
 #'
 #' @examples
 #' data(ex_dta)
@@ -56,6 +57,9 @@ psrwe_ci <- function(dta_psrst,
                                   conf_int,
                                   ...)
     } else if (dta_psrst$Method %in% get_rwe_class("ANAMETHOD_KM")) {
+        if (dta_psrst$Method %in% c("ps_lrk", "ps_rmst")) {
+             conf_type <- "plain"
+        }
         rst_psci <- get_psci_km(dta_psrst,
                                 conf_int,
                                 conf_type,

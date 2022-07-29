@@ -1,6 +1,6 @@
-#' PS-Integrated Log-Rank Test For Comparing Time-to-event Outcomes
+#' PS-Integrated Restricted Mean Survival Time (RMST) Test For Comparing Time-to-event Outcomes
 #'
-#' Log-rank test evaluates two-arm RCT for up to a given time point.
+#' RMST test evaluates two-arm RCT for up to a given time point.
 #' Variance can be estimated by Jackknife methods.
 #' Applies to the case when there is only one external data source and
 #' two-arm RCT.
@@ -34,19 +34,19 @@
 #'                         ps_method = "logistic", nstrata = 5,
 #'                         stra_ctl_only = FALSE)
 #' ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
-#' rst_lrk <- psrwe_survlrk(ps_bor_rct,
-#'                          v_time = "Y_Surv",
-#'                          v_event = "Status")
-#' rst_lrk
+#' rst_rmst <- psrwe_survrmst(ps_bor_rct,
+#'                            v_time = "Y_Surv",
+#'                            v_event = "Status")
+#' rst_rmst
 #'
 #' @export
 #'
-psrwe_survlrk <- function(dta_psbor,
-                          v_time        = "time",
-                          v_event       = "event",
-                          pred_tp       = 1,
-                          stderr_method = c("naive", "jk", "jkoverall"), 
-                          ...) {
+psrwe_survrmst <- function(dta_psbor,
+                           v_time        = "time",
+                           v_event       = "event",
+                           pred_tp       = 1,
+                           stderr_method = c("naive", "jk", "jkoverall"), 
+                           ...) {
 
     ## check
     stopifnot(dta_psbor$is_rct)
@@ -71,37 +71,37 @@ psrwe_survlrk <- function(dta_psbor,
 
     ## call estimation
     if (stderr_method %in% c("naive", "jk")) {
-        rst <- get_ps_cl_lrk(dta_psbor,
-                             v_event = v_event, v_time = v_time,
-                             f_stratum = get_surv_stratum_lrk,
-                             pred_tp = all_tps,
-                             stderr_method = stderr_method,
-                             ...)
+        rst <- get_ps_cl_rmst(dta_psbor,
+                              v_event = v_event, v_time = v_time,
+                              f_stratum = get_surv_stratum_rmst,
+                              pred_tp = all_tps,
+                              stderr_method = stderr_method,
+                              ...)
     } else {
-        rst <- get_ps_cl_lrk_jkoverall(dta_psbor,
-                                       v_event = v_event, v_time = v_time,
-                                       f_stratum = get_surv_stratum_lrk_wostderr,
-                                       pred_tp = all_tps,
-                                       ...)
+        rst <- get_ps_cl_rmst_jkoverall(dta_psbor,
+                                        v_event = v_event, v_time = v_time,
+                                        f_stratum = get_surv_stratum_rmst_wostderr,
+                                        pred_tp = all_tps,
+                                        ...)
     }
 
     ## return
     rst$Observed <- rst_obs
     rst$pred_tp  <- pred_tp
     rst$stderr_method <- stderr_method
-    rst$Method   <- "ps_lrk"
+    rst$Method   <- "ps_rmst"
     rst$Outcome_type <- "tte"
     class(rst)   <- get_rwe_class("ANARST")
     return(rst)
 }
 
-#' Get log-rank estimation for each stratum
+#' Get RMST estimation for each stratum
 #'
 #'
 #' @noRd
 #'
-get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
-                                 stderr_method, ...) {
+get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
+                                  stderr_method, ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -117,7 +117,7 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
     }
 
     ##  overall estimate
-    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
+    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
 
     ##jackknife stderr
     if (stderr_method == "jk") {
@@ -125,21 +125,21 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
-            cur_jk   <- rwe_lrk(dta_cur[-j, ], dta_ext, dta_cur_trt, n_borrow,
-                                pred_tp)
+            cur_jk   <- rwe_rmst(dta_cur[-j, ], dta_ext, dta_cur_trt, n_borrow,
+                                 pred_tp)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         for (j in seq_len(ns1_trt)) {
-            cur_jk   <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt[-j, ], n_borrow,
-                                pred_tp)
+            cur_jk   <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt[-j, ], n_borrow,
+                                 pred_tp)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
-                ext_jk   <- rwe_lrk(dta_cur, dta_ext[-j, ], dta_cur_trt,
-                                    n_borrow, pred_tp)
+                ext_jk   <- rwe_rmst(dta_cur, dta_ext[-j, ], dta_cur_trt,
+                                     n_borrow, pred_tp)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
@@ -154,9 +154,9 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
     return(overall)
 }
 
-#' Log-rank Estimation
+#' RMST Estimation
 #'
-#' Estimate log-rank estimates for a single PS
+#' Estimate RMST estimates for a single PS
 #' stratum
 #'
 #'
@@ -169,13 +169,13 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tp,
 #' @param n_borrow Number of subjects to be borrowed
 #' @param pred_tp Time points to be estimated
 #'
-#' @return Estimation of log-rank estimates at time \code{pred_tps}
+#' @return Estimation of RMST estimates at time \code{pred_tps}
 #'
 #'
 #' @export
 #'
-rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
-                    pred_tp = 1) {
+rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
+                     pred_tp = 1) {
 
     ## current control and external control if available
     cur_data    <- dta_cur
@@ -213,48 +213,66 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
     rst_trt <- summary(cur_surv_trt, time = pred_tp, extend = TRUE)
 
-    ## Info needed for LRK
+    ## Info needed for RMST
+    surv_trt <- rst_trt$surv
+    surv_ctl <- rst$surv
+    time_diff <- diff(c(0, pred_tp))
     n_risk_trt <- rst_trt$n.risk
     n_risk_ctl <- rst$n.risk
     n_event_trt <- rst_trt$n.event
     n_event_ctl <- rst$n.event
 
-    n_risk <- n_risk_trt + n_risk_ctl
-    n_event <- n_event_trt + n_event_ctl
-    p_event <- ifelse(n_risk == 0, 0, n_event / n_risk)
-    E_1_j <- n_risk_trt * p_event
+    ## RMST main statistic
+    area_trt <- surv_trt * time_diff
+    area_ctl <- surv_ctl * time_diff
+    area_diff <- area_trt - area_ctl
+    auc_diff <- cumsum(area_diff)
 
-    ## LRK main statistic
-    mean_d <- n_event_trt - E_1_j
-    mean_d <- cumsum(mean_d)
+    ## RMST naive stderr
+    ## For RMST2 naive stderr
+    ## - see survival vignette page 13
+    ## - \hat{\mu} = \int_0^T \hat{S}(t) dt
+    ## - var(\hat{\mu}) =
+    ##     \int_0^T (\int_t^T \hat{S}(u) du)^2 *
+    ##              \frac{d \bar{N}(t)}{\bar{Y}(t) * (\bar{Y}(t) - \bar{N}(t))}
+    ## - see also survRM2:::rmst1()
+    v_trt <- ifelse((n_risk_trt - n_event_trt) == 0, 0,
+                    n_event_trt / (n_risk_trt * (n_risk_trt - n_event_trt)))
+    v_ctl <- ifelse((n_risk_ctl - n_event_ctl) == 0, 0,
+                    n_event_ctl / (n_risk_ctl * (n_risk_ctl - n_event_ctl)))
+    f_get_auc_var <- function(i.tau, area, v) {
+        rev_auc <- rev(cumsum(rev(area[1:i.tau])))
+        auc_var <- sum(rev_auc^2 * v[1:i.tau])
+        auc_var
+    }
+    auc_var_trt <- do.call("c", lapply(1:length(pred_tp), f_get_auc_var,
+                                       area = area_trt, v = v_trt))
+    auc_var_ctl <- do.call("c", lapply(1:length(pred_tp), f_get_auc_var,
+                                       area = area_ctl, v = v_ctl))
+    auc_var_diff <- auc_var_trt + auc_var_ctl
+    auc_stderr_diff <- sqrt(auc_var_diff)
 
-    ## LRK naive stderr
-    stderr_d <- ifelse(n_risk <= 1, 0,
-                       E_1_j * (1 - p_event) *
-                       n_risk_ctl / (n_risk - 1))
-    stderr_d <- sqrt(cumsum(stderr_d))
+    ## Compute RMST estimates
+    rst_rmst <- cbind(auc_diff, auc_stderr_diff, pred_tp)
 
-    ## Compute log-rank estimates
-    rst_lrk <- cbind(mean_d, stderr_d, pred_tp)
-
-    colnames(rst_lrk) <- c("Mean", "StdErr", "T")
-    return(rst_lrk)
+    colnames(rst_rmst) <- c("Mean", "StdErr", "T")
+    return(rst_rmst)
 }
 
 
-#' Get estimates for log-rank test between two arms
+#' Get estimates for RMST test between two arms
 #'
 #'
 #'
 #' @noRd
 #'
-get_ps_cl_lrk <- function(dta_psbor,
-                          v_outcome     = NULL,
-                          v_event       = NULL,
-                          v_time        = NULL,
-                          f_stratum     = get_surv_stratum_lrk,
-                          f_overall_est = get_overall_est,
-                          ...) {
+get_ps_cl_rmst <- function(dta_psbor,
+                           v_outcome     = NULL,
+                           v_event       = NULL,
+                           v_time        = NULL,
+                           f_stratum     = get_surv_stratum_rmst,
+                           f_overall_est = get_overall_est,
+                           ...) {
 
     ## prepare data
     data    <- dta_psbor$data
@@ -296,13 +314,13 @@ get_ps_cl_lrk <- function(dta_psbor,
 
 ## Jackknife overall
 
-#' Get log-rank estimation for each stratum without stderr
+#' Get RMST estimation for each stratum without stderr
 #'
 #'
 #' @noRd
 #'
-get_surv_stratum_lrk_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
-                                          pred_tp, stderr_method, ...) {
+get_surv_stratum_rmst_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
+                                           pred_tp, stderr_method, ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -310,34 +328,34 @@ get_surv_stratum_lrk_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
     dta_cur_trt <- d1t
 
     ##  overall estimate
-    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
+    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tp)
     return(overall)
 }
 
 
-#' Get JKoverall estimates for log-rank estimation
+#' Get JKoverall estimates for RMST estimation
 #'
 #'
 #'
 #' @noRd
 #'
-get_ps_cl_lrk_jkoverall <- function(dta_psbor,
-                                    v_outcome     = NULL,
-                                    v_event       = NULL,
-                                    v_time        = NULL,
-                                    f_stratum     = get_surv_stratum_lrk_wostderr,
-                                    f_overall_est = get_overall_est_wostderr,
-                                    ...) {
+get_ps_cl_rmst_jkoverall <- function(dta_psbor,
+                                     v_outcome     = NULL,
+                                     v_event       = NULL,
+                                     v_time        = NULL,
+                                     f_stratum     = get_surv_stratum_rmst_wostderr,
+                                     f_overall_est = get_overall_est_wostderr,
+                                     ...) {
 
     ## prepare data
     data    <- dta_psbor$data
     data    <- data[!is.na(data[["_strata_"]]), ]
 
     ## main estimates
-    rst <- get_ps_cl_lrk(dta_psbor, v_outcome = v_outcome,
-                         v_event = v_event, v_time = v_time,
-                         f_stratum = f_stratum,
-                         f_overall_est = f_overall_est, ...)
+    rst <- get_ps_cl_rmst(dta_psbor, v_outcome = v_outcome,
+                          v_event = v_event, v_time = v_time,
+                          f_stratum = f_stratum,
+                          f_overall_est = f_overall_est, ...)
 
     ## JK overall stderr
     rstom <- rst$Effect$Overall_Estimate$Mean
@@ -347,10 +365,10 @@ get_ps_cl_lrk_jkoverall <- function(dta_psbor,
     dta_psbor_jk <- dta_psbor
     for (i_jk in 1:n_jk) {
         dta_psbor_jk$data <- data[-i_jk,]
-        rst_jk <- get_ps_cl_lrk(dta_psbor_jk, v_outcome = v_outcome,
-                                v_event = v_event, v_time = v_time,
-                                f_stratum = f_stratum,
-                                f_overall_est = f_overall_est, ...)
+        rst_jk <- get_ps_cl_rmst(dta_psbor_jk, v_outcome = v_outcome,
+                                 v_event = v_event, v_time = v_time,
+                                 f_stratum = f_stratum,
+                                 f_overall_est = f_overall_est, ...)
         sdf <- sdf + (rst_jk$Effect$Overall_Estimate$Mean - rstom)^2
     }
 

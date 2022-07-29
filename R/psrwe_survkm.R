@@ -1,8 +1,8 @@
 #' PS-Integrated Kaplan-Meier Estimation
 #'
 #' Estimate the mean of a survival outcome at a given time point based on
-#' PS-integrated Kaplan-Meier approach. Variance is estimated by Jack-Knife
-#' method. Applies to the case when there is only one external data source.
+#' PS-integrated Kaplan-Meier approach. Variance can be estimated by Jackknife
+#' methods. Applies to the case when there is only one external data source.
 #'
 #' @inheritParams psrwe_powerp
 #'
