@@ -23,7 +23,7 @@ psrwe_survlrk(
 
 \item{pred_tp}{Time of interest (e.g., 1 year)}
 
-\item{stderr_method}{Method for computing StdErr, see Details}
+\item{stderr_method}{Method for computing StdErr (see Details)}
 
 \item{...}{Additional Parameters}
 }

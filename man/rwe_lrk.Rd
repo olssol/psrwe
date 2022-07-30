@@ -4,7 +4,14 @@
 \alias{rwe_lrk}
 \title{Log-rank Estimation}
 \usage{
-rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0, pred_tp = 1)
+rwe_lrk(
+  dta_cur,
+  dta_ext,
+  dta_cur_trt,
+  n_borrow = 0,
+  pred_tps = NULL,
+  stderr_method = "naive"
+)
 }
 \arguments{
 \item{dta_cur}{Matrix of time and event from a PS stratum in current study
@@ -18,7 +25,9 @@ study (treatment arm only)}
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
-\item{pred_tp}{Time points to be estimated}
+\item{pred_tps}{All time points of events (unique and sorted)}
+
+\item{stderr_method}{Method for computing StdErr (available for naive only)}
 }
 \value{
 Estimation of log-rank estimates at time \code{pred_tps}

@@ -39,6 +39,7 @@ when there is only one external data source.
 }
 \details{
 \code{stderr_method} include \code{jk} as default
+    using Jackknife method within each stratum, or
     \code{jkoverall} for Jackknife method for overall/combined estimates
     such as point estimates in single arm or treatment effects in RCT.
     Note that \code{jkoverall} may take a while longer to finish.

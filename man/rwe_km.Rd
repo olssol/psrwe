@@ -4,7 +4,13 @@
 \alias{rwe_km}
 \title{Kaplan-Meier Estimation}
 \usage{
-rwe_km(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1)
+rwe_km(
+  dta_cur,
+  dta_ext = NULL,
+  n_borrow = 0,
+  pred_tp = 1,
+  stderr_method = "naive"
+)
 }
 \arguments{
 \item{dta_cur}{Matrix of time and event from a PS stratum in current study}
@@ -14,7 +20,9 @@ source}
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
-\item{pred_tp}{Time points to be estimated}
+\item{pred_tp}{Time points to be estimated (unique and sorted)}
+
+\item{stderr_method}{Method for computing StdErr (available for naive only)}
 }
 \value{
 Estimation of survival probabilities at time \code{pred_tps}
