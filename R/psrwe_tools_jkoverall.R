@@ -6,7 +6,7 @@ get_ps_cl_km_jkoverall <- function(dta_psbor,
                                    v_outcome     = NULL,
                                    v_event       = NULL,
                                    v_time        = NULL,
-                                   f_stratum     = get_cl_stratum_wostderr,
+                                   f_stratum     = get_cl_stratum,
                                    f_overall_est = get_overall_est_wostderr,
                                    ...) {
 
@@ -100,30 +100,5 @@ get_overall_est_wostderr <- function(ts1, weights, ts2 = NULL) {
 
     list(Stratum_Estimate = s_est,
          Overall_Estimate = o_est)
-}
-
-
-#' Get CL estimation for each stratum without stderr
-#'
-#'
-#' @noRd
-#'
-get_cl_stratum_wostderr <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
-
-    ## treatment or control only
-    dta_cur <- d1
-    if (0 == n_borrow | is.null(d0)) {
-        theta    <- mean(dta_cur)
-        return(c(theta, NA))
-    }
-
-    ## overall ps-cl
-    dta_ext <- d0
-
-    ##  overall estimate
-    overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
-
-    ## summary
-    return(c(overall_theta, NA))
 }
 

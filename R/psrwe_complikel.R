@@ -56,12 +56,13 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
     if (stderr_method == "jk") {
         rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
                             outcome_type = outcome_type,
-                            f_stratum = get_cl_stratum, ...)
+                            f_stratum = get_cl_stratum,
+                            stderr_method = stderr_method, ...)
     } else {
         rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
                                       outcome_type = outcome_type,
-                                      f_stratum = get_cl_stratum_wostderr,
-                                      ...)
+                                      f_stratum = get_cl_stratum,
+                                      stderr_method = stderr_method, ...)
     }
 
     ## return
@@ -172,7 +173,8 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
 #'
 #' @noRd
 #'
-get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
+get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
+                           stderr_method = "jk", ...) {
 
     ## treatment or control only
     dta_cur <- d1
@@ -194,20 +196,25 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
 
     ##jackknife
-    jk_theta <- NULL
-    for (j in seq_len(ns1)) {
-        cur_jk   <- rwe_cl(dta_cur[-j], dta_ext, n_borrow, ...)
-        jk_theta <- c(jk_theta, cur_jk)
-    }
-
-    if (ns0 > 0) {
-        for (j in seq_len(ns0)) {
-            cur_jk <- rwe_cl(dta_cur, dta_ext[-j], n_borrow, ...)
+    if (stderr_method == "jk") {
+        jk_theta <- NULL
+        for (j in seq_len(ns1)) {
+            cur_jk   <- rwe_cl(dta_cur[-j], dta_ext, n_borrow, ...)
             jk_theta <- c(jk_theta, cur_jk)
         }
+
+        if (ns0 > 0) {
+            for (j in seq_len(ns0)) {
+                cur_jk <- rwe_cl(dta_cur, dta_ext[-j], n_borrow, ...)
+                jk_theta <- c(jk_theta, cur_jk)
+            }
+        }
+
+        stderr_theta <- get_jk_sd(overall_theta, jk_theta)
+    } else {
+        stderr_theta <- NA
     }
 
     ## summary
-    stderr_theta <- get_jk_sd(overall_theta, jk_theta)
     return(c(overall_theta, stderr_theta))
 }
