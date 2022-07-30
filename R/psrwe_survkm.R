@@ -78,8 +78,9 @@ psrwe_survkm <- function(dta_psbor,
     } else {
         rst <- get_ps_cl_km_jkoverall(dta_psbor,
                                       v_event = v_event, v_time = v_time,
-                                      f_stratum = get_surv_stratum_wostderr,
+                                      f_stratum = get_surv_stratum,
                                       pred_tp = all_tps,
+                                      stderr_method = stderr_method,
                                       ...)
     }
 
@@ -104,30 +105,32 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
     ## treatment or control only
     dta_cur <- d1
     dta_ext <- d0
-    ns1     <- nrow(dta_cur)
-
-    if (is.null(d0)) {
-        ns0 <- 0
-    } else {
-        ns0 <- nrow(dta_ext)
-    }
 
     ##  overall estimate
-    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tp)
+    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tp, stderr_method)
 
     ##jackknife stderr
     if (stderr_method == "jk") {
+        ns1     <- nrow(dta_cur)
+        if (is.null(d0)) {
+            ns0 <- 0
+        } else {
+            ns0 <- nrow(dta_ext)
+        }
+
         overall_theta <- overall[, 1, drop = TRUE]
 
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
-            cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tp)
+            cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tp,
+                               stderr_method)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
-                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp)
+                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp,
+                                   stderr_method)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
@@ -151,14 +154,16 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
 #' @param dta_ext Matrix of time and event from a PS stratum in external data
 #'     source
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tp Time points to be estimated
+#' @param pred_tp Time points to be estimated (unique and sorted)
+#' @param stderr_method Method for computing StdErr (available for naive only)
 #'
 #' @return Estimation of survival probabilities at time \code{pred_tps}
 #'
 #'
 #' @export
 #'
-rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
+rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1,
+                   stderr_method = "naive") {
 
     ## current control and external control if available
     cur_data    <- dta_cur
@@ -182,7 +187,14 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1) {
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions
     rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
-    rst <- cbind(rst$surv, rst$std.err, pred_tp)
+
+    ## For KM naive stderr
+    if (stderr_method == "naive") {
+        rst <- cbind(rst$surv, rst$std.err, pred_tp)
+    } else {
+        ## For jk or jkoverall
+        rst <- cbind(rst$surv, rep(NA, length(rst$std.err)), pred_tp)
+    }
 
     colnames(rst) <- c("Mean", "StdErr", "T")
     return(rst)

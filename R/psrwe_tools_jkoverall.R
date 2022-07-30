@@ -127,22 +127,3 @@ get_cl_stratum_wostderr <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, .
     return(c(overall_theta, NA))
 }
 
-
-#' Get surv estimation for each stratum without stderr
-#'
-#'
-#' @noRd
-#'
-get_surv_stratum_wostderr <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
-                                      stderr_method, ...) {
-
-    ## treatment or control only
-    dta_cur <- d1
-    dta_ext <- d0
-
-    ##  overall estimate
-    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tp)
-    return(overall)
-}
-
-
