@@ -170,10 +170,8 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tps All time points of events
+#' @param pred_tps All time points of events (unique and sort)
 #' @param stderr_method Method for computing StdErr (available for naive only)
-#' @param v_time Column name corresponding to event time
-#' @param v_event Column name corresponding to event status
 #'
 #' @return Estimation of log-rank estimates at time \code{pred_tps}
 #'
@@ -181,8 +179,7 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
 #' @export
 #'
 rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
-                    pred_tps = NULL, stderr_method = "naive",
-                    v_time = "time", v_event = "event") {
+                    pred_tps = NULL, stderr_method = "naive") {
 
     ## current control and external control if available
     cur_data    <- dta_cur
@@ -218,9 +215,8 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions
     if (is.null(pred_tps)) {
-        data <- cbind(cur_data, cur_data_trt)
-        obs_tps <- data[which(1 == data[[v_event]]), v_time]
-        pred_tps <- sort(unique(obs_tps))
+        pred_tps <- sort(unique(c(cur_surv$time[cur_surv$n.event > 0],
+                                  cur_surv_trt$time[cur_surv_trt$n.event > 0])))
     }
 
     ## summary.survfit() only reports information for specified time points
@@ -250,6 +246,7 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
                            n_risk_ctl / (n_risk - 1))
         stderr_d <- sqrt(cumsum(stderr_d))
     } else {
+        ## For jk or jkoverall
         stderr_d <- rep(NA, length(mean_d))
     }
 
