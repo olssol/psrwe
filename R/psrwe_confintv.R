@@ -454,7 +454,7 @@ get_psci_km <- function(dta_psrst,
                      Conf_type = conf_type)
 
     ## by study type
-    if (exists("Control", dta_psrst)) {
+    if (exists("Control", dta_psrst) && !is.null(dta_psrst$Control)) {
         rst_psci$Control$Stratum_Estimate <-
             get_kmci(dta_psrst$Control$Stratum_Estimate,
                      conf_int = conf_int,
@@ -468,7 +468,7 @@ get_psci_km <- function(dta_psrst,
         rst_psci$Control$Conf_type <- conf_type
     }
 
-    if (exists("Treatment", dta_psrst)) {
+    if (exists("Treatment", dta_psrst) && !is.null(dta_psrst$Treatment)) {
         rst_psci$Treatment$Stratum_Estimate <-
             get_kmci(dta_psrst$Treatment$Stratum_Estimate,
                      conf_int = conf_int,
@@ -482,7 +482,7 @@ get_psci_km <- function(dta_psrst,
         rst_psci$Treatment$Conf_type <- conf_type
     }
 
-    if (exists("Effect", dta_psrst)) {
+    if (exists("Effect", dta_psrst) && !is.null(dta_psrst$Effect)) {
         rst_psci$Effect$Stratum_Estimate <-
             get_kmci(dta_psrst$Effect$Stratum_Estimate,
                      conf_int = conf_int,
