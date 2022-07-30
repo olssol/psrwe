@@ -82,8 +82,9 @@ psrwe_survlrk <- function(dta_psbor,
     } else {
         rst <- get_ps_lrk_rmst_jkoverall(dta_psbor,
                                          v_event = v_event, v_time = v_time,
-                                         f_stratum = get_surv_stratum_lrk_wostderr,
+                                         f_stratum = get_surv_stratum_lrk,
                                          pred_tps = all_tps,
+                                         stderr_method = stderr_method,
                                          ...)
     }
 
@@ -170,7 +171,7 @@ get_surv_stratum_lrk <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tps All time points of events (unique and sort)
+#' @param pred_tps All time points of events (unique and sorted)
 #' @param stderr_method Method for computing StdErr (available for naive only)
 #'
 #' @return Estimation of log-rank estimates at time \code{pred_tps}
@@ -250,32 +251,10 @@ rwe_lrk <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
         stderr_d <- rep(NA, length(mean_d))
     }
 
-    ## Compute log-rank estimates
+    ## Combine log-rank estimates
     rst_lrk <- cbind(mean_d, stderr_d, pred_tps)
 
     colnames(rst_lrk) <- c("Mean", "StdErr", "T")
     return(rst_lrk)
-}
-
-
-## Jackknife overall
-
-#' Get log-rank estimation for each stratum without stderr
-#'
-#'
-#' @noRd
-#'
-get_surv_stratum_lrk_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
-                                          pred_tps, stderr_method, ...) {
-
-    ## treatment or control only
-    dta_cur <- d1
-    dta_ext <- d0
-    dta_cur_trt <- d1t
-
-    ##  overall estimate
-    overall  <- rwe_lrk(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps,
-                        stderr_method)
-    return(overall)
 }
 

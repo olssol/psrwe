@@ -60,7 +60,7 @@ get_ps_lrk_rmst_jkoverall <- function(dta_psbor,
                                       v_outcome     = NULL,
                                       v_event       = NULL,
                                       v_time        = NULL,
-                                      f_stratum     = get_surv_stratum_lrk_wostderr,
+                                      f_stratum     = get_surv_stratum_lrk,
                                       f_overall_est = get_overall_est_wostderr,
                                       ...) {
 

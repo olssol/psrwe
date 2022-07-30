@@ -82,7 +82,7 @@ psrwe_survrmst <- function(dta_psbor,
     } else {
         rst <- get_ps_lrk_rmst_jkoverall(dta_psbor,
                                          v_event = v_event, v_time = v_time,
-                                         f_stratum = get_surv_stratum_rmst_wostderr,
+                                         f_stratum = get_surv_stratum_rmst,
                                          pred_tps = all_tps,
                                          stderr_method = stderr_method,
                                          ...)
@@ -171,7 +171,7 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tps All time points of events (unique and sort)
+#' @param pred_tps All time points of events (unique and sorted)
 #' @param stderr_method Method for computing StdErr (available for naive only)
 #'
 #' @return Estimation of RMST estimates at time \code{pred_tps}
@@ -238,14 +238,14 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     auc_d <- cumsum(area_d[-(n_tps + 1)])
 
     ## For RMST naive stderr
-    ## - see survival vignette page 13
-    ## - \hat{\mu} = \int_0^T \hat{S}(t) dt
-    ## - var(\hat{\mu}) =
-    ##     \int_0^T (\int_t^T \hat{S}(u) du)^2 *
-    ##              \frac{d \bar{N}(t)}{\bar{Y}(t) *
-    ##                                  (\bar{Y}(t) - \bar{N}(t))}
-    ## - see also similarly in survRM2:::rmst1()
     if (stderr_method == "naive") {
+        ## - see survival vignette page 13
+        ## - \hat{\mu} = \int_0^T \hat{S}(t) dt
+        ## - var(\hat{\mu}) =
+        ##     \int_0^T (\int_t^T \hat{S}(u) du)^2 *
+        ##              \frac{d \bar{N}(t)}{\bar{Y}(t) *
+        ##                                  (\bar{Y}(t) - \bar{N}(t))}
+        ## - see also similarly in survRM2:::rmst1()
         n_risk_trt <- rst_trt$n.risk
         n_risk_ctl <- rst$n.risk
         n_event_trt <- rst_trt$n.event
@@ -256,7 +256,7 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
         v_ctl <- ifelse((n_risk_ctl - n_event_ctl) == 0, 0,
                         n_event_ctl / (n_risk_ctl * (n_risk_ctl - n_event_ctl)))
 
-        ## This version is very slow
+        ## This version can be very slow
         # f_getvar <- function(j, area, v) {
         #     sum(cumsum(rev(area[1:j]))^2 * rev(v[1:j]))
         # }
@@ -287,32 +287,10 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
         auc_stderr_d <- rep(NA, n_tps)
     }
 
-    ## Compute RMST estimates
+    ## Combine RMST estimates
     rst_rmst <- cbind(auc_d, auc_stderr_d, pred_tps)
 
     colnames(rst_rmst) <- c("Mean", "StdErr", "T")
     return(rst_rmst)
-}
-
-
-## Jackknife overall
-
-#' Get RMST estimation for each stratum without stderr
-#'
-#'
-#' @noRd
-#'
-get_surv_stratum_rmst_wostderr <- function(d1, d0 = NULL, d1t, n_borrow = 0,
-                                           pred_tps, stderr_method, ...) {
-
-    ## treatment or control only
-    dta_cur <- d1
-    dta_ext <- d0
-    dta_cur_trt <- d1t
-
-    ##  overall estimate
-    overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps,
-                         stderr_method)
-    return(overall)
 }
 
