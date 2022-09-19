@@ -106,7 +106,7 @@ psrwe_outana <- function(dta_psrst,
     }
 
     ## summary estimation
-    if (exists("Stratum", dta_psrst[[type]]$Stratum_Estimate)) {
+    if (dta_psrst$Method %in% c("ps_km", "ps_lrk", "ps_rmst")) {
         ## i.e., ps_km, ps_lrk, and ps_rmst
         id_s <- factor(c(dta_psrst[[type]]$Stratum_Estimate$Stratum,
                          rep(0, nrow(dta_psrst[[type]]$Overall_Estimate))),
