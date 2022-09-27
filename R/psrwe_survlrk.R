@@ -2,7 +2,7 @@
 #'
 #' Log-rank test evaluates two-arm RCT for up to a given time point.
 #' Variance can be estimated by Jackknife methods.
-#' Applies to the case when there is only one external data source and
+#' Apply to the case when there is only one external data source and
 #' two-arm RCT.
 #'
 #' @inheritParams psrwe_survkm
@@ -21,7 +21,7 @@
 #'
 #' @return A data frame with class name \code{PSRWE_RST_TESTANA}.
 #'     It contains the test statistics of each stratum as well as the
-#'     jackknife estimation. The results can be further
+#'     Jackknife estimation. The results can be further
 #'     summarized by its S3 method \code{summary}.
 #'     The results can be also analyzed by \code{psrwe_outana} for outcome
 #'     analysis and inference.

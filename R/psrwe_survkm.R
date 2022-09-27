@@ -2,7 +2,7 @@
 #'
 #' Estimate the mean of a survival outcome at a given time point based on
 #' PS-integrated Kaplan-Meier approach. Variance can be estimated by Jackknife
-#' methods. Applies to the case when there is only one external data source.
+#' methods. Apply to the case when there is only one external data source.
 #'
 #' @inheritParams psrwe_powerp
 #'
@@ -12,7 +12,7 @@
 #' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Additional Parameters
 #'
-#' @details \code{stderr_method} include \code{naive} as default which
+#' @details \code{stderr_method} includes \code{naive} as default which
 #'     mostly follows Greenwood formula,
 #'     \code{jk} using Jackknife method within each stratum, or
 #'     \code{jkoverall} using Jackknife method for overall/combined estimates
@@ -21,7 +21,7 @@
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
-#'     jackknife estimation. The results can be further
+#'     Jackknife estimation. The results can be further
 #'     summarized by its S3 method \code{summary}.
 #'     The results can be also analyzed by \code{psrwe_outana} for outcome
 #'     analysis and inference.
