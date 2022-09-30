@@ -198,8 +198,9 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     colnames(cur_data) <- c("time", "event")
     cur_data <- data.frame(cur_data)
     cur_surv <- survfit(Surv(time, event) ~ 1,
-                        data    = cur_data,
-                        weights = cur_weights)
+                        data      = cur_data,
+                        weights   = cur_weights,
+                        conf.type = "none")
 
     ## trt arm
     cur_data_trt    <- dta_cur_trt
@@ -210,8 +211,9 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     colnames(cur_data_trt) <- c("time", "event")
     cur_data_trt <- data.frame(cur_data_trt)
     cur_surv_trt <- survfit(Surv(time, event) ~ 1,
-                            data    = cur_data_trt,
-                            weights = cur_weights_trt)
+                            data      = cur_data_trt,
+                            weights   = cur_weights_trt,
+                            conf.type = "none")
 
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions

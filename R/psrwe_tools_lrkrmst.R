@@ -46,6 +46,7 @@ get_ps_lrk_rmst <- function(dta_psbor,
                  Borrow    = dta_psbor$Borrow,
                  Total_borrow = dta_psbor$Total_borrow,
                  is_rct       = dta_psbor$is_rct)
+    return(rst)
 }
 
 

@@ -181,8 +181,8 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1,
     colnames(cur_data) <- c("time", "event")
     cur_data <- data.frame(cur_data)
     cur_surv <- survfit(Surv(time, event) ~ 1,
-                        data    = cur_data,
-                        weights = cur_weights,
+                        data      = cur_data,
+                        weights   = cur_weights,
                         conf.type = "none")
 
     ## summary.survfit() need to be extend to longer time points
