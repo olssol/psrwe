@@ -8,7 +8,7 @@ rwe_km(
   dta_cur,
   dta_ext = NULL,
   n_borrow = 0,
-  pred_tp = 1,
+  pred_tps = NULL,
   stderr_method = "naive"
 )
 }
@@ -20,7 +20,7 @@ source}
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
-\item{pred_tp}{Time points to be estimated (unique and sorted)}
+\item{pred_tps}{Time points to be estimated (unique and sorted)}
 
 \item{stderr_method}{Method for computing StdErr (available for naive only)}
 }

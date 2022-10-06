@@ -23,9 +23,9 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
 ### PSLRK, two-arm RCT, time-to-event outcome.
 rst_lrk <- psrwe_survlrk(ps_bor_rct,
+                         pred_tp = 365,
                          v_time = "Y_Surv",
-                         v_event = "Status",
-                         pred_tp = 365)
+                         v_event = "Status")
 rst_lrk
 
 ### Outcome analysis.
@@ -36,18 +36,18 @@ summary(oa_lrk, pred_tps = c(180, 365))
 
 ### Use Jackknife stderr. This may take a while.
 rst_lrk_jk <- psrwe_survlrk(ps_bor_rct,
+                            pred_tp = 365,
                             v_time = "Y_Surv",
                             v_event = "Status",
-                            pred_tp = 365,
                             stderr_method = "jk")
 oa_lrk_jk <- psrwe_outana(rst_lrk_jk)
 summary(oa_lrk_jk, pred_tps = c(180, 365))
 
 ### Use Jackknife overall stderr. This may take a while longer.
 rst_lrk_jko <- psrwe_survlrk(ps_bor_rct,
+                             pred_tp = 365,
                              v_time = "Y_Surv",
                              v_event = "Status",
-                             pred_tp = 365,
                              stderr_method = "jkoverall")
 oa_lrk_jko <- psrwe_outana(rst_lrk_jko)
 summary(oa_lrk_jko, pred_tps = c(180, 365))

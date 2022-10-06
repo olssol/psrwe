@@ -21,9 +21,9 @@ ps_bor_single <- psrwe_borrow(dta_ps_single, total_borrow = 30)
 
 ### PSKM, single arm study, time-to-event outcome.
 rst_km <- psrwe_survkm(ps_bor_single,
+                       pred_tp  = 365,
                        v_time    = "Y_Surv",
-                       v_event   = "Status",
-                       pred_tp  = 365)
+                       v_event   = "Status")
 rst_km
 
 ### Plot PSKM.
@@ -39,18 +39,18 @@ summary(oa_km, pred_tps = c(180, 365))
 
 ### Use Jackknife stderr. This may take a while.
 rst_km_jk <- psrwe_survkm(ps_bor_single,
+                          pred_tp  = 365,
                           v_time    = "Y_Surv",
                           v_event   = "Status",
-                          pred_tp  = 365,
                           stderr_method = "jk")
 oa_km_jk <- psrwe_outana(rst_km_jk, mu = 0.70, alternative = "greater")
 summary(oa_km_jk, pred_tps = c(180, 365))
 
 ### Use Jackknife overall stderr. This may take a while longer.
 rst_km_jko <- psrwe_survkm(ps_bor_single,
+                           pred_tp  = 365,
                            v_time    = "Y_Surv",
                            v_event   = "Status",
-                           pred_tp  = 365,
                            stderr_method = "jkoverall")
 oa_km_jko <- psrwe_outana(rst_km_jko, mu = 0.70, alternative = "greater")
 summary(oa_km_jko, pred_tps = c(180, 365))

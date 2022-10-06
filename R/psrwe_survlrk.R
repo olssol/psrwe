@@ -7,9 +7,10 @@
 #'
 #' @inheritParams psrwe_survkm
 #'
+#' @param pred_tp A numeric value corresponding to time of interest
+#'                (e.g., 365 days or 1 year)
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
-#' @param pred_tp Time of interest (e.g., 1 year)
 #' @param stderr_method Method for computing StdErr (see Details)
 #' @param ... Additional Parameters
 #'
@@ -37,16 +38,16 @@
 #'                         stra_ctl_only = FALSE)
 #' ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 #' rst_lrk <- psrwe_survlrk(ps_bor_rct,
+#'                          pred_tp = 365, 
 #'                          v_time = "Y_Surv",
 #'                          v_event = "Status")
 #' rst_lrk
 #'
 #' @export
 #'
-psrwe_survlrk <- function(dta_psbor,
+psrwe_survlrk <- function(dta_psbor, pred_tp,
                           v_time        = "time",
                           v_event       = "event",
-                          pred_tp       = 1,
                           stderr_method = c("naive", "jk", "jkoverall"), 
                           ...) {
 

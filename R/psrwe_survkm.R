@@ -6,9 +6,10 @@
 #'
 #' @inheritParams psrwe_powerp
 #'
+#' @param pred_tp A numeric value corresponding to time of interest
+#'                (e.g., 365 days or 1 year)
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
-#' @param pred_tp Time of interest (e.g., 1 year)
 #' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Additional Parameters
 #'
@@ -35,18 +36,18 @@
 #'        cur_grp_level = "current")
 #' ps_borrow <- psrwe_borrow(total_borrow = 30, dta_ps)
 #' rst       <- psrwe_survkm(ps_borrow,
-#'                            v_time = "Y_Surv",
-#'                            v_event = "Status")
+#'                           pred_tp = 365,
+#'                           v_time = "Y_Surv",
+#'                           v_event = "Status")
 #' rst
 #'
 #' @export
 #'
-psrwe_survkm <- function(dta_psbor,
-                          v_time     = "time",
-                          v_event    = "event",
-                          pred_tp    = 1,
-                          stderr_method = c("naive", "jk", "jkoverall"), 
-                          ...) {
+psrwe_survkm <- function(dta_psbor, pred_tp,
+                         v_time     = "time",
+                         v_event    = "event",
+                         stderr_method = c("naive", "jk", "jkoverall"), 
+                         ...) {
 
     ## check
     stopifnot(inherits(dta_psbor,
@@ -99,7 +100,7 @@ psrwe_survkm <- function(dta_psbor,
 #'
 #' @noRd
 #'
-get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
+get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tps,
                              stderr_method, ...) {
 
     ## treatment or control only
@@ -107,7 +108,7 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
     dta_ext <- d0
 
     ##  overall estimate
-    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tp, stderr_method)
+    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tps, stderr_method)
 
     ##jackknife stderr
     if (stderr_method == "jk") {
@@ -122,14 +123,14 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
 
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
-            cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tp,
+            cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tps,
                                stderr_method)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
-                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tp,
+                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tps,
                                    stderr_method)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
@@ -154,7 +155,7 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
 #' @param dta_ext Matrix of time and event from a PS stratum in external data
 #'     source
 #' @param n_borrow Number of subjects to be borrowed
-#' @param pred_tp Time points to be estimated (unique and sorted)
+#' @param pred_tps Time points to be estimated (unique and sorted)
 #' @param stderr_method Method for computing StdErr (available for naive only)
 #'
 #' @return Estimation of survival probabilities at time \code{pred_tps}
@@ -162,7 +163,7 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tp,
 #'
 #' @export
 #'
-rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1,
+rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tps = NULL,
                    stderr_method = "naive") {
 
     ## current control and external control if available
@@ -187,14 +188,20 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tp = 1,
 
     ## summary.survfit() need to be extend to longer time points
     ## Last values will be carried over for predictions
-    rst <- summary(cur_surv, time = pred_tp, extend = TRUE)
+    if (is.null(pred_tps)) {
+        pred_tps <- sort(unique(c(cur_surv$time[cur_surv$n.event > 0])))
+    }
+
+    ## summary.survfit() need to be extend to longer time points
+    ## Last values will be carried over for predictions
+    rst <- summary(cur_surv, time = pred_tps, extend = TRUE)
 
     ## For KM naive stderr
     if (stderr_method == "naive") {
-        rst <- cbind(rst$surv, rst$std.err, pred_tp)
+        rst <- cbind(rst$surv, rst$std.err, pred_tps)
     } else {
         ## For jk or jkoverall
-        rst <- cbind(rst$surv, rep(NA, length(rst$std.err)), pred_tp)
+        rst <- cbind(rst$surv, rep(NA, length(rst$std.err)), pred_tps)
     }
 
     colnames(rst) <- c("Mean", "StdErr", "T")

@@ -23,9 +23,9 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
 ### PSKM, two-arm RCT, time-to-event outcome.
 rst_km_rct <- psrwe_survkm(ps_bor_rct,
+                           pred_tp = 365,
                            v_time = "Y_Surv",
-                           v_event = "Status",
-                           pred_tp = 365)
+                           v_event = "Status")
 rst_km_rct
 
 ### Plot PSKM.
@@ -39,18 +39,18 @@ summary(oa_km_rct, pred_tps = c(180, 365))
 
 ### Use Jackknife stderr. This may take a while.
 rst_km_rct_jk <- psrwe_survkm(ps_bor_rct,
+                              pred_tp = 365,
                               v_time = "Y_Surv",
                               v_event = "Status",
-                              pred_tp = 365,
                               stderr_method = "jk")
 oa_km_rct_jk <- psrwe_outana(rst_km_rct_jk, alternative = "greater")
 summary(oa_km_rct_jk, pred_tps = c(180, 365))
 
 ### Use Jackknife overall stderr. This may take a while longer.
 rst_km_rct_jko <- psrwe_survkm(ps_bor_rct,
+                               pred_tp = 365,
                                v_time = "Y_Surv",
                                v_event = "Status",
-                               pred_tp = 365,
                                stderr_method = "jkoverall")
 oa_km_rct_jko <- psrwe_outana(rst_km_rct_jko, alternative = "greater")
 summary(oa_km_rct_jko, pred_tps = c(180, 365))
