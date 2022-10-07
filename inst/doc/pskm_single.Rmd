@@ -1,6 +1,5 @@
 ---
 title: "Propensity Score-Integrated Kaplan-Meier (PSKM) Method for Single-Arm Studies"
-author: "Wei-Chen Chen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
