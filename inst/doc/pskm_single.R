@@ -23,15 +23,15 @@ rst_km <- psrwe_survkm(ps_bor,
 rst_km
 
 
-## ---- echo=TRUE, fig.width=5, fig.height=5------------------------------------
+## ---- echo=TRUE, fig.width=6, fig.height=5------------------------------------
 plot(rst_km)
 
 
-## ---- echo=TRUE, fig.width=5, fig.height=5------------------------------------
+## ---- echo=TRUE, fig.width=6, fig.height=5------------------------------------
 plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
 
 
-## ---- echo=TRUE, fig.width=5, fig.height=5------------------------------------
+## ---- echo=TRUE, fig.width=6, fig.height=5------------------------------------
 plot(rst_km, conf_type = "plain")
 
 

@@ -74,15 +74,15 @@ number of total strata.
 
 The overall survival estimates can be further visualized.
 
-```{r, echo=TRUE, fig.width=5, fig.height=5}
+```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km)
 ```
 
-```{r, echo=TRUE, fig.width=5, fig.height=5}
+```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
 ```
 
-```{r, echo=TRUE, fig.width=5, fig.height=5}
+```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km, conf_type = "plain")
 ```
 
