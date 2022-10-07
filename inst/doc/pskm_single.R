@@ -11,7 +11,8 @@ dta_ps <- psrwe_est(ex_dta,
                     cur_grp_level = "current",
                     nstrata = 5,
                     ps_method = "logistic")
-ps_bor <- psrwe_borrow(dta_ps, total_borrow = 30,
+ps_bor <- psrwe_borrow(dta_ps,
+                       total_borrow = 30,
                        method = "distance")
 
 
@@ -19,7 +20,7 @@ ps_bor <- psrwe_borrow(dta_ps, total_borrow = 30,
 rst_km <- psrwe_survkm(ps_bor,
                        pred_tp = 365,
                        v_time  = "Y_Surv",
-		       v_event = "Status")
+                       v_event = "Status")
 rst_km
 
 

@@ -22,7 +22,8 @@ implmeneted for leveraging real-world evidence in single-arm studies.
 While the PSKM is an non-parametric approach for time-to-event endpoints.
 Similar with the PSPP and PSCL approaches,
 the PS-integrated parts `psrwe_est()` and `psrwe_borrow()`
-below are the same.
+below estimate PS model, set borrowing parameters, and deterime
+discounting parameters for borrowing information.
 
 ```{r, eval=T, echo=TRUE}
 data(ex_dta)
@@ -32,15 +33,16 @@ dta_ps <- psrwe_est(ex_dta,
                     cur_grp_level = "current",
                     nstrata = 5,
                     ps_method = "logistic")
-ps_bor <- psrwe_borrow(dta_ps, total_borrow = 30,
+ps_bor <- psrwe_borrow(dta_ps,
+                       total_borrow = 30,
                        method = "distance")
 ```
 
 # PS-integrated Kaplan-Meier approach for single arm studies
 
 For single arm studies when there is one external data source, the function
-`psrwe_survkm()` allows one to conduct the analysis proposed in
-Chen et. al.  (2022).
+`psrwe_survkm()` allows one to conduct the survival (KM) analysis proposed in
+Chen et. al. (2022).
 The PSKM approach is applied in each PS stratum to obtain stratum-specific
 KM estimates, which are combined to complete the overal survival estimates.
 Suppose we are interested in the survival probability at one year, then
@@ -51,7 +53,7 @@ we may use the argument `pred_tp=365` (days) in the function
 rst_km <- psrwe_survkm(ps_bor,
                        pred_tp = 365,
                        v_time  = "Y_Surv",
-		       v_event = "Status")
+                       v_event = "Status")
 rst_km
 ```
 
@@ -72,7 +74,7 @@ Both results may be similar but slightly different
 since the overall weights are fixed and close to one over the
 number of total strata.
 
-The overall survival estimates can be further visualized.
+The overall survival estimates can be further visualized as below.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km)
