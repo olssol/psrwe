@@ -1,0 +1,242 @@
+---
+title: "Propensity Score-Integrated Survival Inference in Randomized Controlled Trials (RCTs) with Augmenting Control Arm"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Propensity Score-Integrated Survival Inference in Randomized Controlled Trials (RCTs) with Augmenting Control Arm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, eval=T, echo=FALSE}
+suppressMessages(require(psrwe, quietly = TRUE))
+options(digits = 3)
+set.seed(1000)
+```
+<br>
+
+
+## Introduction
+
+In the **psrwe**, PS-integrated survival analyses
+in randomized controlled trials (RCTs) with augmenting control arm
+(Chen et al., to be submitted)
+are also implemented in three functions:
+
+* `psrwe_survkm()` for treatment effect test (Com-Nougue, et al., 1993).
+* `psrwe_survlrk()` for log-rank test (Klein and Moeschberger, 2003; Peto and Peto, 1972).
+* `psrwe_survrmst()` for restricted mean survival time (RMST) test (Royston and Parmar, 2013; Uno, et al., 2014).
+
+These tests are non-parametric approaches for comparing two treatments
+with time-to-event endpoints.
+Therefore, these tests are only implemented for RCTs with
+augmenting control arm.
+
+Similar with the approaches: PSPP (Wang, et al., 2019),
+PSCL (Wang, et al., 2020), and PSKM (Chen, et al., 2022),
+the PS-integrated study design functions, `psrwe_est()` and `psrwe_borrow()`,
+below estimate PS model, set borrowing parameters, and determine
+discounting parameters for borrowing information
+for a two-arm RCT with augmenting control arm from RWD.
+
+```{r, eval=T, echo=TRUE}
+data(ex_dta_rct)
+dta_ps_rct <- psrwe_est(ex_dta_rct,
+                        v_covs = paste("V", 1:7, sep = ""),
+                        v_grp = "Group", cur_grp_level = "current",
+                        v_arm = "Arm", ctl_arm_level = "control",
+                        ps_method = "logistic", nstrata = 5,
+                        stra_ctl_only = FALSE)
+ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
+```
+<br>
+
+
+## PS-integrated treatment effect test
+
+Similar with the single arm study example
+(in **psrwe/demo/sec_4_4_ex.r** and `demo("sec_4_5_ex", package = "psrwe")`),
+the code below evaluates two-arm RCT.
+The results show the treatment effect which is
+the survival difference between two arms at one year or 365 days.
+
+```{r, eval=T, echo=TRUE}
+rst_km_rct <- psrwe_survkm(ps_bor_rct,
+                           pred_tp = 365,
+                           v_time = "Y_Surv",
+                           v_event = "Status")
+rst_km_rct
+```
+
+The estimated PSKM curves with confidence intervals can be visualized below.
+
+```{r, echo=TRUE, fig.width=6, fig.height=5}
+plot(rst_km_rct, xlim = c(0, 730))
+```
+
+The inference is based on the treatment effect
+$S_{trt}(\tau) - S_{ctl}(\tau)$ at $\tau = 365$ days
+where $S_{trt}$ and $S_{ctl}$ are the
+survival probabilities of the treatment and control arms, respectively.
+i.e., the example tests
+$$
+H_0: S_{trt}(\tau) - S_{ctl}(\tau) \leq 0 \quad \mbox{vs.} \quad H_a: S_{trt}(\tau) - S_{ctl}(\tau) > 0 .
+$$
+The outcome analysis can be summarized below.
+
+```{r, eval=T, echo=TRUE}
+oa_km_rct <- psrwe_outana(rst_km_rct, alternative = "greater")
+oa_km_rct
+```
+
+The details of estimates for each arm can be printed via the `print()`
+function with the option `show_rct = TRUE`.
+
+```{r, eval=T, echo=TRUE}
+print(oa_km_rct, show_rct = TRUE)
+```
+
+As the **survival** package, the results of other time points can be also
+predicted via the `summary()` with the option `pred_tps`.
+
+```{r, eval=T, echo=TRUE}
+summary(oa_km_rct, pred_tps = c(180, 365))
+```
+<br>
+
+
+## PS-integrated log-rank test
+
+
+```{r, eval=T, echo=TRUE}
+rst_lrk <- psrwe_survlrk(ps_bor_rct,
+                         pred_tp = 365,
+                         v_time = "Y_Surv",
+                         v_event = "Status")
+rst_lrk
+```
+
+The outcome analysis can be summarized below.
+
+```{r, eval=T, echo=TRUE}
+oa_lrk <- psrwe_outana(rst_lrk)
+oa_lrk
+```
+
+The details of estimates for each arm can be printed via the `print()`
+function with the option `show_rct = TRUE`.
+
+```{r, eval=T, echo=TRUE}
+print(oa_lrk, show_details = TRUE)
+```
+
+As the **survival** package, the results of other time points can be also
+predicted via the `summary()` with the option `pred_tps`.
+
+```{r, eval=T, echo=TRUE}
+summary(oa_lrk, pred_tps = c(180, 365))
+```
+<br>
+
+
+## PS-integrated restricted mean survival time (RMST) test
+
+
+```{r, eval=T, echo=TRUE}
+rst_rmst <- psrwe_survrmst(ps_bor_rct,
+                           pred_tp = 365,
+                           v_time = "Y_Surv",
+                           v_event = "Status")
+rst_rmst
+```
+
+The outcome analysis can be summarized below.
+
+```{r, eval=T, echo=TRUE}
+oa_rmst <- psrwe_outana(rst_rmst)
+oa_rmst
+```
+
+The details of estimates for each arm can be printed via the `print()`
+function with the option `show_rct = TRUE`.
+
+```{r, eval=T, echo=TRUE}
+print(oa_rmst, show_details = TRUE)
+```
+
+As the **survival** package, the results of other time points can be also
+predicted via the `summary()` with the option `pred_tps`.
+
+```{r, eval=T, echo=TRUE}
+summary(oa_rmst, pred_tps = c(180, 365))
+```
+<br>
+
+
+## Demo examples
+
+The scripts in
+"**psrwe/demo/sec_4_5_ex.r**",
+"**psrwe/demo/sec_4_6_ex.r**", and
+"**psrwe/demo/sec_4_7_ex.r**"
+source files have
+the full examples for the PS-integrated survival analyses which can be run via
+the `demo("sec_4_5_ex", package = "psrwe")`,
+`demo("sec_4_6_ex", package = "psrwe")`, and
+`demo("sec_4_7_ex", package = "psrwe")`, respectively.
+
+Two Jackknife standard errors are also demonstrated for each test method.
+Note that Jackknife standard errors may take a while to finish.
+<br>
+
+
+## References
+
+1. Chen, W.-C., Lu, N., Wang, C., Li, H., Song, C., Tiwari, R., Xu, Y., and
+Yue, L.Q. (to be submitted).
+Propensity Score-Integrated Statistical Tests for Survival Analysis:
+Leveraging External Evidence for Augmenting the Control Arm of a
+Randomized Controlled Trial.
+
+2. Chen, W.-C., Lu, N., Wang, C., Li, H., Song, C., Tiwari, R., Xu, Y., and
+Yue, L.Q. (2022).
+Propensity Score-Integrated Approach to Survival Analysis: Leveraging External
+Evidence in Single-Arm Studies.
+Journal of Biopharmaceutical Statistics, 32(3), 400-413.
+
+3. Com-Nougue, C., Rodary, C. and Patte, C. (1993).
+How to establish equivalence when data are censored: A randomized trial of
+treatments for B non-Hodgkin lymphoma.
+Statist. Med., Volume 12, pp. 1353-1364.
+
+4. Klein, J. and Moeschberger, M. (2003).
+Survival Analysis: Techniques for Censored and Truncated Data.
+2nd ed. New York: Springer.
+
+5. Peto, R. and Peto, J. (1972).
+Asymptotically Efficient Rank Invariant Test Procedures.
+Journal of the Royal Statistical Society, Series A, 135(2), 185-207.
+
+6. Royston, P. and Parmar, M. K. (2013).
+Restricted mean survival time: an alternative to the hazard ratio for the
+design and analysis of randomized trials with a time-to-event outcome.
+BMC Med Res Methodol, 13(152).
+
+7. Uno, H., et al., (2014).
+Moving beyond the hazard ratio in quantifying the between-group difference
+in survival analysis.
+Journal of clinical oncology, Volume 32, 2380-2385.
+
+8. Wang, C., Li, H., Chen, W. C., Lu, N., Tiwari, R., Xu, Y., and Yue, L.Q.
+(2019).
+Propensity score-integrated power prior approach for incorporating
+real-world evidence in single-arm clinical studies.
+Journal of Biopharmaceutical Statistics, 29(5), 731-748.
+
+9. Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., and Yue, L.Q.
+(2020).
+Propensity score-integrated composite likelihood approach for
+incorporating real-world evidence in single-arm clinical studies.
+Journal of Biopharmaceutical Statistics, 30(3), 495-507.
+

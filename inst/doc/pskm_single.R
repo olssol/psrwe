@@ -1,5 +1,6 @@
 ## ---- eval=T, echo=FALSE------------------------------------------------------
-require(psrwe)
+suppressMessages(require(psrwe, quietly = TRUE))
+options(digits = 3)
 set.seed(1000)
 
 
