@@ -17,11 +17,11 @@ set.seed(1000)
 # Introduction
 
 In the **psrwe**, PS-integrated Kaplan-Meier (PSKM) method is also
-implmeneted for leveraging real-world evidence in single-arm studies.
+implemented for leveraging real-world evidence in single-arm studies.
 While the PSKM is an non-parametric approach for time-to-event endpoints.
 Similar with the PSPP and PSCL approaches,
 the PS-integrated parts `psrwe_est()` and `psrwe_borrow()`
-below estimate PS model, set borrowing parameters, and deterime
+below estimate PS model, set borrowing parameters, and determine
 discounting parameters for borrowing information.
 
 ```{r, eval=T, echo=TRUE}
@@ -37,16 +37,17 @@ ps_bor <- psrwe_borrow(dta_ps,
                        method = "distance")
 ```
 
-# PS-integrated Kaplan-Meier approach for single arm studies
+# PS-integrated Kaplan-Meier method 
 
-For single arm studies when there is one external data source, the function
+For single arm studies, when there is one external data source, the function
 `psrwe_survkm()` allows one to conduct the survival (KM) analysis proposed in
 Chen et. al. (2022).
 The PSKM approach is applied in each PS stratum to obtain stratum-specific
-KM estimates, which are combined to complete the overal survival estimates.
+KM estimates on all distinctive time points, which are combined to complete
+the overall survival estimates.
 Suppose we are interested in the survival probability at one year, then
 we may use the argument `pred_tp=365` (days) in the function
-`psrwe_survkm()`.
+`psrwe_survkm()` to specify the time point of interest.
 
 ```{r, eval=T, echo=TRUE}
 rst_km <- psrwe_survkm(ps_bor,
@@ -56,12 +57,13 @@ rst_km <- psrwe_survkm(ps_bor,
 rst_km
 ```
 
-The `pred_tp_365` will be carried on to other down-stream analysis.
-Howerver, the function `psrwe_survkm()` will still return results on
+The `pred_tp_365` will be carried on to other down-stream analyses.
+However, the function `psrwe_survkm()` still returns results on
 all distinctive time points which may be also needed for down-stream analysis
 (e.g., visualizing KM curves and confidence intervals).
 Therefore, the returned object `rst_km` above may have different
-data structure then those retruned by the PSPP and PSCL approaches.
+data structure then those returned by the PSPP and PSCL approaches.
+Please use `str()` to see the details.
 
 Note two Jackknife options have been implemented for estimating standard
 errors of the survival estimates which can be the options for the
@@ -72,41 +74,58 @@ survival probability.
 Both results may be similar but slightly different
 since the overall weights are fixed and close to one over the
 number of total strata.
+Please see Demo section below for examples using `stderr_method`.
 
 The overall survival estimates can be further visualized as below.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km)
 ```
+The stratum-specific survival estimates can be further visualized as below.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
 ```
+The confidence intervals can be also visualized as below.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km, conf_type = "plain")
 ```
 
-# PSKM inference for single arm studies
+# PSKM inference
 
 The inference for the parameters of interest such as survival
 probability or rate at one year (`pred_tp=365` days) can be
-further arrived from the utilitiez function `psrwe_outana()`.
+further arrived from the utility function `psrwe_outana()`.
 For example, the code below test the one year survival probability
 is `greater` than `mu = 0.7` (i.e., `70%`) or not.
 
 ```{r, eval=T, echo=TRUE}
 oa_km <- psrwe_outana(rst_km, mu = 0.70, alternative = "greater")
 oa_km
+```
+
+The details of stratum-specific estimates can be printed via the `print()`
+function with the option `show_details = TRUE`.
+
+```{r, eval=T, echo=TRUE}
 print(oa_km, show_details = TRUE)
+```
+
+As the `survival` package, the results of other time points can be also
+predicted via the `summary()` with the option `pred_tps`.
+
+```{r, eval=T, echo=TRUE}
 summary(oa_km, pred_tps = c(180, 365))
 ```
 
 # Demo example
 
-The full example for the PSKM single-arm study can be found via
-the script `demo("sec_4_4_ex", package = "psrwe")`.
-Note that Jackknife standard error may take a while to finish.
+The script in "psrwe/demo/sec_4_4_ex.r" source file has
+the full example for the PSKM single-arm study which can be run via
+the `demo("sec_4_4_ex", package = "psrwe")`.
+Two Jackknife standard errors are also demonstrated in the script.
+Note that Jackknife standard errors may take a while to finish.
 
 
 # Reference

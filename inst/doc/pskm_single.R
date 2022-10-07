@@ -39,6 +39,12 @@ plot(rst_km, conf_type = "plain")
 ## ---- eval=T, echo=TRUE-------------------------------------------------------
 oa_km <- psrwe_outana(rst_km, mu = 0.70, alternative = "greater")
 oa_km
+
+
+## ---- eval=T, echo=TRUE-------------------------------------------------------
 print(oa_km, show_details = TRUE)
+
+
+## ---- eval=T, echo=TRUE-------------------------------------------------------
 summary(oa_km, pred_tps = c(180, 365))
 
