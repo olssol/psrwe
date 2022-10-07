@@ -1,0 +1,118 @@
+---
+title: "Propensity Score-Integrated Kaplan-Meier (PSKM) Method for Single-Arm Studies"
+author: "Wei-Chen Chen"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Propensity Score-Integrated Kaplan-Meier (PSKM) Method for Single-Arm Studies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, eval=T, echo=FALSE}
+require(psrwe)
+set.seed(1000)
+```
+
+# Introduction
+
+In the **psrwe**, PS-integrated Kaplan-Meier (PSKM) method is also
+implmeneted for leveraging real-world evidence in single-arm studies.
+While the PSKM is an non-parametric approach for time-to-event endpoints.
+Similar with the PSPP and PSCL approaches,
+the PS-integrated parts `psrwe_est()` and `psrwe_borrow()`
+below are the same.
+
+```{r, eval=T, echo=TRUE}
+data(ex_dta)
+dta_ps <- psrwe_est(ex_dta,
+                    v_covs = paste("V", 1:7, sep = ""),
+                    v_grp = "Group",
+                    cur_grp_level = "current",
+                    nstrata = 5,
+                    ps_method = "logistic")
+ps_bor <- psrwe_borrow(dta_ps, total_borrow = 30,
+                       method = "distance")
+```
+
+# PS-integrated Kaplan-Meier approach for single arm studies
+
+For single arm studies when there is one external data source, the function
+`psrwe_survkm()` allows one to conduct the analysis proposed in
+Chen et. al.  (2022).
+The PSKM approach is applied in each PS stratum to obtain stratum-specific
+KM estimates, which are combined to complete the overal survival estimates.
+Suppose we are interested in the survival probability at one year, then
+we may use the argument `pred_tp=365` (days) in the function
+`psrwe_survkm()`.
+
+```{r, eval=T, echo=TRUE}
+rst_km <- psrwe_survkm(ps_bor,
+                       pred_tp = 365,
+                       v_time  = "Y_Surv",
+		       v_event = "Status")
+rst_km
+```
+
+The `pred_tp_365` will be carried on to other down-stream analysis.
+Howerver, the function `psrwe_survkm()` will still return results on
+all distinctive time points which may be also needed for down-stream analysis
+(e.g., visualizing KM curves and confidence intervals).
+Therefore, the returned object `rst_km` above may have different
+data structure then those retruned by the PSPP and PSCL approaches.
+
+Note two Jackknife options have been implemented for estimating standard
+errors of the survival estimates which can be the options for the
+function `psrwe_survkm()`.
+The `stderr_method = "jk"` applies Jackknife by each stratum and
+the `stderr_method = "jkoverall"` applies Jackknife on the overall
+survival probability.
+Both results may be similar but slightly different
+since the overall weights are fixed and close to one over the
+number of total strata.
+
+The overall survival estimates can be further visualized.
+
+```{r, echo=TRUE, fig.width=5, fig.height=5}
+plot(rst_km)
+```
+
+```{r, echo=TRUE, fig.width=5, fig.height=5}
+plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
+```
+
+```{r, echo=TRUE, fig.width=5, fig.height=5}
+plot(rst_km, conf_type = "plain")
+```
+
+# PSKM inference for single arm studies
+
+The inference for the parameters of interest such as survival
+probability or rate at one year (`pred_tp=365` days) can be
+further arrived from the utilitiez function `psrwe_outana()`.
+For example, the code below test the one year survival probability
+is `greater` than `mu = 0.7` (i.e., `70%`) or not.
+
+```{r, eval=T, echo=TRUE}
+oa_km <- psrwe_outana(rst_km, mu = 0.70, alternative = "greater")
+oa_km
+print(oa_km, show_details = TRUE)
+summary(oa_km, pred_tps = c(180, 365))
+```
+
+# Demo example
+
+The full example for the PSKM single-arm study can be found via
+the script `demo("sec_4_4_ex", package = "psrwe")`.
+Note that Jackknife standard error may take a while to finish.
+
+
+# Reference
+
+Chen, W.-C., Lu, N., Wang, C., Li, H., Song, C., Tiwari, R., Xu, Y., and
+Yue, L.Q. (2022).
+Propensity Score-Integrated Approach to Survival Analysis: Leveraging External
+Evidence in Single-Arm Studies.
+Journal of Biopharmaceutical Statistics, 32(3), 400-413.
+
