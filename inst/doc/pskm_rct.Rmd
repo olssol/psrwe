@@ -21,7 +21,7 @@ set.seed(1000)
 
 In the **psrwe**, PS-integrated survival analyses
 in randomized controlled trials (RCTs) with augmenting control arm
-(Chen et al., to be submitted)
+(Chen, et al., to be submitted)
 are also implemented in three functions:
 
 * `psrwe_survkm()` for treatment effect test (Com-Nougue, et al., 1993).
@@ -81,9 +81,11 @@ where $S_{trt}$ and $S_{ctl}$ are the
 survival probabilities of the treatment and control arms, respectively.
 i.e., the example tests
 $$
-H_0: S_{trt}(\tau) - S_{ctl}(\tau) \leq 0 \quad \mbox{vs.} \quad H_a: S_{trt}(\tau) - S_{ctl}(\tau) > 0 .
+H_0: S_{trt}(\tau) - S_{ctl}(\tau) \leq 0 \quad \mbox{vs.} \quad
+H_a: S_{trt}(\tau) - S_{ctl}(\tau) > 0 .
 $$
 The outcome analysis can be summarized below.
+Note that this is an one-sided test.
 
 ```{r, eval=T, echo=TRUE}
 oa_km_rct <- psrwe_outana(rst_km_rct, alternative = "greater")
@@ -108,6 +110,12 @@ summary(oa_km_rct, pred_tps = c(180, 365))
 
 ## PS-integrated log-rank test
 
+The log-rank test is another way to compare two treatments of
+time-to-event endpoint.
+Similar the PSKM for the two-arm test above, the function
+`psrwe_survlrk()` computes the statistic for each distinctive time point
+beased on the observed data then returns all necessary results for
+the down-streatm analyses such as tests and confidence intervals.
 
 ```{r, eval=T, echo=TRUE}
 rst_lrk <- psrwe_survlrk(ps_bor_rct,
@@ -117,6 +125,14 @@ rst_lrk <- psrwe_survlrk(ps_bor_rct,
 rst_lrk
 ```
 
+The inference is based on the log-rank method to test whether two survival
+distributions are different from each other.
+The example tests
+$$
+H_0: S_{trt}(t) = S_{ctl}(t) \quad \mbox{vs.} \quad
+H_a: S_{trt}(t) \neq S_{ctl}(t) 0
+$$
+for all $t \leq \tau$ where $\tau = 365$ days.
 The outcome analysis can be summarized below.
 
 ```{r, eval=T, echo=TRUE}
@@ -142,6 +158,13 @@ summary(oa_lrk, pred_tps = c(180, 365))
 
 ## PS-integrated restricted mean survival time (RMST) test
 
+The restricted means survival time (RMST) between two
+treatments is to test whether areas under
+two survival distributions (AUC) are different from each other.
+Similar the log-rank test above, the function
+`psrwe_survrmst()` computes the statistic for each distinctive time point
+beased on the observed data then returns all necessary results for
+the down-streatm analyses such as tests and confidence intervals.
 
 ```{r, eval=T, echo=TRUE}
 rst_rmst <- psrwe_survrmst(ps_bor_rct,
@@ -151,7 +174,17 @@ rst_rmst <- psrwe_survrmst(ps_bor_rct,
 rst_rmst
 ```
 
+The inference is based on the to compare whether AUCs
+are different from each other.
+The example tests
+$$
+H_0: \int_0^{\tau} S_{trt}(t) dt = \int_0^{\tau} S_{ctl}(t) dt
+\quad \mbox{vs.} \quad
+H_a: \int_0^{\tau} S_{trt}(t) dt \neq \int_0^{\tau} S_{ctl}(t) dt
+$$
+where $\tau = 365$ days.
 The outcome analysis can be summarized below.
+Note that this is a two-sided test.
 
 ```{r, eval=T, echo=TRUE}
 oa_rmst <- psrwe_outana(rst_rmst)

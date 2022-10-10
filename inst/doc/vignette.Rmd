@@ -120,9 +120,8 @@ rst_cl_rct$Effect
 # Demo examples
 
 The full examples for the PSPP and PSCL approaches can be found via
-the script `demo("sec_4_1_ex", package = "psrwe")`,
-`demo("sec_4_2_ex", package = "psrwe")`, and
-`demo("sec_4_3_ex", package = "psrwe")`.
+the script `demo("sec_4_1_ex", package = "psrwe")` and
+`demo("sec_4_2_ex", package = "psrwe")`.
 
 
 # Reference
