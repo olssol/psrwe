@@ -92,7 +92,8 @@ get_psci_bayesian <- function(dta_psrst,
                      Effect = NULL,
                      Method_ci = "credible interval",
                      Conf_type = NA,
-                     Conf_int = conf_int)
+                     Conf_int = conf_int,
+                     Conf_stderr = NA)
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
@@ -182,7 +183,16 @@ get_psci_freq <- function(dta_psrst,
                      Effect = NULL,
                      Method_ci = method_ci,
                      Conf_type = NA,
-                     Conf_int = conf_int)
+                     Conf_int = conf_int,
+                     Conf_stderr = NA)
+
+    if (method_ci == "wilson") {
+        tmp_conf_stderr <- list(...)$conf_stderr
+        if (is.null(tmp_conf_stderr)){
+            tmp_conf_stderr <- "original"
+        }
+        rst_psci$Conf_stderr <- tmp_conf_stderr
+    }
 
     ## by study type
     rst_psci$Control$Stratum_Estimate <-
@@ -300,13 +310,13 @@ get_fci_wilson <- function(mean,
                            stderr,
                            n,
                            conf_int = 0.95,
-                           method_stderr = c("original", "plain"),
+                           conf_stderr = c("original", "plain"),
                            ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
-    method_stderr <- match.arg(method_stderr)
-    if (method_stderr == "original") {
+    conf_stderr <- match.arg(conf_stderr)
+    if (conf_stderr == "original") {
         stderr <- sqrt(mean * (1 - mean) / n)
     }
 
@@ -394,13 +404,13 @@ get_fci_2arms_wilson <- function(mean,
                                  n,
                                  n_2,
                                  conf_int = 0.95,
-                                 method_stderr = c("original", "plain"),
+                                 conf_stderr = c("original", "plain"),
                                  ...) {
 
     z_alphad2 <- qnorm((1 - conf_int) / 2, lower.tail = FALSE)
 
-    method_stderr <- match.arg(method_stderr)
-    if (method_stderr == "original") {
+    conf_stderr <- match.arg(conf_stderr)
+    if (conf_stderr == "original") {
         stderr <- sqrt(mean * (1 - mean) / n)
         stderr_2 <- sqrt(mean_2 * (1 - mean_2) / n_2)
     }

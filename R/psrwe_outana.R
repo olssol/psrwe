@@ -88,7 +88,8 @@ psrwe_outana <- function(dta_psrst,
                      Study_type   = ifelse(is_rct, "RCT", "single-arm"))
     rst_conf$CI <- dta_psrst$CI[c("Method_ci",
                                   "Conf_type",
-                                  "Conf_int")]
+                                  "Conf_int",
+                                  "Conf_stderr")]
     rst_conf$INFER <- dta_psrst$INFER[c("Method_infer",
                                         "Alternative",
                                         "Mu")]
@@ -253,6 +254,12 @@ print.PSRWE_RST_OUTANA <- function(x,
             cat(paste(", Type: ", ci$Conf_type,
                       sep = ""))
         }
+
+        if (!is.na(ci$Conf_stderr)) {
+            cat(paste(", Stderr: ", ci$Conf_stderr,
+                      sep = ""))
+        }
+
 
         cat("\n")
     }
