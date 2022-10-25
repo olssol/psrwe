@@ -460,8 +460,9 @@ get_psci_km <- function(dta_psrst,
                      Treatment = NULL,
                      Effect = NULL,
                      Method_ci = "Wald",
+                     Conf_type = conf_type,
                      Conf_int = conf_int,
-                     Conf_type = conf_type)
+                     Conf_stderr = NA)
 
     ## by study type
     if (exists("Control", dta_psrst) && !is.null(dta_psrst$Control)) {
