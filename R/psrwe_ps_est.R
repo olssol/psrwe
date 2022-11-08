@@ -227,6 +227,12 @@ summary.PSRWE_DTA <- function(object,
     n_rwd     <- length(which(0 == dataps[["_grp_"]]))
     n_current <- nrow(dataps) - n_rwd
 
+    ps_range_current <- range(dataps[["_ps_"]][dataps[["_grp_"]] == 1])
+    n_rwd_below <- sum(dataps[["_ps_"]][dataps[["_grp_"]] == 0] <
+                       ps_range_current[1])
+    n_rwd_above <- sum(dataps[["_ps_"]][dataps[["_grp_"]] == 0] >
+                       ps_range_current[2])
+
     rst <- NULL
     for (i in strata) {
         inx_ps0 <- i == dataps[["_strata_"]] & 0 == dataps[["_grp_"]]
@@ -285,7 +291,9 @@ summary.PSRWE_DTA <- function(object,
                                         rst_overall),
                 N               = c(RWD     = n_rwd,
                                     Current = n_current,
-                                    Trimmed = n_trim),
+                                    Trimmed = n_trim,
+                                    RWD_below_current = n_rwd_below,
+                                    RWD_above_current = n_rwd_above),
                 ps_fml          = object$ps_fml,
                 Distance_metric = metric[1])
 
