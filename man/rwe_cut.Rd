@@ -4,7 +4,13 @@
 \alias{rwe_cut}
 \title{Create strata}
 \usage{
-rwe_cut(x, y = x, breaks = 5, keep_inx = NULL)
+rwe_cut(
+  x,
+  y = x,
+  breaks = 5,
+  keep_inx = NULL,
+  trim_ab = c("both", "above", "below", "none")
+)
 }
 \arguments{
 \item{x}{Vector of values based on which cut points will be determined}
@@ -16,6 +22,11 @@ rwe_cut(x, y = x, breaks = 5, keep_inx = NULL)
 \item{keep_inx}{Indices of y that will be categorized as 1 or the largest bin
 even if their values are out of range of x, i.e. the y's that will not be
 trimmed}
+
+\item{\code{trim_ab}}{Trim external subjects who are above or below the
+range of current study. Default \code{both} trims both above and below.
+Other options include \code{above} for above only, \code{below} for
+below only, and \code{none} for no trimming.}
 }
 \value{
 A vector of stratum assignment for \code{y}. The y's that are outside

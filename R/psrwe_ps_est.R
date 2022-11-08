@@ -24,7 +24,9 @@
 #'     \code{logistic} for logistic regression or \code{randomforest} for a
 #'     random forest approach.
 #' @param \code{trim_ab} Trim external subjects who are above or below the
-#'     range of current study. Default \code{TRUE}.
+#'     range of current study. Default \code{both} trims both above and below.
+#'     Other options include \code{above} for above only, \code{below} for
+#'     below only, and \code{none} for no trimming.
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
@@ -57,7 +59,8 @@ psrwe_est <- function(data,
                        ctl_arm_level = NULL,
                        stra_ctl_only = TRUE,
                        nstrata       = 5,
-                       trim_ab       = TRUE, ...) {
+                       trim_ab       = c("both", "above", "below", "none"),
+                       ...) {
 
     if (!identical("data.frame", class(data))) {
         warning("data should be a data.frame object")
@@ -65,6 +68,7 @@ psrwe_est <- function(data,
 
     data      <- as.data.frame(data)
     ps_method <- match.arg(ps_method)
+    trim_ab   <- match.arg(trim_ab)
 
     ## Generate formula
     if (is.null(ps_fml)) {
@@ -386,7 +390,9 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #'     even if their values are out of range of x, i.e. the y's that will not be
 #'     trimmed
 #' @param \code{trim_ab} Trim external subjects who are above or below the
-#'     range of current study. Default \code{TRUE}.
+#'     range of current study. Default \code{both} trims both above and below.
+#'     Other options include \code{above} for above only, \code{below} for
+#'     below only, and \code{none} for no trimming.
 #'
 #' @return A vector of stratum assignment for \code{y}. The y's that are outside
 #'     the range of \code{x} and not in \code{keep_inx} are assigned \code{NA}
@@ -401,15 +407,24 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #' @export
 #'
 #'
-rwe_cut <- function(x, y = x, breaks = 5, keep_inx = NULL, trim_ab = TRUE) {
+rwe_cut <- function(x, y = x, breaks = 5, keep_inx = NULL,
+                    trim_ab = c("both", "above", "below", "none")) {
     cuts    <- quantile(x, seq(0, 1, length = breaks + 1))
     cuts[1] <- cuts[1] - 1e-100
 
-    ## Overwrite cuts[1] and cuts[breaks] if no trimming
-    if (!trim_ab) {
-        cuts[1] <- -Inf
-        cuts[breaks + 1] <- Inf
-    }
+    ## Overwrite cuts[1] and cuts[breaks]
+    trim_ab <- match.arg(trim_ab)
+    switch(trim_ab,
+           none = {
+             cuts[1] <- -Inf
+             cuts[breaks + 1] <- Inf
+           },
+           above = {
+             cuts[1] <- -Inf
+           },
+           below = {
+             cuts[breaks + 1] <- Inf
+           })
 
     rst     <- rep(NA, length(y))
     for (i in 2:length(cuts)) {

@@ -592,14 +592,17 @@ cat_ps_dta <- function(x, rst_sum) {
                 "scores by", x$ps_method, "model.",
                 sep = " ")
 
-    if (rst_sum$N["Trim_ab"]) {
+    if (rst_sum$N["Trim_ab"] != "none") {
         ss <- paste(ss,
                 "A total of", rst_sum$N["Trimmed"],
                 "RWD subjects are trimmed",
-                paste("(", rst_sum$N["RWD_below_current"], " below and ",
-                      rst_sum$N["RWD_above_current"], " above)",
+                paste("(trim_ab=", rst_sum$N["Trim_ab"], ")",
                       sep = ""),
                 "and excluded from the final analysis.",
+                paste("(PS values of ", rst_sum$N["RWD_below_current"],
+                      " and ", rst_sum$N["RWD_above_current"],
+                      " RWD are below and above current study)",
+                      sep = ""),
                 sep = " ")
     }
 
