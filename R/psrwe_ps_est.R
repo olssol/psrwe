@@ -23,6 +23,8 @@
 #' @param ps_method Method to calculate propensity scores. Can be set to
 #'     \code{logistic} for logistic regression or \code{randomforest} for a
 #'     random forest approach.
+#' @param \code{trim_ab} Trim external subjects who are above or below the
+#'     range of current study. Default \code{TRUE}.
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
@@ -54,7 +56,8 @@ psrwe_est <- function(data,
                        v_arm         = NULL,
                        ctl_arm_level = NULL,
                        stra_ctl_only = TRUE,
-                       nstrata       = 5, ...) {
+                       nstrata       = 5,
+                       trim_ab       = TRUE, ...) {
 
     if (!identical("data.frame", class(data))) {
         warning("data should be a data.frame object")
@@ -122,7 +125,8 @@ psrwe_est <- function(data,
         d1_ps   <- all_ps[which(d1_inx)]
         strata  <- rwe_cut(d1_ps, all_ps,
                            breaks   = nstrata,
-                           keep_inx = keep_inx)
+                           keep_inx = keep_inx,
+                           trim_ab  = trim_ab)
 
         data[["_strata_"]] <- factor(strata,
                                      levels = c(1:nstrata),
@@ -139,7 +143,8 @@ psrwe_est <- function(data,
                 ps_fml    = ps_fml,
                 ps_method = ps_method,
                 is_rct    = is_rct,
-                nstrata   = nstrata)
+                nstrata   = nstrata,
+                trim_ab   = trim_ab)
 
     class(rst) <- get_rwe_class("DWITHPS")
     return(rst)
@@ -214,6 +219,7 @@ summary.PSRWE_DTA <- function(object,
     nstrata <- object$nstrata
     is_rct  <- object$is_rct
     strata  <- levels(dataps[["_strata_"]])
+    trim_ab <- object$trim_ab
 
     if (is_rct) {
         col_n  <- c("N_RWD",     "N_RWD_CTL", "N_RWD_TRT",
@@ -293,7 +299,8 @@ summary.PSRWE_DTA <- function(object,
                                     Current = n_current,
                                     Trimmed = n_trim,
                                     RWD_below_current = n_rwd_below,
-                                    RWD_above_current = n_rwd_above),
+                                    RWD_above_current = n_rwd_above,
+                                    Trim_ab = trim_ab),
                 ps_fml          = object$ps_fml,
                 Distance_metric = metric[1])
 
@@ -378,6 +385,8 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #' @param keep_inx Indices of y that will be categorized as 1 or the largest bin
 #'     even if their values are out of range of x, i.e. the y's that will not be
 #'     trimmed
+#' @param \code{trim_ab} Trim external subjects who are above or below the
+#'     range of current study. Default \code{TRUE}.
 #'
 #' @return A vector of stratum assignment for \code{y}. The y's that are outside
 #'     the range of \code{x} and not in \code{keep_inx} are assigned \code{NA}
@@ -392,9 +401,15 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #' @export
 #'
 #'
-rwe_cut <- function(x, y = x, breaks = 5, keep_inx = NULL) {
+rwe_cut <- function(x, y = x, breaks = 5, keep_inx = NULL, trim_ab = TRUE) {
     cuts    <- quantile(x, seq(0, 1, length = breaks + 1))
     cuts[1] <- cuts[1] - 1e-100
+
+    ## Overwrite cuts[1] and cuts[breaks] if no trimming
+    if (!trim_ab) {
+        cuts[1] <- -Inf
+        cuts[breaks + 1] <- Inf
+    }
 
     rst     <- rep(NA, length(y))
     for (i in 2:length(cuts)) {

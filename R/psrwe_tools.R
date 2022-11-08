@@ -590,12 +590,20 @@ cat_ps_dta <- function(x, rst_sum) {
                 "current study subjects are used to",
                 "estimate propensity",
                 "scores by", x$ps_method, "model.",
+                sep = " ")
+
+    if (rst_sum$N["Trim_ab"]) {
+        ss <- paste(ss,
                 "A total of", rst_sum$N["Trimmed"],
                 "RWD subjects are trimmed",
                 paste("(", rst_sum$N["RWD_below_current"], " below and ",
                       rst_sum$N["RWD_above_current"], " above)",
                       sep = ""),
                 "and excluded from the final analysis.",
+                sep = " ")
+    }
+
+    ss <- paste(ss,
                 "The following covariates are adjusted in the propensity",
                 "score model:",
                 paste(all.vars(x$ps_fml[-1]), collapse = ", "),
