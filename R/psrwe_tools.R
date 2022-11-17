@@ -84,7 +84,8 @@ get_ps <- function(dta,
 get_aborrow <- function(total_borrow, ns0, ns1, rs,
                         m_lambda = c("distance",
                                      "inverse_distance",
-                                     "n_current"),
+                                     "n_current",
+                                     "n_external"),
                         ...) {
 
     m_lambda   <- match.arg(m_lambda)
@@ -98,6 +99,9 @@ get_aborrow <- function(total_borrow, ns0, ns1, rs,
                          },
                          n_current = {
                              proportion <- ns1 / sum(ns1)
+                         },
+                         n_external = {
+                             proportion <- ns0 / sum(ns0)
                          })
 
     borrow     <- apply(cbind(ns0, total_borrow * proportion),
