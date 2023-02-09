@@ -39,11 +39,6 @@ LinkingTo:
     RcppEigen (>= 0.3.3.7.0),
     StanHeaders (>= 2.21.0-5),
     RcppParallel (>= 5.0.2)
-RcppModules:
-    stan_fit4powerp_mod,
-    stan_fit4powerps_mod,
-    stan_fit4powerpsbinary_mod,
-    stan_fit4prior_mod
 Imports:
     parallel (>= 3.2),
     cowplot (>= 1.0.0),
