@@ -36,6 +36,11 @@ rst_cl
 oa_cl <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40)
 oa_cl
 
+### Outcome analysis with score method (binary outcomes and single arm only.)
+oa_cl_score <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40,
+                            method_pval = "score")
+oa_cl_score
+
 ### Use optmatch with caliper.
 .remark_optmatch <- function() {
     warning("The optmatch may restrict use (academic license).")

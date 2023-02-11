@@ -17,7 +17,7 @@ psrwe_ci(
 \arguments{
 \item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{method_ci}{A method name for confidence interval (default Wald)}
+\item{method_ci}{A method name for confidence interval (default wald)}
 
 \item{conf_int}{A two-sided level of confidence/credible limits
 (default 0.95)}

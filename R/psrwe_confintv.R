@@ -3,7 +3,7 @@
 #' Estimate the confidence/credible interval for the PS-integrated approach.
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}
-#' @param method_ci A method name for confidence interval (default Wald)
+#' @param method_ci A method name for confidence interval (default wald)
 #' @param conf_int A two-sided level of confidence/credible limits
 #'        (default 0.95)
 #' @param conf_type A type name of transformation for the confidence interval
@@ -459,7 +459,7 @@ get_psci_km <- function(dta_psrst,
     rst_psci <- list(Control = NULL,
                      Treatment = NULL,
                      Effect = NULL,
-                     Method_ci = "Wald",
+                     Method_ci = "wald",
                      Conf_type = conf_type,
                      Conf_int = conf_int,
                      Conf_stderr = NA)

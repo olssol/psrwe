@@ -3,8 +3,8 @@
 #' Report outcome analysis for the PS-integrated approach.
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}
-#' @param method_ci A method name for confidence interval (default Wald)
-#' @param conf_type A type name of transformation for the confidence interal
+#' @param method_ci A method name for confidence interval (default wald)
+#' @param conf_type A type name of transformation for the confidence interval
 #'        of PSKM approach (default log_log)
 #' @param conf_int A two-sided level of confidence/credible limits
 #'        (default 0.95)
@@ -14,6 +14,10 @@
 #' @param mu A number indicating the true value of the parameter of interest
 #'        (or the difference in means for two arms),
 #'        \code{mu = 0} when the test is log-rank or RMST
+#' @param method_pval A method name for p-value (default wald),
+#'        no impact for Bayesian method, and
+#'        \code{method = "score"} only is for binary outcome in
+#'        single arm study (i.e., comparing with a PG set by \code{mu})
 #' @param ... Other options
 #'
 #' @return A list with class name \code{PSRWE_EST_OUTANA}.
@@ -45,6 +49,7 @@ psrwe_outana <- function(dta_psrst,
                          conf_int = 0.95,
                          alternative = c("less", "greater", "two_sided"),
                          mu = 0,
+                         method_pval = c("wald", "score"),
                          ...) {
     ## check
     stopifnot(inherits(dta_psrst,
@@ -55,6 +60,7 @@ psrwe_outana <- function(dta_psrst,
     method_ci <- match.arg(method_ci)
     conf_type <- match.arg(conf_type)
     alternative <- match.arg(alternative)
+    method_pval <- match.arg(method_pval)
 
     ## check components
     outcome_type <- dta_psrst$Outcome_type
@@ -80,7 +86,9 @@ psrwe_outana <- function(dta_psrst,
                           ...)
     dta_psrst <- psrwe_infer(dta_psrst,
                              alternative = alternative,
-                             mu = mu)
+                             mu = mu,
+                             method_pval = method_pval,
+                             ...)
 
     ## analysis configuration
     rst_conf <- list(Method       = dta_psrst$Method,
@@ -92,7 +100,8 @@ psrwe_outana <- function(dta_psrst,
                                   "Conf_stderr")]
     rst_conf$INFER <- dta_psrst$INFER[c("Method_infer",
                                         "Alternative",
-                                        "Mu")]
+                                        "Mu",
+                                        "Method_pval")]
     ## summary observed
     rst_obs <- dta_psrst$Observed
     rst_obs$Group <- factor(rst_obs$Group,
@@ -246,7 +255,7 @@ print.PSRWE_RST_OUTANA <- function(x,
 
     if (exists("CI", x_outana$Analysis_Setup)) {
         ci <- x_outana$Analysis_Setup$CI
-        cat(paste("- Confidence Interval: ", ci$Method_ci,
+        cat(paste("- Interval Method: ", ci$Method_ci,
 		  ", Level: ", ci$Conf_int,
                   sep = ""))
 
@@ -266,8 +275,14 @@ print.PSRWE_RST_OUTANA <- function(x,
 
     if (exists("INFER", x_outana$Analysis_Setup)) {
         infer <- x_outana$Analysis_Setup$INFER
-        cat(paste("- Test Method: ", infer$Method_infer,
-		  "\n", sep = ""))
+        cat(paste("- Test Method: ", infer$Method_infer, sep = ""))
+
+        if (infer$Method_infer == "p_value") {
+            cat(paste(", Method pval: ", infer$Method_pval,
+                      sep = ""))
+        }
+
+        cat("\n")
 
         if (x_outana$Analysis_Setup$Study_type == "RCT") {
             if (x_outana$Analysis_Setup$Method %in%

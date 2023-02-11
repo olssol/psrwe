@@ -13,15 +13,16 @@ psrwe_outana(
   conf_int = 0.95,
   alternative = c("less", "greater", "two_sided"),
   mu = 0,
+  method_pval = c("wald", "score"),
   ...
 )
 }
 \arguments{
 \item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{method_ci}{A method name for confidence interval (default Wald)}
+\item{method_ci}{A method name for confidence interval (default wald)}
 
-\item{conf_type}{A type name of transformation for the confidence interal
+\item{conf_type}{A type name of transformation for the confidence interval
 of PSKM approach (default log_log)}
 
 \item{conf_int}{A two-sided level of confidence/credible limits
@@ -34,6 +35,11 @@ must be one of \code{"less"} (default) or \code{"greater"}, or
 \item{mu}{A number indicating the true value of the parameter of interest
 (or the difference in means for two arms),
 \code{mu = 0} when the test is log-rank or RMST}
+
+\item{method_pval}{A method name for p-value (default wald),
+no impact for Bayesian method, and
+\code{method = "score"} only is for binary outcome in
+single arm study (i.e., comparing with a PG set by \code{mu})}
 
 \item{...}{Other options}
 }
