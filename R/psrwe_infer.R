@@ -33,7 +33,7 @@
 psrwe_infer <- function(dta_psrst,
                         alternative = c("less", "greater", "two_sided"),
                         mu = 0,
-                        method_pval = c("wald", "score"),
+                        method_pval = c("wald", "score", "score_weighted"),
                         ...) {
 
     ## check
@@ -168,24 +168,35 @@ get_psinfer_freq <- function(dta_psrst,
                         Method_pval = method_pval)
 
     ## by method_pval, study type, and outcome type
-    if (method_pval == "score") {
+    if (method_pval %in% c("score", "score_weighted")) {
       if (is_rct || outcome_type != "binary") {
         stop("socre pval is only for binary outcomes and single arm study.")
       } else {
         N_borrow <- dta_psrst$Borrow$N_Borrow
         N_current <- dta_psrst$Borrow$N_Current
         N_nominal <- N_current + N_borrow
-        N_nominal_overall <- sum(N_nominal)
+
         rst_psinfer[[type]]$Stratum_InferProb <-
             get_fpval_binary_score(dta_psrst[[type]]$Stratum_Estimate,
                                    alternative = alternative,
                                    mu = mu,
                                    n_nominal = N_nominal)
-        rst_psinfer[[type]]$Overall_InferProb <-
-            get_fpval_binary_score(dta_psrst[[type]]$Overall_Estimate,
-                                   alternative = alternative,
-                                   mu = mu,
-                                   n_nominal = N_nominal_overall)
+
+        if (method_pval == "score") {
+          rst_psinfer[[type]]$Overall_InferProb <-
+              get_fpval_binary_score(dta_psrst[[type]]$Overall_Estimate,
+                                     alternative = alternative,
+                                     mu = mu,
+                                     n_nominal = sum(N_nominal))
+        } else {
+          rst_psinfer[[type]]$Overall_InferProb <-
+              get_fpval_binary_score_weighted(
+                  dta_psrst[[type]]$Overall_Estimate,
+                  alternative = alternative,
+                  mu = mu,
+                  n_nominal = N_nominal,
+                  weights = N_current)
+        }
       }
     } else {
       rst_psinfer[[type]]$Stratum_InferProb <-
@@ -234,7 +245,9 @@ get_fpval_binary_score <- function(x,
                                    mu,
                                    n_nominal) {
 
-    tstat <- (x$Mean - mu) / sqrt(mu * (1 - mu) / n_nominal)
+    ## mu is the PG0
+    stderr <- sqrt(mu * (1 - mu) / n_nominal)
+    tstat <- (x$Mean - mu) / stderr
     p_value <- switch(alternative,
                       less = {
                         pnorm(tstat)
@@ -249,3 +262,33 @@ get_fpval_binary_score <- function(x,
     rst <- data.frame(Infer_prob = p_value)
     return(rst)
 }
+
+
+#' @title Frequentist p-value (for binary outcome and score_weighted method)
+#'
+#' @noRd
+get_fpval_binary_score_weighted <- function(x,
+                                            alternative,
+                                            mu,
+                                            n_nominal,
+                                            weights) {
+
+    ## mu is the PG0
+    ws <- weights / sum(weights)
+    stderr <- sqrt((mu * (1 - mu) / n_nominal) %*% ws^2)
+    tstat <- (x$Mean - mu) / stderr
+    p_value <- switch(alternative,
+                      less = {
+                        pnorm(tstat)
+                      },
+                      greater = {
+                        pnorm(tstat, lower.tail = FALSE)
+                      },
+                      two_sided = {
+                        pnorm(abs(tstat), lower.tail = FALSE) * 2
+                      })
+
+    rst <- data.frame(Infer_prob = p_value)
+    return(rst)
+}
+

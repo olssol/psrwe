@@ -10,7 +10,7 @@ psrwe_infer(
   dta_psrst,
   alternative = c("less", "greater", "two_sided"),
   mu = 0,
-  method_pval = c("wald", "score"),
+  method_pval = c("wald", "score", "score_weighted"),
   ...
 )
 }
