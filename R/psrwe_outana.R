@@ -49,7 +49,7 @@ psrwe_outana <- function(dta_psrst,
                          conf_int = 0.95,
                          alternative = c("less", "greater", "two_sided"),
                          mu = 0,
-                         method_pval = c("wald", "score"),
+                         method_pval = c("wald", "score", "score_weighted"),
                          ...) {
     ## check
     stopifnot(inherits(dta_psrst,
