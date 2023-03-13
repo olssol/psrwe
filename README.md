@@ -8,7 +8,7 @@ status](https://www.r-pkg.org/badges/version/psrwe)](https://CRAN.R-project.org/
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Download](https://cranlogs.r-pkg.org/badges/psrwe)](https://cran.r-project.org/package=psrwe)
 [![Build
-Status](https://gitlab.com/snoweye/psrwe/badges/master/pipeline.svg)](https://gitlab.com/snoweye/psrwe/-/commits/master)
+Status](https://gitlab.com/snoweye/psrwe/badges/ci/pipeline.svg)](https://gitlab.com/snoweye/psrwe/-/commits/ci)
 [![Appveyor
 Build status](https://ci.appveyor.com/api/projects/status/lnta05dn3ex9v641?svg=true)](https://ci.appveyor.com/project/snoweye/psrwe)
 <!-- badges: end -->
