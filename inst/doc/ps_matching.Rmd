@@ -1,0 +1,129 @@
+---
+title: "Propensity Score-Integrated Matching Method"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Propensity Score-Integrated Matching Method}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, eval=T, echo=FALSE}
+suppressMessages(require(psrwe, quietly = TRUE))
+options(digits = 3)
+set.seed(1000)
+```
+<br>
+
+
+## Introduction
+
+In the **psrwe**, PS-integrated matching method (Chen, et al., 2021)
+is also implemented for leveraging real-world evidence in
+evaluation of diagnostic tests for low prevalence diseases.
+This example is based on PS matching and stratification on an important
+baseline covariate (e.g., disease stage) which may have major impact
+on the sensitivity of diagnostic.
+
+Not that this example is only for demonstrating PS matching on
+low prevalent disease and when the resource may be very limited.
+For different scenarios, other PS-integrated approaches may be more
+appropriate.
+
+```{r, eval=T, echo=TRUE}
+data(ex_dta)
+dta_ps <- psrwe_est(ex_dta,
+                    v_covs = paste("V", 1:7, sep = ""),
+                    v_grp = "Group",
+                    cur_grp_level = "current",
+                    ps_method = "logistic")
+dta_ps
+```
+<br>
+
+
+## PS-integrated matching method
+
+The propensity score (PS) estimation above based on `psrwe_est()`
+may provide stratification.
+This matching example `psrwe_match()` below will
+match the RWD (real-world data) to the current study with $2:1$ ratio
+(`ratio = 2`)
+based on the covariate `V1` (`strata_covs = "V1"`).
+The (categorical) covariate `V1` will be used to create strata,
+then the data will be matched within each stratum based on PS values
+based on the nearest neighbor algorithm.
+
+Please see Section of Demo example below for the other option using different
+matching algorithm and package.
+
+```{r, eval=T, echo=TRUE}
+dta_ps_match <- psrwe_match(dta_ps,
+                            ratio = 2,
+                            strata_covs = "V1")
+dta_ps_match
+```
+
+The returned object `dta_ps_match` will be used to calculate
+discounting parameters for the study design.
+Note that the results are based on two stages indicated by `V1` rather than
+five strata originally set by `dta_ps` above.
+
+```{r, eval=T, echo=TRUE}
+ps_bor_match <- psrwe_borrow(dta_ps_match,
+                             total_borrow = 30)
+ps_bor_match
+```
+<br>
+
+
+## PSCL and outcome analyses
+
+The PSCL analysis (Wang, et al., 2020) can be done below with the same step as
+other PSCL examples.
+
+```{r, eval=T, echo=TRUE}
+rst_cl <- psrwe_compl(ps_bor_match,
+                      outcome_type = "binary",
+                      v_outcome    = "Y_Bin")
+rst_cl
+```
+
+The outcome analysis can be done in the same way.
+Note that typically the Wilson score method will be used for constructing
+confidence intervals.
+
+```{r, eval=T, echo=TRUE}
+oa_cl <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40)
+oa_cl
+```
+<br>
+
+
+## Demo example
+
+The script in "**psrwe/demo/sec_4_3_ex.r**" source file has
+the full example for the PS matching which can be run via
+the `demo("sec_4_3_ex", package = "psrwe")`.
+
+Note the *R* package **optim** may provide other matching algorithms,
+however, it may need additional license permission.
+Please check with package announcement if the package is turned on.
+<br>
+
+
+## References
+
+1.  Chen, W.-C., Li, H., Wang, C., Lu, N., Song, C., Tiwari, R., Xu, Y., and
+Yue, L.Q. (2021).
+Evaluation of Diagnostic Tests for Low Prevalence Diseases: A Statistical
+Approach for Leveraging Real-World Data to Accelerate the Study.
+Journal of Biopharmaceutical Statistics, 31(3), 375-390.
+
+2. Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., and Yue, L.Q.
+(2020).
+Propensity score-integrated composite likelihood approach for
+incorporating real-world evidence in single-arm clinical studies.
+Journal of Biopharmaceutical Statistics, 30(3), 495-507.
+

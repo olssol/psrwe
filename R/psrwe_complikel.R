@@ -6,12 +6,21 @@
 #'
 #' @inheritParams psrwe_powerp
 #'
+#' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Parameters for \code{rwe_cl}
+#'
+#' @details \code{stderr_method} include \code{jk} as default
+#'     using Jackknife method within each stratum, or
+#'     \code{jkoverall} for Jackknife method for overall/combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT.
+#'     Note that \code{jkoverall} may take a while longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
-#'     jackknife estimation for each subject. The results should be further
+#'     jackknife estimation for each subject. The results can be further
 #'     summarized by its S3 method \code{summary}.
+#'     The results can be also analyzed by \code{psrwe_outana} for outcome
+#'     analysis and inference.
 #'
 #' @examples
 #' data(ex_dta)
@@ -27,6 +36,7 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
+                      stderr_method = c("jk", "jkoverall", "ignore"), 
                       ...) {
 
     ## check
@@ -37,16 +47,27 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
 
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
 
+    stderr_method <- match.arg(stderr_method)
+
     ## observed
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## call estimation
-    rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
-                        outcome_type = outcome_type,
-                        f_stratum = get_cl_stratum, ...)
+    if (stderr_method %in% c("jk", "ignore")) {
+        rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
+                            outcome_type = outcome_type,
+                            f_stratum = get_cl_stratum,
+                            stderr_method = stderr_method, ...)
+    } else {
+        rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
+                                      outcome_type = outcome_type,
+                                      f_stratum = get_cl_stratum,
+                                      stderr_method = stderr_method, ...)
+    }
 
     ## return
     rst$Observed <- rst_obs
+    rst$stderr_method <- stderr_method
     rst$Method   <- "ps_cl"
     rst$Outcome_type <- outcome_type
     class(rst)   <- get_rwe_class("ANARST")
@@ -147,23 +168,24 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
 }
 
 
-#' Get estimation for each stratum
+#' Get CL estimation for each stratum
 #'
 #'
 #' @noRd
 #'
-get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
+get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
+                           stderr_method = "jk", ...) {
 
     ## treatment or control only
     dta_cur <- d1
     ns1     <- length(dta_cur)
     if (0 == n_borrow | is.null(d0)) {
         theta    <- mean(dta_cur)
-        sd_theta <- switch(outcome_type,
-                           continuous = sd(dta_cur),
-                           binary     = sqrt(theta * (1 - theta) / ns1))
+        stderr_theta <- switch(outcome_type,
+                               continuous = sd(dta_cur) / sqrt(ns1),
+                               binary     = sqrt(theta * (1 - theta) / ns1))
 
-        return(c(theta, sd_theta))
+        return(c(theta, stderr_theta))
     }
 
     ## overall ps-cl
@@ -174,20 +196,25 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type, ...) {
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
 
     ##jackknife
-    jk_theta <- NULL
-    for (j in seq_len(ns1)) {
-        cur_jk   <- rwe_cl(dta_cur[-j], dta_ext, n_borrow, ...)
-        jk_theta <- c(jk_theta, cur_jk)
-    }
-
-    if (ns0 > 0) {
-        for (j in seq_len(ns0)) {
-            cur_jk <- rwe_cl(dta_cur, dta_ext[-j], n_borrow, ...)
+    if (stderr_method == "jk") {
+        jk_theta <- NULL
+        for (j in seq_len(ns1)) {
+            cur_jk   <- rwe_cl(dta_cur[-j], dta_ext, n_borrow, ...)
             jk_theta <- c(jk_theta, cur_jk)
         }
+
+        if (ns0 > 0) {
+            for (j in seq_len(ns0)) {
+                cur_jk <- rwe_cl(dta_cur, dta_ext[-j], n_borrow, ...)
+                jk_theta <- c(jk_theta, cur_jk)
+            }
+        }
+
+        stderr_theta <- get_jk_sd(overall_theta, jk_theta)
+    } else {
+        stderr_theta <- NA
     }
 
     ## summary
-    sd_theta <- get_jk_sd(overall_theta, jk_theta)
-    return(c(overall_theta, sd_theta))
+    return(c(overall_theta, stderr_theta))
 }

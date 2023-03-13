@@ -1,6 +1,6 @@
 Package: psrwe
 Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
-Version: 3.1
+Version: 3.2
 Authors@R: c(
     person(given = "Chenguang", family = "Wang",
            email = "chenguang.wang.0517@gmail.com",

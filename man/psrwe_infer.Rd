@@ -6,16 +6,31 @@
 
 Inference for the PS-integrated approach.}
 \usage{
-psrwe_infer(dta_psrst, alternative = c("less", "greater"), mu = 0)
+psrwe_infer(
+  dta_psrst,
+  alternative = c("less", "greater", "two_sided"),
+  mu = 0,
+  method_pval = c("wald", "score", "score_weighted"),
+  ...
+)
 }
 \arguments{
-\item{dta_psrst}{a returned object with class \code{PSRWE_EST}}
+\item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{alternative}{a character string for the alternative hypothesis that
-must be one of \code{"less"} (default) or \code{"greater"}}
+\item{alternative}{A character string for the alternative hypothesis that
+must be one of \code{"less"} (default), \code{"greater"}, or
+\code{"two_sided"} (for log-rank and RMST only)}
 
-\item{mu}{a number indicating the true value of the parameter of interest
-(or the difference in means for two arms)}
+\item{mu}{A number indicating the true value of the parameter of interest
+(or the difference in means for two arms),
+\code{mu = 0} when the test is log-rank or RMST}
+
+\item{method_pval}{A method name for p-value (default wald),
+no impact for Bayesian method, and
+\code{method = "score"} only is for binary outcome in
+single arm study (i.e., comparing with a PG set by \code{mu})}
+
+\item{...}{Other options}
 }
 \value{
 A list with class name \code{PSRWE_EST}.
