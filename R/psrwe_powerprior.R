@@ -182,8 +182,8 @@ psrwe_powerp <- function(dta_psbor, v_outcome = "Y",
 get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
     f_curd <- function(i, d1, d0 = NULL) {
         cur_d <- c(N1    = length(d1),
-                   YBAR1 = mean(cur_d1),
-                   YSUM1 = sum(cur_d1))
+                   YBAR1 = mean(d1),
+                   YSUM1 = sum(d1))
 
         if (is.null(d0)) {
             cur_d <- c(cur_d,
@@ -192,9 +192,9 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                        SD0   = 0)
         } else {
             cur_d <- c(cur_d,
-                       N0    = length(cur_d0),
-                       YBAR0 = mean(cur_d0),
-                       SD0   = sd(cur_d0))
+                       N0    = length(d0),
+                       YBAR0 = mean(d0),
+                       SD0   = sd(d0))
         }
 
         list(stan_d = cur_d,
