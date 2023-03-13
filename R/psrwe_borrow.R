@@ -9,6 +9,9 @@
 #' @param method Method to split \code{total_borrow} for a class
 #'     \code{PSRWE_DTA} object, which can be based on distance (\code{method =
 #'     "distance"}) or inverse distance (\code{method = "inverse_distance"}).
+#'     Other possible options include \code{"n_current"} and \code{"n_external"}
+#'     that use the proportion of stratum sample size based on the current and
+#'     external data, respectively.
 #'     Ignored for class \code{PSRWE_DTA_MAT} object.
 #' @param ... Additional parameters for \code{\link{summary.PSRWE_DTA}}.
 #'
@@ -44,7 +47,10 @@
 #'
 #'
 psrwe_borrow <- function(dtaps, total_borrow,
-                          method = c("distance", "inverse_distance"),
+                          method = c("distance",
+                                     "inverse_distance",
+                                     "n_current",
+                                     "n_external"),
                           ...) {
 
     is_ps       <- inherits(dtaps, what = get_rwe_class("DWITHPS"))

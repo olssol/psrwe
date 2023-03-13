@@ -4,18 +4,20 @@
 \alias{print.PSRWE_RST_OUTANA}
 \title{Print outcome analysis results}
 \usage{
-\method{print}{PSRWE_RST_OUTANA}(x, show_details = FALSE, show_rct = FALSE, ...)
+\method{print}{PSRWE_RST_OUTANA}(x, show_details = FALSE, show_rct = FALSE, show_pred_tps = NULL, ...)
 }
 \arguments{
 \item{x}{A list of class \code{PSRWE_RST_OUTANA} that is generated using the
 \code{\link{psrwe_outana}} function.}
 
-\item{show_details}{print out more observed summary}
+\item{show_details}{Print out more observed summary}
 
-\item{show_rct}{print out more analysis summary for RCT arms}
+\item{show_rct}{Print out more analysis summary for RCT arms}
+
+\item{show_pred_tps}{Specified time points to be shown}
 
 \item{...}{Additional parameters}
 }
 \description{
-Print summary information of outcome analysis results
+Print detail information of outcome analysis results
 }

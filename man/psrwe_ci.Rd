@@ -9,23 +9,23 @@ Estimate the confidence/credible interval for the PS-integrated approach.}
 psrwe_ci(
   dta_psrst,
   method_ci = c("wald", "wilson"),
-  conf_type = c("log_log", "plain"),
   conf_int = 0.95,
+  conf_type = c("log_log", "plain"),
   ...
 )
 }
 \arguments{
-\item{dta_psrst}{a returned object with class \code{PSRWE_EST}}
+\item{dta_psrst}{A returned object with class \code{PSRWE_EST}}
 
-\item{method_ci}{a method name for confidence interval (default Wald)}
+\item{method_ci}{A method name for confidence interval (default wald)}
 
-\item{conf_type}{a type name of transformation for the confidence interal
-of PSKM approach (default log_log)}
-
-\item{conf_int}{a two-sided level of confidence/credible limits
+\item{conf_int}{A two-sided level of confidence/credible limits
 (default 0.95)}
 
-\item{...}{other options}
+\item{conf_type}{A type name of transformation for the confidence interval
+of PSKM approach}
+
+\item{...}{Other options}
 }
 \value{
 A list with class name \code{PSRWE_EST}.
@@ -37,6 +37,7 @@ Estimate the confidence/credible interval for the PS-integrated approach.
 }
 \details{
 \code{method_ci = "wilson"} is for binary outcomes only.
+         \code{conf_type = "log_log"} is for \code{ps_km} only.
 }
 \examples{
 data(ex_dta)
