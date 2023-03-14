@@ -31,7 +31,7 @@ build_script:
   #- R CMD INSTALL psrwe*.tar.gz
   - cd ..\
   - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
-  - R CMD INSTALL psrwe_3.2.tar.gz
+  - R CMD INSTALL --no-test-load psrwe_3.2.tar.gz
   # - pwd
   # - dir
   # - R CMD check --as-cran --no-manual --no-build-vignettes psrwe_3.2.tar.gz
