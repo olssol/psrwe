@@ -48,13 +48,13 @@ scores of the entire current study patients.}
 
 \item{nstrata}{Number of PS strata to be created.}
 
-\item{...}{Additional parameters for calculating the propensity score to be
-used in \code{randomForest} or \code{glm} .}
-
-\item{\code{trim_ab}}{Trim external subjects who are above or below the
+\item{trim_ab}{Trim external subjects who are above or below the
 range of current study. Default \code{both} trims both above and below.
 Other options include \code{above} for above only, \code{below} for
 below only, and \code{none} for no trimming.}
+
+\item{...}{Additional parameters for calculating the propensity score to be
+used in \code{randomForest} or \code{glm} .}
 }
 \value{
 A list of class \code{PSRWE_DAT} with items:

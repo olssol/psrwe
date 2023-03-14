@@ -23,7 +23,7 @@ rwe_cut(
 even if their values are out of range of x, i.e. the y's that will not be
 trimmed}
 
-\item{\code{trim_ab}}{Trim external subjects who are above or below the
+\item{trim_ab}{Trim external subjects who are above or below the
 range of current study. Default \code{both} trims both above and below.
 Other options include \code{above} for above only, \code{below} for
 below only, and \code{none} for no trimming.}
