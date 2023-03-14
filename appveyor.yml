@@ -34,6 +34,6 @@ build_script:
   - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
   - pwd
   - dir
-  - R CMD check --as-cran --no-manual --no-build-vignettes ./psrwe_*.tar.gz
+  - R CMD check --as-cran --no-manual --no-build-vignettes './psrwe_*.tar.gz'
   - cat ./psrwe.Rcheck/00install.out
   - cat ./psrwe.Rcheck/00check.log
