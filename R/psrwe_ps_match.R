@@ -33,9 +33,15 @@
 #'                      v_covs = paste("V", 1:7, sep = ""),
 #'                      v_grp = "Group",
 #'                      cur_grp_level = "current")
-#' dta_ps_mat <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
-#'                            seed = 123)
-#' dta_ps_mat
+#'
+#' ## With neighest neighbor
+#' .remark_nnmatch <- function() {
+#'   dta_ps_mat <- psrwe_match(dta_ps, ratio = 2, strata_covs = "V1",
+#'                             seed = 123)
+#'   dta_ps_mat
+#' }
+#' ## Unmark below to run
+#' # .remark_nnmatch()
 #'
 #' ## With optmatch
 #' .remark_optmatch <- function() {

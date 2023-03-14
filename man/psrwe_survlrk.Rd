@@ -51,7 +51,7 @@ two-arm RCT.
 }
 \examples{
 data(ex_dta_rct)
-dta_ps_rct <- psrwe_est(ex_dta,
+dta_ps_rct <- psrwe_est(ex_dta_rct,
                         v_covs = paste("V", 1:7, sep = ""),
                         v_grp = "Group", cur_grp_level = "current",
                         v_arm = "Arm", ctl_arm_level = "control",

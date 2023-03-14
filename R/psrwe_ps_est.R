@@ -23,7 +23,7 @@
 #' @param ps_method Method to calculate propensity scores. Can be set to
 #'     \code{logistic} for logistic regression or \code{randomforest} for a
 #'     random forest approach.
-#' @param \code{trim_ab} Trim external subjects who are above or below the
+#' @param trim_ab Trim external subjects who are above or below the
 #'     range of current study. Default \code{both} trims both above and below.
 #'     Other options include \code{above} for above only, \code{below} for
 #'     below only, and \code{none} for no trimming.
@@ -389,7 +389,7 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #' @param keep_inx Indices of y that will be categorized as 1 or the largest bin
 #'     even if their values are out of range of x, i.e. the y's that will not be
 #'     trimmed
-#' @param \code{trim_ab} Trim external subjects who are above or below the
+#' @param trim_ab Trim external subjects who are above or below the
 #'     range of current study. Default \code{both} trims both above and below.
 #'     Other options include \code{above} for above only, \code{below} for
 #'     below only, and \code{none} for no trimming.
