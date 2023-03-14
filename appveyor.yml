@@ -28,5 +28,8 @@ build_script:
   #- Rscript -e "install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/rstan_2.21.2.zip')"
   - travis-tool.sh install_deps
   #- R CMD INSTALL psrwe*.tar.gz
-  - R CMD build --no-build-vignettes --no-manual --no-resave-data .
-  - R CMD check --as-cran --no-manual --ignore-vignettes psrwe*.tar.gz
+  - chmod u+x cleanup
+  - chmod u+x configure
+  - cd ../
+  - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
+  - R CMD check --as-cran --no-manual --no-vignettes psrwe_*.tar.gz
