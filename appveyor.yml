@@ -31,7 +31,7 @@ build_script:
   - chmod u+x cleanup
   - chmod u+x configure
   - cd ..\
+  - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
   - pwd
   - dir
-  - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
-  - R CMD check --as-cran --no-manual --no-build-vignettes psrwe_*.tar.gz
+  - R CMD check --as-cran --no-manual --no-build-vignettes psrwe_3.2.tar.gz
