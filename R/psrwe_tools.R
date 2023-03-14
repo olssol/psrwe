@@ -20,7 +20,9 @@ get_rwe_class <- function(c_str) {
          omkss     = "one minus Kolmogorov-Smirnov statistic",
          n_current = "the number of current control subjects",
          distance  = "the distance in PS distributions",
-         inverse_distance = "one minus the inverse of the distance in PS distributions"
+         inverse_distance = "one minus the inverse of the distance in PS distributions",
+         ANAMETHOD = c("ps_pp", "ps_cl", "ps_km", "ps_lrk", "ps_rmst"),
+         ANAMETHOD_KM = c("ps_km", "ps_lrk", "ps_rmst")
          )
 }
 
@@ -82,7 +84,8 @@ get_ps <- function(dta,
 get_aborrow <- function(total_borrow, ns0, ns1, rs,
                         m_lambda = c("distance",
                                      "inverse_distance",
-                                     "n_current"),
+                                     "n_current",
+                                     "n_external"),
                         ...) {
 
     m_lambda   <- match.arg(m_lambda)
@@ -96,6 +99,9 @@ get_aborrow <- function(total_borrow, ns0, ns1, rs,
                          },
                          n_current = {
                              proportion <- ns1 / sum(ns1)
+                         },
+                         n_external = {
+                             proportion <- ns0 / sum(ns0)
                          })
 
     borrow     <- apply(cbind(ns0, total_borrow * proportion),
@@ -170,14 +176,14 @@ get_observed <- function(data, v_covs) {
         group_by(Group, Arm, Stratum) %>%
         summarize(N      = n(),
                   Mean   = mean(Y),
-                  StdErr = sd(Y))
+                  SD     = sd(Y))
 
     rst2 <- data %>%
         mutate(Stratum = "Overall") %>%
         group_by(Group, Arm, Stratum) %>%
         summarize(N      = n(),
                   Mean   = mean(Y),
-                  StdErr = sd(Y))
+                  SD     = sd(Y))
 
     rst <- data.frame(rbind(rst1, rst2))
     rst
@@ -588,9 +594,23 @@ cat_ps_dta <- function(x, rst_sum) {
                 "current study subjects are used to",
                 "estimate propensity",
                 "scores by", x$ps_method, "model.",
+                sep = " ")
+
+    if (rst_sum$N["Trim_ab"] != "none") {
+        ss <- paste(ss,
                 "A total of", rst_sum$N["Trimmed"],
                 "RWD subjects are trimmed",
+                paste("(trim_ab=", rst_sum$N["Trim_ab"], ")",
+                      sep = ""),
                 "and excluded from the final analysis.",
+                paste("(PS values of ", rst_sum$N["RWD_below_current"],
+                      " and ", rst_sum$N["RWD_above_current"],
+                      " RWD are below and above current study)",
+                      sep = ""),
+                sep = " ")
+    }
+
+    ss <- paste(ss,
                 "The following covariates are adjusted in the propensity",
                 "score model:",
                 paste(all.vars(x$ps_fml[-1]), collapse = ", "),
@@ -684,6 +704,7 @@ get_ps_cl_km <- function(dta_psbor,
                  Borrow    = dta_psbor$Borrow,
                  Total_borrow = dta_psbor$Total_borrow,
                  is_rct       = is_rct)
+    return(rst)
 }
 
 #' Summarize overall theta
@@ -698,7 +719,7 @@ get_overall_est <- function(ts1, weights, ts2 = NULL) {
         sds0   <- ts1[, 2]
     } else {
         theta0 <- ts1[, 1] - ts2[, 1]
-        sds0   <- sqrt(ts1[, 2] + ts2[, 2])
+        sds0   <- sqrt(ts1[, 2]^2 + ts2[, 2]^2)
     }
 
     ws         <- weights / sum(weights)
@@ -827,6 +848,9 @@ plot_km_rst <- function(x,
                         add_stratum = FALSE,
                         ...) {
 
+    ## check args
+    args <- list(...)
+
     ## prepare data
     if (x$is_rct){
       label_Arm <- "Control"
@@ -861,12 +885,23 @@ plot_km_rst <- function(x,
 
     ## CI
     if (add_ci) {
-      ci  <- get_ci_km(rst$Mean, rst$StdErr, ...)
+      if ("conf_int" %in% names(args)) {
+          conf_int <- args[['conf_int']]
+      } else {
+          conf_int <- 0.95
+      }
+ 
+      if ("conf_type" %in% names(args)) {
+          conf_type <- args[['conf_type']]
+      } else {
+          conf_type <- "plain"
+      }
+
+      ci  <- get_kmci_wald(rst$Mean, rst$StdErr, conf_int, conf_type, ...)
       rst <- cbind(rst, Lower = ci$Lower, Upper = ci$Upper)
     }
 
     ## check arguments
-    args <- list(...)
     if ("xlim" %in% names(args)) {
         xlim <- args[['xlim']]
     } else {

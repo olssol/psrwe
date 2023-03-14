@@ -1,4 +1,7 @@
-sec_4_1_ex	psrwe	The example of Section 4.1
-sec_4_2_ex	psrwe	The example of Section 4.2
-sec_4_3_ex	psrwe	The example of Section 4.3
-sec_4_4_ex	psrwe	The example of Section 4.4
+sec_4_1_ex	psrwe	The example of Section 4.1 (PSPP, single arm)
+sec_4_2_ex	psrwe	The example of Section 4.2 (PSCL, RCT)
+sec_4_3_ex	psrwe	The example of Section 4.3 (diagnostics, matching)
+sec_4_4_ex	psrwe	The example of Section 4.4 (PSKM, single arm)
+sec_4_5_ex	psrwe	The example of Section 4.5 (PSKM, RCT)
+sec_4_6_ex	psrwe	The example of Section 4.6 (PSLRK)
+sec_4_7_ex	psrwe	The example of Section 4.7 (PSRMST)

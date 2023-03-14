@@ -182,8 +182,8 @@ psrwe_powerp <- function(dta_psbor, v_outcome = "Y",
 get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
     f_curd <- function(i, d1, d0 = NULL) {
         cur_d <- c(N1    = length(d1),
-                   YBAR1 = mean(cur_d1),
-                   YSUM1 = sum(cur_d1))
+                   YBAR1 = mean(d1),
+                   YSUM1 = sum(d1))
 
         if (is.null(d0)) {
             cur_d <- c(cur_d,
@@ -192,9 +192,9 @@ get_stan_data <- function(dta_psbor, v_outcome, prior_type) {
                        SD0   = 0)
         } else {
             cur_d <- c(cur_d,
-                       N0    = length(cur_d0),
-                       YBAR0 = mean(cur_d0),
-                       SD0   = sd(cur_d0))
+                       N0    = length(d0),
+                       YBAR0 = mean(d0),
+                       SD0   = sd(d0))
         }
 
         list(stan_d = cur_d,
@@ -327,7 +327,7 @@ summary.PSRWE_RST <- function(object, ...) {
     }
 
     dtype <- object[[type]]$Overall_Estimate
-    if ("ps_km" == object$Method) {
+    if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
         dtype <- data.frame(dtype) %>%
             filter(object$pred_tp == T)
     }
@@ -343,7 +343,7 @@ summary.PSRWE_RST <- function(object, ...) {
         citype <- cbind(object$CI[[type]]$Overall_Estimate)
 
         if (is.data.frame(citype)) {
-            if ("ps_km" == object$Method) {
+            if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
                 citype <- cbind(citype,
                                 T = object[[type]]$Overall_Estimate$T)
 
@@ -364,7 +364,7 @@ summary.PSRWE_RST <- function(object, ...) {
     if (exists("INFER", object)) {
         hitype <- object$INFER[[type]]$Overall_InferProb
 
-        if ("ps_km" == object$Method) {
+        if (object$Method %in% get_rwe_class("ANAMETHOD_KM")) {
             hitype <- cbind(hitype,
                             T = object[[type]]$Overall_Estimate$T)
 
@@ -406,14 +406,24 @@ print.PSRWE_RST <- function(x, ...) {
     rst_infer <- rst$INFER
 
     extra_1 <- ""
-    if ("ps_km" == x$Method) {
+    if (x$Method %in% get_rwe_class("ANAMETHOD_KM")) {
         extra_1 <- paste(" based on the survival probability at time ",
                          x$pred_tp, ",", sep = "")
     }
 
     if ("Effect" == rst_sum[1, "Type"]) {
-        extra_2 <- "treatment effect"
-        extra_2_param <- "theta_trt-theta_ctl"
+        if (x$Method %in% c("ps_pp", "ps_cl", "ps_km")) {
+            extra_2 <- "treatment effect"
+            extra_2_param <- "theta_trt-theta_ctl"
+        } else if(x$Method == "ps_lrk") {
+            extra_2 <- "log-rank statistic"
+            extra_2_param <- "sum[d_trt-E(d_trt)]"
+        } else if(x$Method == "ps_rmst") {
+            extra_2 <- "RMST statistic"
+            extra_2_param <- "auc(S_trt)-auc(S_ctl)"
+        } else {
+          stop("The method is not implemented.")
+        }
     } else {
         extra_2 <- "point estimate"
         extra_2_param <- "theta"
@@ -503,6 +513,12 @@ plot.PSRWE_RST <- function(x, ...) {
                   ps_cl = {
                       stop("This method is currently unavailable
                             for composite likelihood analysis.")
+                  },
+                  ps_lrk = {
+                      stop("This method is currently unavailable.")
+                  },
+                  ps_rmst = {
+                      stop("This method is currently unavailable.")
                   })
 
     rst

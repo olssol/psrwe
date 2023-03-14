@@ -49,3 +49,23 @@ rst_cl
 ### Outcome analysis.
 oa_cl <- psrwe_outana(rst_cl, mu = 0.4)
 oa_cl
+
+### Use Jackknife overall stderr. This may take a while longer.
+rst_cl_jko <- psrwe_compl(ps_bor_single,
+                          outcome_type = "binary",
+                          v_outcome = "Y_Bin",
+                          stderr_method = "jkoverall")
+oa_cl_jko <- psrwe_outana(rst_cl_jko, mu = 0.4)
+oa_cl_jko
+
+### With score method (binary outcomes and single arm only.)
+oa_cl_score <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40,
+                            method_pval = "score")
+oa_cl_score
+
+### With score_weighted method (binary outcomes and single arm only.)
+oa_cl_score_wt <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40,
+                               method_pval = "score_weighted")
+oa_cl_score_wt
+
+
