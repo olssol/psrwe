@@ -108,7 +108,11 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tps,
     dta_ext <- d0
 
     ##  overall estimate
-    overall  <- rwe_km(dta_cur, dta_ext, n_borrow, pred_tps, stderr_method)
+    overall  <- rwe_km(dta_cur,
+                       dta_ext       = dta_ext,
+                       n_borrow      = n_borrow,
+                       pred_tps      = pred_tps,
+                       stderr_method = stderr_method)
 
     ##jackknife stderr
     if (stderr_method == "jk") {
@@ -123,15 +127,21 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tps,
 
         jk_theta      <- rep(0, length(overall_theta))
         for (j in seq_len(ns1)) {
-            cur_jk   <- rwe_km(dta_cur[-j, ], dta_ext, n_borrow, pred_tps,
-                               stderr_method)
+            cur_jk   <- rwe_km(dta_cur[-j, ],
+                               dta_ext       = dta_ext,
+                               n_borrow      = n_borrow,
+                               pred_tps      = pred_tps,
+                               stderr_method = stderr_method)
             jk_theta <- jk_theta + (cur_jk[, 1] - overall_theta)^2
         }
 
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
-                ext_jk   <- rwe_km(dta_cur, dta_ext[-j, ], n_borrow, pred_tps,
-                                   stderr_method)
+                ext_jk   <- rwe_km(dta_cur,
+                                   dta_ext       = dta_ext[-j, ],
+                                   n_borrow      = n_borrow,
+                                   pred_tps      = pred_tps,
+                                   stderr_method = stderr_method)
                 jk_theta <- jk_theta + (ext_jk[, 1] - overall_theta)^2
             }
         }
@@ -232,7 +242,7 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                     next
 
                 est <- rwe_km(cur_s[, c(v_time, v_event), drop = F],
-                              pred_tp = pred_tp)
+                              pred_tps = pred_tp)
 
                 rst <- rbind(rst,
                              data.frame(Group   = g,
@@ -244,7 +254,8 @@ get_km_observed <- function(dta, v_time, v_event, pred_tp) {
                                         T       = est[, 3]))
             }
 
-            est <- rwe_km(cur_d[, c(v_time, v_event)], pred_tp = pred_tp)
+            est <- rwe_km(cur_d[, c(v_time, v_event)],
+                          pred_tps = pred_tp)
             rst_overall <- rbind(rst_overall,
                                  data.frame(Group   = g,
                                             Arm     = a,

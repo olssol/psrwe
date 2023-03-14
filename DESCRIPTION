@@ -60,5 +60,5 @@ LazyData: true
 ByteCompile: true
 SystemRequirements: GNU make
 NeedsCompilation: yes
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
