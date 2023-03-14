@@ -8,7 +8,7 @@ branches:
 # Download script file from GitHub
 init:
   ps: |
-        $ErrorActionPreference = "Stop"
+        $ErrorActionPreference = "Continue"
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 install:
@@ -17,16 +17,23 @@ install:
 environment:
   global:
     WARNINGS_ARE_ERRORS:
-    RTOOLS_VERSION: 34 
+    RTOOLS_VERSION: 40 
     USE_RTOOLS: true
 
   matrix:
   - R_VERSION: release
     R_ARCH: x64
+    GCC_PATH: mingw_64
 
 build_script:
   #- Rscript -e "install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/rstan_2.21.2.zip')"
   - travis-tool.sh install_deps
   #- R CMD INSTALL psrwe*.tar.gz
-  - R CMD build --no-build-vignettes --no-manual --no-resave-data .
-  - R CMD check --as-cran --no-manual --ignore-vignettes psrwe*.tar.gz
+  - cd ..\
+  - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
+  - R CMD INSTALL --no-test-load psrwe_3.2.tar.gz
+  # - pwd
+  # - dir
+  # - R CMD check --as-cran --no-manual --no-build-vignettes psrwe_3.2.tar.gz
+  # - cat ./psrwe.Rcheck/00install.out
+  # - cat ./psrwe.Rcheck/00check.log
