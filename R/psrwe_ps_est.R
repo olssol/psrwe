@@ -69,6 +69,7 @@ psrwe_est <- function(data,
     data      <- as.data.frame(data)
     ps_method <- match.arg(ps_method)
     trim_ab   <- match.arg(trim_ab)
+    call_fml  <- match.call()
 
     ## Generate formula
     if (is.null(ps_fml)) {
@@ -148,7 +149,8 @@ psrwe_est <- function(data,
                 ps_method = ps_method,
                 is_rct    = is_rct,
                 nstrata   = nstrata,
-                trim_ab   = trim_ab)
+                trim_ab   = trim_ab,
+                Call_fml  = list(psrwe_est = call_fml))
 
     class(rst) <- get_rwe_class("DWITHPS")
     return(rst)

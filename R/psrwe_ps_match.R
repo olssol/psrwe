@@ -63,6 +63,7 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
     mat_method <- match.arg(method)
+    call_fml   <- match.call()
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -107,12 +108,13 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     ## result
     rst             <- dta_ps
-    rst$data        <- as.data.frame(data)
+    rst$data_match  <- as.data.frame(data)
     rst$nstrata     <- nstrata
     rst$ratio       <- ratio
     rst$caliper     <- caliper
     rst$strata_covs <- strata_covs
     rst$mat_method  <- mat_method
+    rst$Call_fml    <- c(rst$Call_fml, psrwe_match = call_fml)
     class(rst)      <- get_rwe_class("DPSMATCH")
     return(rst)
 }
@@ -172,7 +174,7 @@ summary.PSRWE_DTA_MAT <- function(object, ...) {
     # }
 
     ## check matching ratio
-    match_n   <- object$data %>%
+    match_n   <- object$data_match %>%
         dplyr::filter(1 == `_grp_` &
                       0 == `_arm_`) %>%
         select(`_matchn_`)

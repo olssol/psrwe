@@ -57,7 +57,9 @@ psrwe_borrow <- function(dtaps, total_borrow,
     is_ps_match <- inherits(dtaps, what = get_rwe_class("DPSMATCH"))
     stopifnot(is_ps | is_ps_match)
 
-    method  <- match.arg(method)
+    method   <- match.arg(method)
+    call_fml <- match.call()
+
     rst_sum <- summary(dtaps, ...)
     ns0     <- rst_sum$Summary$N_RWD
     rs      <- rst_sum$Summary$Distance
@@ -81,6 +83,7 @@ psrwe_borrow <- function(dtaps, total_borrow,
     dtaps$Total_borrow  <- total_borrow
     dtaps$Borrow        <- cbind(rst_sum$Summary, borrow)
     dtaps$Borrow_method <- method
+    dtaps$Call_fml      <- c(dtaps$Call_fml, psrwe_borrow = call_fml)
 
     class(dtaps) <- get_rwe_class("PSDIST")
     return(dtaps)
