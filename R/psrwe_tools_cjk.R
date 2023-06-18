@@ -41,7 +41,7 @@ get_ps_cl_km_cjk <- function(dta_psbor,
         ## Avoid interruptions by errors during PS steps.
         rst_try <- try({
             ## Get the jk dataset from the original data (without trimming).
-            data_jk <- data_org[-jk,]
+            data_jk <- data_org[-i_jk,]
 
             ## Repeat all saved psrwe steps prior to get_ps_cl_km() call.
             ## dta_ps <- psrwe_est(data, ...)
@@ -83,6 +83,7 @@ get_ps_cl_km_cjk <- function(dta_psbor,
     }
 
     ## update rst
+print(c(n_jk, n_jk_noerr))
     nc_jk <- (n_jk_noerr - 1) / n_jk_noerr
     rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_ctl * nc_jk)
 
