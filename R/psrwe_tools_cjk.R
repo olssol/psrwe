@@ -35,20 +35,35 @@ get_ps_cl_km_cjk <- function(dta_psbor,
 
     ## Complex JK
     n_jk <- nrow(data_org)
-    for (i_jk in 1:n_jk) {
-        ## Get the jk dataset from the original data (without trimming).
-        data <- data_org[-jk,]
+    n_jk_noerr <- n_jk
 
-        ## Repeat all saved psrwe steps prior to get_ps_cl_km() call.
-        # dta_ps <- psrwe_est(data, ...)
-        # dta_ps_mat <- psrwe_match(dta_ps, ...)
-        # dta_psbor_jk <- psrwe_match(dta_ps_mat, ...)
-        for (i_call in 1:(length(Call_fml) - 1)) {
-          name_rst <- as.character(Call_fml[[i_call + 1]][[2]])
-          tmp_rst  <- eval(Call_fml[[i_call]])
-          assign(name_rst, tmp_rst)
+    for (i_jk in 1:n_jk) {
+        ## Avoid interruptions by errors during PS steps.
+        rst_try <- try({
+            ## Get the jk dataset from the original data (without trimming).
+            data_jk <- data_org[-jk,]
+
+            ## Repeat all saved psrwe steps prior to get_ps_cl_km() call.
+            ## dta_ps <- psrwe_est(data, ...)
+            ## dta_ps_mat <- psrwe_match(dta_ps, ...)
+            ## dta_psbor_jk <- psrwe_match(dta_ps_mat, ...)
+
+            name_rst <- as.character(Call_fml[[1]][[2]])
+            assign(name_rst, data_jk)
+
+            for (i_call in 1:(length(Call_fml) - 1)) {
+              tmp_rst  <- eval(Call_fml[[i_call]])
+              name_rst <- as.character(Call_fml[[i_call + 1]][[2]])
+              assign(name_rst, tmp_rst)
+            }
+
+            dta_psbor_jk <- eval(Call_fml[[i_call + 1]])
+        }, silent = TRUE)
+
+        if (inherits(rst_try, "try-error")) {
+            n_jk_noerr <- n_jk_noerr - 1
+            next
         }
-        dta_psbor_jk <- eval(Call_fml[[i_call + 1]])
 
         ## Do the same as "jkoverall" method on the new "dta_psbor_jk".
         rst_jk <- get_ps_cl_km(dta_psbor_jk, v_outcome = v_outcome,
@@ -68,7 +83,7 @@ get_ps_cl_km_cjk <- function(dta_psbor,
     }
 
     ## update rst
-    nc_jk <- (n_jk - 1) / n_jk
+    nc_jk <- (n_jk_noerr - 1) / n_jk_noerr
     rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_ctl * nc_jk)
 
     if (is_rct) {

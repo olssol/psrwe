@@ -10,10 +10,14 @@
 #' @param ... Parameters for \code{rwe_cl}
 #'
 #' @details \code{stderr_method} include \code{jk} as default
-#'     using Jackknife method within each stratum, or
+#'     using Jackknife method within each stratum,
 #'     \code{jkoverall} for Jackknife method for overall/combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT.
-#'     Note that \code{jkoverall} may take a while longer to finish.
+#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     \code{cjk} for complex Jackknife method including refitting PS model,
+#'     matching, trimming, calculating borrowing parameters, and
+#'     combining overall estimates.
+#'     Note that \code{jkoverall} may take a while longer to finish and
+#'     \code{cjk} will take even much longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -202,7 +206,7 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
     ##  overall estimate
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
 
-    ##jackknife
+    ## jackknife stderr
     if (stderr_method == "jk") {
         jk_theta <- NULL
         for (j in seq_len(ns1)) {
