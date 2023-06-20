@@ -24,7 +24,7 @@ rst_cl <- psrwe_compl(ps_bor_match,
 oa_cl <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40)
 oa_cl
 
-### Use complex Jackknife stderr. This may take a while longer.
+### Use complex Jackknife stderr. This may take very long to finish.
 rst_cl_cjk <- psrwe_compl(ps_bor_match,
                           outcome_type = "binary",
                           v_outcome = "Y_Bin",

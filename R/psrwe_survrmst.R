@@ -14,11 +14,16 @@
 #' @param stderr_method Method for computing StdErr, see Details
 #' @param ... Additional Parameters
 #'
-#' @details \code{stderr_method} include \code{naive} as default which
-#'     mostly follows Greenwood formula (plug-in),
-#'     \code{jk} using Jackknife method within each stratum, or
-#'     \code{jkoverall} using Jackknife method for overall/combined estimates.
-#'     Note that \code{jkoverall} may take a while longer to finish.
+#' @details \code{stderr_method} includes \code{naive} as default which
+#'     mostly follows Greenwood formula,
+#'     \code{jk} using Jackknife method within each stratum,
+#'     \code{jkoverall} using Jackknife method for overall/combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     \code{cjk} for complex Jackknife method including refitting PS model,
+#'     matching, trimming, calculating borrowing parameters, and
+#'     combining overall estimates.
+#'     Note that \code{jkoverall} may take a while longer to finish and
+#'     \code{cjk} will take even much longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST_TESTANA}.
 #'     It contains the test statistics of each stratum as well as the
@@ -48,7 +53,7 @@
 psrwe_survrmst <- function(dta_psbor, pred_tp,
                            v_time        = "time",
                            v_event       = "event",
-                           stderr_method = c("naive", "jk", "jkoverall"), 
+                           stderr_method = c("naive", "jk", "jkoverall", "cjk"), 
                            ...) {
 
     ## check
@@ -80,13 +85,22 @@ psrwe_survrmst <- function(dta_psbor, pred_tp,
                                pred_tps = all_tps,
                                stderr_method = stderr_method,
                                ...)
-    } else {
+    } else if (stderr_method %in% c("jkoverall")) {
         rst <- get_ps_lrk_rmst_jkoverall(dta_psbor,
                                          v_event = v_event, v_time = v_time,
                                          f_stratum = get_surv_stratum_rmst,
                                          pred_tps = all_tps,
                                          stderr_method = stderr_method,
                                          ...)
+    } else if (stderr_method %in% c("cjk")) {
+        rst <- get_ps_lrk_rmst_cjk(dta_psbor,
+                                   v_event = v_event, v_time = v_time,
+                                   f_stratum = get_surv_stratum_rmst,
+                                   pred_tp = all_tps,
+                                   stderr_method = "none",
+                                   ...)
+    } else {
+        stop("stderr_errmethod is not implemented.")
     }
 
     ## return
@@ -105,7 +119,7 @@ psrwe_survrmst <- function(dta_psbor, pred_tp,
 #' @noRd
 #'
 get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
-                                  stderr_method, ...) {
+                                  stderr_method = "jk", ...) {
 
     ## treatment or control only
     dta_cur <- d1

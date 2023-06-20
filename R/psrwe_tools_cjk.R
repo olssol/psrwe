@@ -1,4 +1,4 @@
-#' Get Complex JKoverall estimates for composite likelihood and survival
+#' Get complex JK estimates for composite likelihood and survival
 #'
 #' @noRd
 #'
@@ -21,7 +21,7 @@ get_ps_cl_km_cjk <- function(dta_psbor,
                         f_stratum = f_stratum,
                         f_overall_est = f_overall_est, ...)
 
-    ## JK overall stderr
+    ## Complex JK stderr
     rstom_ctl <- rst$Control$Overall_Estimate$Mean
     sdf_ctl <- rep(0, length(rstom_ctl))
 
@@ -31,7 +31,6 @@ get_ps_cl_km_cjk <- function(dta_psbor,
         sdf_trt <- rep(0, length(rstom_trt))
         sdf_eff <- rep(0, length(rstom_eff))
     }
-
 
     ## Complex JK
     n_jk <- nrow(data_org)
@@ -83,7 +82,6 @@ get_ps_cl_km_cjk <- function(dta_psbor,
     }
 
     ## update rst
-print(c(n_jk, n_jk_noerr))
     nc_jk <- (n_jk_noerr - 1) / n_jk_noerr
     rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_ctl * nc_jk)
 
