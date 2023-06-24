@@ -9,7 +9,7 @@ psrwe_survrmst(
   pred_tp,
   v_time = "time",
   v_event = "event",
-  stderr_method = c("naive", "jk", "jkoverall"),
+  stderr_method = c("naive", "jk", "sjk", "cjk"),
   ...
 )
 }
@@ -43,11 +43,16 @@ Apply to the case when there is only one external data source and
 two-arm RCT.
 }
 \details{
-\code{stderr_method} include \code{naive} as default which
-    mostly follows Greenwood formula (plug-in),
-    \code{jk} using Jackknife method within each stratum, or
-    \code{jkoverall} using Jackknife method for overall/combined estimates.
-    Note that \code{jkoverall} may take a while longer to finish.
+\code{stderr_method} includes \code{naive} as default which
+    mostly follows Greenwood formula,
+    \code{jk} using Jackknife method within each stratum,
+    \code{sjk} using simple Jackknife method for combined estimates
+    such as point estimates in single arm or treatment effects in RCT, or
+    \code{cjk} for complex Jackknife method including refitting PS model,
+    matching, trimming, calculating borrowing parameters, and
+    combining overall estimates.
+    Note that \code{sjk} may take a while longer to finish and
+    \code{cjk} will take even much longer to finish.
 }
 \examples{
 data(ex_dta_rct)

@@ -8,7 +8,7 @@ psrwe_compl(
   dta_psbor,
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
-  stderr_method = c("jk", "jkoverall", "ignore"),
+  stderr_method = c("jk", "sjk", "ignore", "cjk"),
   ...
 )
 }
@@ -39,10 +39,14 @@ when there is only one external data source.
 }
 \details{
 \code{stderr_method} include \code{jk} as default
-    using Jackknife method within each stratum, or
-    \code{jkoverall} for Jackknife method for overall/combined estimates
-    such as point estimates in single arm or treatment effects in RCT.
-    Note that \code{jkoverall} may take a while longer to finish.
+    using Jackknife method within each stratum,
+    \code{sjk} for simple Jackknife method for combined estimates
+    such as point estimates in single arm or treatment effects in RCT, or
+    \code{cjk} for complex Jackknife method including refitting PS model,
+    matching, trimming, calculating borrowing parameters, and
+    combining overall estimates.
+    Note that \code{sjk} may take a while longer to finish and
+    \code{cjk} will take even much longer to finish.
 }
 \examples{
 data(ex_dta)
