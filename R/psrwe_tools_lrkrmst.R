@@ -50,20 +50,20 @@ get_ps_lrk_rmst <- function(dta_psbor,
 }
 
 
-## Jackknife overall
+## Simple Jackknife
 
 #' Get JKoverall estimates for log-rank and RMST estimations between two arms
 #' for RCT augmenting control
 #'
 #' @noRd
 #'
-get_ps_lrk_rmst_jkoverall <- function(dta_psbor,
-                                      v_outcome     = NULL,
-                                      v_event       = NULL,
-                                      v_time        = NULL,
-                                      f_stratum     = get_surv_stratum_lrk,
-                                      f_overall_est = get_overall_est_wostderr,
-                                      ...) {
+get_ps_lrk_rmst_sjk <- function(dta_psbor,
+                                v_outcome     = NULL,
+                                v_event       = NULL,
+                                v_time        = NULL,
+                                f_stratum     = get_surv_stratum_lrk,
+                                f_overall_est = get_overall_est_wostderr,
+                                ...) {
 
     ## prepare data
     data    <- dta_psbor$data

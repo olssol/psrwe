@@ -1,14 +1,14 @@
-#' Get JKoverall estimates for composite likelihood and survival
+#' Get simple JKoverall estimates for composite likelihood and survival
 #'
 #' @noRd
 #'
-get_ps_cl_km_jkoverall <- function(dta_psbor,
-                                   v_outcome     = NULL,
-                                   v_event       = NULL,
-                                   v_time        = NULL,
-                                   f_stratum     = get_cl_stratum,
-                                   f_overall_est = get_overall_est_wostderr,
-                                   ...) {
+get_ps_cl_km_sjk <- function(dta_psbor,
+                             v_outcome     = NULL,
+                             v_event       = NULL,
+                             v_time        = NULL,
+                             f_stratum     = get_cl_stratum,
+                             f_overall_est = get_overall_est_wostderr,
+                             ...) {
 
     ## prepare data
     is_rct  <- dta_psbor$is_rct
@@ -21,7 +21,7 @@ get_ps_cl_km_jkoverall <- function(dta_psbor,
                         f_stratum = f_stratum,
                         f_overall_est = f_overall_est, ...)
 
-    ## JK overall stderr
+    ## Simple JK stderr
     rstom_ctl <- rst$Control$Overall_Estimate$Mean
     sdf_ctl <- rep(0, length(rstom_ctl))
 

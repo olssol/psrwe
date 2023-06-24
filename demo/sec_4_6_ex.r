@@ -43,12 +43,12 @@ rst_lrk_jk <- psrwe_survlrk(ps_bor_rct,
 oa_lrk_jk <- psrwe_outana(rst_lrk_jk)
 summary(oa_lrk_jk, pred_tps = c(180, 365))
 
-### Use Jackknife overall stderr. This may take a while longer.
+### Use simple Jackknife stderr. This may take a while longer.
 rst_lrk_jko <- psrwe_survlrk(ps_bor_rct,
                              pred_tp = 365,
                              v_time = "Y_Surv",
                              v_event = "Status",
-                             stderr_method = "jkoverall")
+                             stderr_method = "sjk")
 oa_lrk_jko <- psrwe_outana(rst_lrk_jko)
 summary(oa_lrk_jko, pred_tps = c(180, 365))
 

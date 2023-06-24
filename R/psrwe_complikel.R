@@ -11,12 +11,12 @@
 #'
 #' @details \code{stderr_method} include \code{jk} as default
 #'     using Jackknife method within each stratum,
-#'     \code{jkoverall} for Jackknife method for overall/combined estimates
+#'     \code{sjk} for simple Jackknife method for combined estimates
 #'     such as point estimates in single arm or treatment effects in RCT, or
 #'     \code{cjk} for complex Jackknife method including refitting PS model,
 #'     matching, trimming, calculating borrowing parameters, and
 #'     combining overall estimates.
-#'     Note that \code{jkoverall} may take a while longer to finish and
+#'     Note that \code{sjk} may take a while longer to finish and
 #'     \code{cjk} will take even much longer to finish.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
@@ -40,7 +40,7 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
-                      stderr_method = c("jk", "jkoverall", "ignore", "cjk"), 
+                      stderr_method = c("jk", "sjk", "ignore", "cjk"), 
                       ...) {
 
     ## check
@@ -62,11 +62,11 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                             outcome_type = outcome_type,
                             f_stratum = get_cl_stratum,
                             stderr_method = stderr_method, ...)
-    } else if (stderr_method %in% c("jkoverall")) {
-        rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
-                                      outcome_type = outcome_type,
-                                      f_stratum = get_cl_stratum,
-                                      stderr_method = stderr_method, ...)
+    } else if (stderr_method %in% c("sjk")) {
+        rst <- get_ps_cl_km_sjk(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = stderr_method, ...)
     } else if (stderr_method %in% c("cjk")) {
         rst <- get_ps_cl_km_cjk(dta_psbor, v_outcome = v_outcome,
                                 outcome_type = outcome_type,
@@ -203,7 +203,7 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
     dta_ext <- d0
     ns0     <- length(dta_ext)
 
-    ##  overall estimate
+    ## overall estimate
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
 
     ## jackknife stderr

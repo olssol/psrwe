@@ -64,7 +64,7 @@ get_ps_cl_km_cjk <- function(dta_psbor,
             next
         }
 
-        ## Do the same as "jkoverall" method on the new "dta_psbor_jk".
+        ## Do the same as "sjk" method on the new "dta_psbor_jk".
         rst_jk <- get_ps_cl_km(dta_psbor_jk, v_outcome = v_outcome,
                                v_event = v_event, v_time = v_time,
                                f_stratum = f_stratum,
