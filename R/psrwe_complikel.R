@@ -40,7 +40,7 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
-                      stderr_method = c("jk", "sjk", "ignore", "cjk"), 
+                      stderr_method = c("jk", "sjk", "none", "cjk"), 
                       ...) {
 
     ## check
@@ -57,7 +57,7 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## call estimation
-    if (stderr_method %in% c("jk", "ignore")) {
+    if (stderr_method %in% c("jk", "none")) {
         rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
                             outcome_type = outcome_type,
                             f_stratum = get_cl_stratum,

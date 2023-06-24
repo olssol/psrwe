@@ -8,7 +8,7 @@ psrwe_compl(
   dta_psbor,
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
-  stderr_method = c("jk", "sjk", "ignore", "cjk"),
+  stderr_method = c("jk", "sjk", "none", "cjk"),
   ...
 )
 }
