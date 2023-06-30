@@ -22,14 +22,21 @@ get_ps_cl_km_sjk <- function(dta_psbor,
                         f_overall_est = f_overall_est, ...)
 
     ## Simple JK stderr
-    rstom_ctl <- rst$Control$Overall_Estimate$Mean
-    sdf_ctl <- rep(0, length(rstom_ctl))
+    rst_sm_ctl <- rst$Control$Stratum_Estimate$Mean
+    rst_om_ctl <- rst$Control$Overall_Estimate$Mean
+    sdf sm_ctl <- rep(0, length(rst_sm_ctl))
+    sdf_om_ctl <- rep(0, length(rst_om_ctl))
 
     if (is_rct) {
-        rstom_trt <- rst$Treatment$Overall_Estimate$Mean
-        rstom_eff <- rst$Effect$Overall_Estimate$Mean
-        sdf_trt <- rep(0, length(rstom_trt))
-        sdf_eff <- rep(0, length(rstom_eff))
+        rst_sm_trt <- rst$Treatment$Stratum_Estimate$Mean
+        rst_om_trt <- rst$Treatment$Overall_Estimate$Mean
+        sdf_sm_trt <- rep(0, length(rst_sm_trt))
+        sdf_om_trt <- rep(0, length(rst_om_trt))
+
+        rst_sm_eff <- rst$Effect$Stratum_Estimate$Mean
+        rst_om_eff <- rst$Effect$Overall_Estimate$Mean
+        sdf_sm_eff <- rep(0, length(rst_sm_eff))
+        sdf_om_eff <- rep(0, length(rst_om_eff))
     }
 
     n_jk <- nrow(data)
@@ -41,24 +48,35 @@ get_ps_cl_km_sjk <- function(dta_psbor,
                                f_stratum = f_stratum,
                                f_overall_est = f_overall_est, ...)
 
-        sdf_ctl <- sdf_ctl + (rst_jk$Control$Overall_Estimate$Mean -
-                              rstom_ctl)^2
+        sdf_sm_ctl <- sdf_sm_ctl + (rst_jk$Control$Stratum_Estimate$Mean -
+                                    rst_sm_ctl)^2
+        sdf_om_ctl <- sdf_om_ctl + (rst_jk$Control$Overall_Estimate$Mean -
+                                    rst_om_ctl)^2
 
         if (is_rct) {
-            sdf_trt <- sdf_trt + (rst_jk$Treatment$Overall_Estimate$Mean -
-                                  rstom_trt)^2
-            sdf_eff <- sdf_eff + (rst_jk$Effect$Overall_Estimate$Mean -
-                                  rstom_eff)^2
+            sdf_sm_trt <- sdf_sm_trt + (rst_jk$Treatment$Stratum_Estimate$Mean -
+                                        rst_sm_trt)^2
+            sdf_om_trt <- sdf_om_trt + (rst_jk$Treatment$Overall_Estimate$Mean -
+                                        rst_om_trt)^2
+
+            sdf_sm_eff <- sdf_sm_eff + (rst_jk$Effect$Stratum_Estimate$Mean -
+                                        rst_sm_eff)^2
+            sdf_om_eff <- sdf_om_eff + (rst_jk$Effect$Overall_Estimate$Mean -
+                                        rst_om_eff)^2
         }
     }
 
     ## update rst
     nc_jk <- (n_jk - 1) / n_jk
-    rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_ctl * nc_jk)
+    rst$Control$Stratum_Estimate$StdErr <- sqrt(sdf_sm_ctl * nc_jk)
+    rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_om_ctl * nc_jk)
 
     if (is_rct) {
-        rst$Treatment$Overall_Estimate$StdErr <- sqrt(sdf_trt * nc_jk)
-        rst$Effect$Overall_Estimate$StdErr <- sqrt(sdf_eff * nc_jk)
+        rst$Treatment$Stratum_Estimate$StdErr <- sqrt(sdf_sm_trt * nc_jk)
+        rst$Treatment$Overall_Estimate$StdErr <- sqrt(sdf_om_trt * nc_jk)
+
+        rst$Effect$Stratum_Estimate$StdErr <- sqrt(sdf_sm_eff * nc_jk)
+        rst$Effect$Overall_Estimate$StdErr <- sqrt(sdf_om_eff * nc_jk)
     }
 
     ## return
