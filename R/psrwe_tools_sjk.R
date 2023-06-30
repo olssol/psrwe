@@ -24,7 +24,7 @@ get_ps_cl_km_sjk <- function(dta_psbor,
     ## Simple JK stderr
     rst_sm_ctl <- rst$Control$Stratum_Estimate$Mean
     rst_om_ctl <- rst$Control$Overall_Estimate$Mean
-    sdf sm_ctl <- rep(0, length(rst_sm_ctl))
+    sdf_sm_ctl <- rep(0, length(rst_sm_ctl))
     sdf_om_ctl <- rep(0, length(rst_om_ctl))
 
     if (is_rct) {

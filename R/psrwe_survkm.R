@@ -85,7 +85,7 @@ psrwe_survkm <- function(dta_psbor, pred_tp,
                                 v_event = v_event, v_time = v_time,
                                 f_stratum = get_surv_stratum,
                                 pred_tp = all_tps,
-                                stderr_method = stderr_method,
+                                stderr_method = "none",
                                 ...)
     } else if (stderr_method %in% c("cjk")) {
         rst <- get_ps_cl_km_cjk(dta_psbor,

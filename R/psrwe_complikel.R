@@ -66,7 +66,7 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
         rst <- get_ps_cl_km_sjk(dta_psbor, v_outcome = v_outcome,
                                 outcome_type = outcome_type,
                                 f_stratum = get_cl_stratum,
-                                stderr_method = stderr_method, ...)
+                                stderr_method = "none", ...)
     } else if (stderr_method %in% c("cjk")) {
         rst <- get_ps_cl_km_cjk(dta_psbor, v_outcome = v_outcome,
                                 outcome_type = outcome_type,
