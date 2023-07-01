@@ -206,7 +206,7 @@ get_ps_lrk_rmst_sbs <- function(dta_psbor,
 
 
     ## get id by unique stratum
-    ustrata <- unique(data[, c("_grp_", "_arm", "_strata_")])
+    ustrata <- unique(data[, c("_grp_", "_arm_", "_strata_")])
     n_ustrata <- nrow(ustrata)
     rst_id <- list()
     rst_n_id <- NULL
@@ -280,7 +280,7 @@ get_ps_lrk_rmst_cbs <- function(dta_psbor,
     sdf_om <- rep(0, length(rst_om))
 
     ## get id by unique stratum
-    ustrata <- unique(data_org[, c("_grp_", "_arm", "_strata_")])
+    ustrata <- unique(data_org[, c("_grp_", "_arm_", "_strata_")])
     n_ustrata <- nrow(ustrata)
     rst_id <- list()
     rst_n_id <- NULL

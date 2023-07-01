@@ -164,7 +164,7 @@ get_ps_cl_km_sbs <- function(dta_psbor,
     }
 
     ## get id by unique stratum
-    ustrata <- unique(data[, c("_grp_", "_arm", "_strata_")])
+    ustrata <- unique(data[, c("_grp_", "_arm_", "_strata_")])
     n_ustrata <- nrow(ustrata)
     rst_id <- list()
     rst_n_id <- NULL
