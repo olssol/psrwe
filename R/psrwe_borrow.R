@@ -13,6 +13,8 @@
 #'     that use the proportion of stratum sample size based on the current and
 #'     external data, respectively.
 #'     Ignored for class \code{PSRWE_DTA_MAT} object.
+#' @param .drop_arg_fml internal use to drop arguments and call, this is
+#'     only used in cjk.
 #' @param ... Additional parameters for \code{\link{summary.PSRWE_DTA}}.
 #'
 #' @return A class \code{PSRWE_BORR} list. It appends the following items to
@@ -51,14 +53,25 @@ psrwe_borrow <- function(dtaps, total_borrow,
                                      "inverse_distance",
                                      "n_current",
                                      "n_external"),
+                          .drop_arg_fml = FALSE,
                           ...) {
 
+    ## save arguments and call first (overwrite the drop if in cjk)
+    if (.drop_arg_fml) {
+        call_arg <- NA
+        call_fml <- NA
+    } else {
+        call_arg <- c(as.list(environment()), list(...))
+        call_arg[["dtaps"]] <- NA
+        call_fml <- as.character(match.call()[[1]])
+    }
+
+    ## prepare
     is_ps       <- inherits(dtaps, what = get_rwe_class("DWITHPS"))
     is_ps_match <- inherits(dtaps, what = get_rwe_class("DPSMATCH"))
     stopifnot(is_ps | is_ps_match)
 
     method   <- match.arg(method)
-    call_fml <- match.call()
 
     rst_sum <- summary(dtaps, ...)
     ns0     <- rst_sum$Summary$N_RWD
@@ -83,7 +96,8 @@ psrwe_borrow <- function(dtaps, total_borrow,
     dtaps$Total_borrow  <- total_borrow
     dtaps$Borrow        <- cbind(rst_sum$Summary, borrow)
     dtaps$Borrow_method <- method
-    dtaps$Call_fml      <- c(dtaps$Call_fml, psrwe_borrow = call_fml)
+    dtaps$Call_arg$psrwe_borrow <- call_arg
+    dtaps$Call_fml$psrwe_borrow <- call_fml
 
     class(dtaps) <- get_rwe_class("PSDIST")
     return(dtaps)

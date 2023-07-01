@@ -8,6 +8,7 @@ psrwe_borrow(
   dtaps,
   total_borrow,
   method = c("distance", "inverse_distance", "n_current", "n_external"),
+  .drop_arg_fml = FALSE,
   ...
 )
 }
@@ -23,6 +24,9 @@ Other possible options include \code{"n_current"} and \code{"n_external"}
 that use the proportion of stratum sample size based on the current and
 external data, respectively.
 Ignored for class \code{PSRWE_DTA_MAT} object.}
+
+\item{.drop_arg_fml}{internal use to drop arguments and call, this is
+only used in cjk.}
 
 \item{...}{Additional parameters for \code{\link{summary.PSRWE_DTA}}.}
 }

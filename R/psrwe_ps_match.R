@@ -12,6 +12,8 @@
 #'     width (euclidean distance) on the probability scale.
 #' @param seed Random seed.
 #' @param method matching algorithm for PS matching.
+#' @param .drop_arg_fml internal use to drop arguments and call, this is
+#'     only used in cjk.
 #' @param ... Additional parameters for matching
 #'
 #' @return A list of class \code{PSRWE_DTA_MAT} with items:
@@ -58,12 +60,24 @@
 #'
 psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
                          caliper = 1, seed = NULL,
-                         method = c("nnwor", "optm"), ...) {
+                         method = c("nnwor", "optm"),
+			 .drop_arg_fml = FALSE,
+                         ...) {
 
+    ## save arguments and call first (overwrite the drop if in cjk)
+    if (.drop_arg_fml) {
+        call_arg <- NA
+        call_fml <- NA
+    } else {
+        call_arg <- c(as.list(environment()), list(...))
+        call_arg[["dta_ps"]] <- NA
+        call_fml <- as.character(match.call()[[1]])
+    }
+
+    ## prepare
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
     mat_method <- match.arg(method)
-    call_fml   <- match.call()
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -114,7 +128,8 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     rst$caliper     <- caliper
     rst$strata_covs <- strata_covs
     rst$mat_method  <- mat_method
-    rst$Call_fml    <- c(rst$Call_fml, psrwe_match = call_fml)
+    rst$Call_arg$psrwe_match <- call_arg
+    rst$Call_fml$psrwe_match <- call_fml
     class(rst)      <- get_rwe_class("DPSMATCH")
     return(rst)
 }

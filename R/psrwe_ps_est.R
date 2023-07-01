@@ -27,6 +27,8 @@
 #'     range of current study. Default \code{both} trims both above and below.
 #'     Other options include \code{above} for above only, \code{below} for
 #'     below only, and \code{none} for no trimming.
+#' @param .drop_arg_fml internal use to drop arguments and call, this is
+#'     only used in cjk.
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
@@ -60,8 +62,20 @@ psrwe_est <- function(data,
                        stra_ctl_only = TRUE,
                        nstrata       = 5,
                        trim_ab       = c("both", "above", "below", "none"),
+		       .drop_arg_fml = FALSE,
                        ...) {
 
+    ## save arguments and call first (overwrite the drop if in cjk)
+    if (.drop_arg_fml) {
+        call_arg <- NA
+        call_fml <- NA
+    } else {
+        call_arg <- c(as.list(environment()), list(...))
+        call_arg[["data"]] <- NA
+        call_fml <- as.character(match.call()[[1]])
+    }
+
+    ## prepare
     if (!identical("data.frame", class(data))) {
         warning("data should be a data.frame object")
     }
@@ -69,7 +83,6 @@ psrwe_est <- function(data,
     data      <- as.data.frame(data)
     ps_method <- match.arg(ps_method)
     trim_ab   <- match.arg(trim_ab)
-    call_fml  <- match.call()
 
     ## Generate formula
     if (is.null(ps_fml)) {
@@ -150,6 +163,7 @@ psrwe_est <- function(data,
                 is_rct    = is_rct,
                 nstrata   = nstrata,
                 trim_ab   = trim_ab,
+                Call_arg  = list(psrwe_est = call_arg),
                 Call_fml  = list(psrwe_est = call_fml))
 
     class(rst) <- get_rwe_class("DWITHPS")

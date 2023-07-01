@@ -11,6 +11,7 @@ psrwe_match(
   caliper = 1,
   seed = NULL,
   method = c("nnwor", "optm"),
+  .drop_arg_fml = FALSE,
   ...
 )
 }
@@ -29,6 +30,9 @@ width (euclidean distance) on the probability scale.}
 \item{seed}{Random seed.}
 
 \item{method}{matching algorithm for PS matching.}
+
+\item{.drop_arg_fml}{internal use to drop arguments and call, this is
+only used in cjk.}
 
 \item{...}{Additional parameters for matching}
 }

@@ -16,6 +16,7 @@ psrwe_est(
   stra_ctl_only = TRUE,
   nstrata = 5,
   trim_ab = c("both", "above", "below", "none"),
+  .drop_arg_fml = FALSE,
   ...
 )
 }
@@ -52,6 +53,9 @@ scores of the entire current study patients.}
 range of current study. Default \code{both} trims both above and below.
 Other options include \code{above} for above only, \code{below} for
 below only, and \code{none} for no trimming.}
+
+\item{.drop_arg_fml}{internal use to drop arguments and call, this is
+only used in cjk.}
 
 \item{...}{Additional parameters for calculating the propensity score to be
 used in \code{randomForest} or \code{glm} .}
