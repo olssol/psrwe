@@ -9,7 +9,7 @@ psrwe_survlrk(
   pred_tp,
   v_time = "time",
   v_event = "event",
-  stderr_method = c("naive", "jk", "sjk", "cjk"),
+  stderr_method = c("naive", "jk", "sjk", "cjk", "none"),
   ...
 )
 }

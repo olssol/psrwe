@@ -40,7 +40,7 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
-                      stderr_method = c("jk", "sjk", "none", "cjk"), 
+                      stderr_method = c("jk", "sjk", "cjk", "none"), 
                       ...) {
 
     ## check

@@ -53,7 +53,7 @@
 psrwe_survrmst <- function(dta_psbor, pred_tp,
                            v_time        = "time",
                            v_event       = "event",
-                           stderr_method = c("naive", "jk", "sjk", "cjk"), 
+                           stderr_method = c("naive", "jk", "sjk", "cjk", "none"), 
                            ...) {
 
     ## check
@@ -78,7 +78,7 @@ psrwe_survrmst <- function(dta_psbor, pred_tp,
     rst_obs <- get_km_observed(data, v_time, v_event, all_tps)
 
     ## call estimation
-    if (stderr_method %in% c("naive", "jk")) {
+    if (stderr_method %in% c("naive", "jk", "none")) {
         rst <- get_ps_lrk_rmst(dta_psbor,
                                v_event = v_event, v_time = v_time,
                                f_stratum = get_surv_stratum_rmst,
