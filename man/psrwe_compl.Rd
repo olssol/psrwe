@@ -8,7 +8,8 @@ psrwe_compl(
   dta_psbor,
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
-  stderr_method = c("jk", "sjk", "cjk", "none"),
+  stderr_method = c("jk", "sjk", "cjk", "sbs", "cbs", "none"),
+  n_bootstrap = 200,
   ...
 )
 }
@@ -21,6 +22,8 @@ psrwe_compl(
 \item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}.}
 
 \item{stderr_method}{Method for computing StdErr, see Details}
+
+\item{n_bootstrap}{Number of bootstrap samples (for bootstrap stderr)}
 
 \item{...}{Parameters for \code{rwe_cl}}
 }
@@ -47,6 +50,8 @@ when there is only one external data source.
     combining overall estimates.
     Note that \code{sjk} may take a while longer to finish and
     \code{cjk} will take even much longer to finish.
+    The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+    methods.
 }
 \examples{
 data(ex_dta)

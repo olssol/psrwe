@@ -7,6 +7,7 @@
 #' @inheritParams psrwe_powerp
 #'
 #' @param stderr_method Method for computing StdErr, see Details
+#' @param n_bootstrap Number of bootstrap samples (for bootstrap stderr)
 #' @param ... Parameters for \code{rwe_cl}
 #'
 #' @details \code{stderr_method} include \code{jk} as default
@@ -18,6 +19,8 @@
 #'     combining overall estimates.
 #'     Note that \code{sjk} may take a while longer to finish and
 #'     \code{cjk} will take even much longer to finish.
+#'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+#'     methods.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -40,7 +43,9 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
-                      stderr_method = c("jk", "sjk", "cjk", "none"), 
+                      stderr_method = c("jk", "sjk", "cjk",
+                                        "sbs", "cbs", "none"), 
+                      n_bootstrap = 200,
                       ...) {
 
     ## check
@@ -61,17 +66,34 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
         rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
                             outcome_type = outcome_type,
                             f_stratum = get_cl_stratum,
-                            stderr_method = stderr_method, ...)
+                            stderr_method = stderr_method,
+                            ...)
     } else if (stderr_method %in% c("sjk")) {
         rst <- get_ps_cl_km_sjk(dta_psbor, v_outcome = v_outcome,
                                 outcome_type = outcome_type,
                                 f_stratum = get_cl_stratum,
-                                stderr_method = "none", ...)
+                                stderr_method = "none",
+                                ...)
     } else if (stderr_method %in% c("cjk")) {
         rst <- get_ps_cl_km_cjk(dta_psbor, v_outcome = v_outcome,
                                 outcome_type = outcome_type,
                                 f_stratum = get_cl_stratum,
-                                stderr_method = "none", ...)
+                                stderr_method = "none",
+                                ...)
+    } else if (stderr_method %in% c("sbs")) {
+        rst <- get_ps_cl_km_sbs(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
+    } else if (stderr_method %in% c("cbs")) {
+        rst <- get_ps_cl_km_cbs(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
     } else {
         stop("stderr_errmethod is not implemented.")
     }

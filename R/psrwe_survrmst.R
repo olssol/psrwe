@@ -12,6 +12,7 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param stderr_method Method for computing StdErr, see Details
+#' @param n_bootstrap Number of bootstrap samples (for bootstrap stderr)
 #' @param ... Additional Parameters
 #'
 #' @details \code{stderr_method} includes \code{naive} as default which
@@ -24,6 +25,8 @@
 #'     combining overall estimates.
 #'     Note that \code{sjk} may take a while longer to finish and
 #'     \code{cjk} will take even much longer to finish.
+#'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+#'     methods.
 #'
 #' @return A data frame with class name \code{PSRWE_RST_TESTANA}.
 #'     It contains the test statistics of each stratum as well as the
@@ -53,7 +56,8 @@
 psrwe_survrmst <- function(dta_psbor, pred_tp,
                            v_time        = "time",
                            v_event       = "event",
-                           stderr_method = c("naive", "jk", "sjk", "cjk", "none"), 
+                           stderr_method = c("naive", "jk", "sjk", "cjk",
+                                             "sbs", "cbs", "none"), 
                            ...) {
 
     ## check
@@ -91,13 +95,29 @@ psrwe_survrmst <- function(dta_psbor, pred_tp,
                                    f_stratum = get_surv_stratum_rmst,
                                    pred_tps = all_tps,
                                    stderr_method = "none",
-                                         ...)
+                                   ...)
     } else if (stderr_method %in% c("cjk")) {
         rst <- get_ps_lrk_rmst_cjk(dta_psbor,
                                    v_event = v_event, v_time = v_time,
                                    f_stratum = get_surv_stratum_rmst,
                                    pred_tp = all_tps,
                                    stderr_method = "none",
+                                   ...)
+    } else if (stderr_method %in% c("sbs")) {
+        rst <- get_ps_lrk_rmst_sbs(dta_psbor,
+                                   v_event = v_event, v_time = v_time,
+                                   f_stratum = get_surv_stratum_rmst,
+                                   pred_tps = all_tps,
+                                   stderr_method = "none",
+                                   n_bootstrap = n_bootstrap,
+                                   ...)
+    } else if (stderr_method %in% c("cbs")) {
+        rst <- get_ps_lrk_rmst_cbs(dta_psbor,
+                                   v_event = v_event, v_time = v_time,
+                                   f_stratum = get_surv_stratum_rmst,
+                                   pred_tp = all_tps,
+                                   stderr_method = "none",
+                                   n_bootstrap = n_bootstrap,
                                    ...)
     } else {
         stop("stderr_errmethod is not implemented.")
@@ -138,7 +158,7 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
     overall  <- rwe_rmst(dta_cur, dta_ext, dta_cur_trt, n_borrow, pred_tps,
                          stderr_method)
 
-    ##jackknife stderr
+    ## jackknife stderr
     if (stderr_method == "jk") {
         overall_theta <- overall[, 1, drop = TRUE]
 
@@ -231,7 +251,7 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
                             conf.type = "none")
 
     ## summary.survfit() need to be extend to longer time points
-    ## Last values will be carried over for predictions
+    ## last values will be carried over for predictions
     if (is.null(pred_tps)) {
         pred_tps <- sort(unique(c(cur_surv$time[cur_surv$n.event > 0],
                                   cur_surv_trt$time[cur_surv_trt$n.event > 0])))
@@ -243,7 +263,7 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     rst <- summary(cur_surv, time = pred_tps, extend = TRUE)
     rst_trt <- summary(cur_surv_trt, time = pred_tps, extend = TRUE)
 
-    ## Info needed for RMST
+    ## info needed for RMST
     surv_trt <- c(1, rst_trt$surv)
     surv_ctl <- c(1, rst$surv)
     time_diff <- diff(c(0, pred_tps, pred_tps[length(pred_tps)]))
@@ -254,7 +274,7 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
     area_d <- area_trt - area_ctl
     auc_d <- cumsum(area_d[-(n_tps + 1)])
 
-    ## For RMST naive stderr
+    ## for RMST naive stderr
     if (stderr_method == "naive") {
         ## - see survival vignette page 13
         ## - \hat{\mu} = \int_0^T \hat{S}(t) dt
@@ -300,11 +320,11 @@ rwe_rmst <- function(dta_cur, dta_ext, dta_cur_trt, n_borrow = 0,
         auc_var_d <- auc_var_trt + auc_var_ctl
         auc_stderr_d <- sqrt(auc_var_d)
     } else {
-        ## For jk, sjk or cjk
+        ## for none, jk, sjk, cjk, sbs, or cbs
         auc_stderr_d <- rep(NA, n_tps)
     }
 
-    ## Combine RMST estimates
+    ## combine RMST estimates
     rst_rmst <- cbind(auc_d, auc_stderr_d, pred_tps)
 
     colnames(rst_rmst) <- c("Mean", "StdErr", "T")

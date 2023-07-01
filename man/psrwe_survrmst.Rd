@@ -9,7 +9,7 @@ psrwe_survrmst(
   pred_tp,
   v_time = "time",
   v_event = "event",
-  stderr_method = c("naive", "jk", "sjk", "cjk", "none"),
+  stderr_method = c("naive", "jk", "sjk", "cjk", "sbs", "cbs", "none"),
   ...
 )
 }
@@ -27,6 +27,8 @@ psrwe_survrmst(
 \item{stderr_method}{Method for computing StdErr, see Details}
 
 \item{...}{Additional Parameters}
+
+\item{n_bootstrap}{Number of bootstrap samples (for bootstrap stderr)}
 }
 \value{
 A data frame with class name \code{PSRWE_RST_TESTANA}.
@@ -53,6 +55,8 @@ two-arm RCT.
     combining overall estimates.
     Note that \code{sjk} may take a while longer to finish and
     \code{cjk} will take even much longer to finish.
+    The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+    methods.
 }
 \examples{
 data(ex_dta_rct)
