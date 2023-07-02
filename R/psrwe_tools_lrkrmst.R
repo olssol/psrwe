@@ -263,6 +263,7 @@ get_ps_lrk_rmst_cbs <- function(dta_psbor,
 
     ## prepare data
     data_org <- dta_psbor$data
+    data_org <- data_org[!is.na(data_org[["_strata_"]]), ]
     Call_arg <- dta_psbor$Call_arg
     Call_fml <- dta_psbor$Call_fml
     for (i_call in 1:length(Call_arg)) {

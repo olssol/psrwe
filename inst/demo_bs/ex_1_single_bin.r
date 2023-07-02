@@ -22,6 +22,7 @@ oa_cl <- psrwe_outana(rst_cl, mu = 0.4)
 oa_cl
 
 ### Use simple Bootstrap stderr. This may take a while longer.
+set.seed(12341)
 rst_cl_sbs <- psrwe_compl(ps_bor_single,
                           outcome_type = "binary",
                           v_outcome = "Y_Bin",
@@ -30,6 +31,7 @@ oa_cl_sbs <- psrwe_outana(rst_cl_sbs, mu = 0.4)
 oa_cl_sbs
 
 ### Use complex Bootstrap stderr. This may take a while longer.
+set.seed(12342)
 rst_cl_cbs <- psrwe_compl(ps_bor_single,
                           outcome_type = "binary",
                           v_outcome = "Y_Bin",

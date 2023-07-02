@@ -25,6 +25,7 @@ print(oa_km, show_details = TRUE)
 summary(oa_km, pred_tps = c(180, 365))
 
 ### Use simple Bootstrap stderr. This may take a while longer.
+set.seed(12341)
 rst_km_sbs <- psrwe_survkm(ps_bor_single,
                            pred_tp  = 365,
                            v_time    = "Y_Surv",
@@ -34,6 +35,7 @@ oa_km_sbs <- psrwe_outana(rst_km_sbs, mu = 0.70, alternative = "greater")
 summary(oa_km_sbs, pred_tps = c(180, 365))
 
 ### Use complex Bootstrap stderr. This may take a while longer.
+set.seed(12342)
 rst_km_cbs <- psrwe_survkm(ps_bor_single,
                            pred_tp  = 365,
                            v_time    = "Y_Surv",

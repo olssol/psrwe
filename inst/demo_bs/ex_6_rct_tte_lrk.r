@@ -27,6 +27,7 @@ print(oa_lrk, show_details = TRUE)
 summary(oa_lrk, pred_tps = c(180, 365))
 
 ### Use simple Bootstrap stderr. This may take a while longer.
+set.seed(12341)
 rst_lrk_sbs <- psrwe_survlrk(ps_bor_rct,
                              pred_tp = 365,
                              v_time = "Y_Surv",
@@ -36,6 +37,7 @@ oa_lrk_sbs <- psrwe_outana(rst_lrk_sbs)
 summary(oa_lrk_sbs, pred_tps = c(180, 365))
 
 ### Use complex Bootstrap stderr. This may take a while longer.
+set.seed(12342)
 rst_lrk_cbs <- psrwe_survlrk(ps_bor_rct,
                              pred_tp = 365,
                              v_time = "Y_Surv",

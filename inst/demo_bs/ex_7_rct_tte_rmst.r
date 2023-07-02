@@ -27,6 +27,7 @@ print(oa_rmst, show_details = TRUE)
 summary(oa_rmst, pred_tps = c(180, 365))
 
 ### Use simple Bootstrap stderr. This may take a while longer.
+set.seed(12341)
 rst_rmst_sbs <- psrwe_survrmst(ps_bor_rct,
                                pred_tp = 365,
                                v_time = "Y_Surv",
@@ -36,6 +37,7 @@ oa_rmst_sbs <- psrwe_outana(rst_rmst_sbs)
 summary(oa_rmst_sbs, pred_tps = c(180, 365))
 
 ### Use complex Bootstrap stderr. This may take a while longer.
+set.seed(12342)
 rst_rmst_cbs <- psrwe_survrmst(ps_bor_rct,
                                pred_tp = 365,
                                v_time = "Y_Surv",

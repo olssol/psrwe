@@ -24,6 +24,7 @@ oa_cl_rct <- psrwe_outana(rst_cl_rct, alternative = "greater")
 print(oa_cl_rct, show_rct = TRUE)
 
 ### Use simple Bootstrap stderr. This may take a while longer.
+set.seed(12341)
 rst_cl_rct_sbs <- psrwe_compl(ps_bor_rct,
                               outcome_type = "continuous",
                               v_outcome = "Y_Con",
@@ -32,6 +33,7 @@ oa_cl_rct_sbs <- psrwe_outana(rst_cl_rct_sbs, alternative = "greater")
 print(oa_cl_rct_sbs, show_rct = TRUE)
 
 ### Use complex Bootstrap stderr. This may take a while longer.
+set.seed(12342)
 rst_cl_rct_cbs <- psrwe_compl(ps_bor_rct,
                               outcome_type = "continuous",
                               v_outcome = "Y_Con",
