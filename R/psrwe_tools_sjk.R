@@ -167,13 +167,11 @@ get_ps_cl_km_sbs <- function(dta_psbor,
     ustrata <- unique(data[, c("_grp_", "_arm_", "_strata_")])
     n_ustrata <- nrow(ustrata)
     rst_id <- list()
-    rst_n_id <- NULL
     for (i_ustrata in 1:n_ustrata) {
-        tmp_id <- which(data$"_grp_" == ustrata[i_ustrata, "_grp_"] &
-                        data$"_arm_" == ustrata[i_ustrata, "_arm_"] &
-                        data$"_strata_" == ustrata[i_ustrata, "_strata_"])
-        rst_id[[i_ustrata]] <- tmp_id
-        rst_n_id <- c(rst_n_id, length(tmp_id))
+        rst_id[[i_ustrata]] <-
+            which(data$"_grp_" == ustrata[i_ustrata, "_grp_"] &
+                  data$"_arm_" == ustrata[i_ustrata, "_arm_"] &
+                  data$"_strata_" == ustrata[i_ustrata, "_strata_"])
     }
 
     dta_psbor_bs <- dta_psbor
@@ -181,8 +179,7 @@ get_ps_cl_km_sbs <- function(dta_psbor,
         ## sample by each unique stratum with replacement
         tmp_data <- data
         for (i_ustrata in 1:n_ustrata) {
-            new_id <- sample(rst_id[[i_ustrata]], rst_n_id[i_ustrata],
-                             replace = TRUE)
+            new_id <- sample(rst_id[[i_ustrata]], replace = TRUE)
             tmp_data[rst_id[[i_ustrata]],] <- data[new_id,]
         }
         dta_psbor_bs$data <- tmp_data

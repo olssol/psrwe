@@ -162,13 +162,11 @@ get_ps_cl_km_cbs <- function(dta_psbor,
     ustrata <- ustrata[!is.na(ustrata$"_strata"),]
     n_ustrata <- nrow(ustrata)
     rst_id <- list()
-    rst_n_id <- NULL
     for (i_ustrata in 1:n_ustrata) {
-        tmp_id <- which(data_org$"_grp_" == ustrata[i_ustrata, "_grp_"] &
-                        data_org$"_arm_" == ustrata[i_ustrata, "_arm_"] &
-                        data_org$"_strata_" == ustrata[i_ustrata, "_strata_"])
-        rst_id[[i_ustrata]] <- tmp_id
-        rst_n_id <- c(rst_n_id, length(tmp_id))
+        rst_id[[i_ustrata]] <-
+            which(data_org$"_grp_" == ustrata[i_ustrata, "_grp_"] &
+                  data_org$"_arm_" == ustrata[i_ustrata, "_arm_"] &
+                  data_org$"_strata_" == ustrata[i_ustrata, "_strata_"])
     }
 
     ## complex Bootstrap
@@ -178,8 +176,7 @@ get_ps_cl_km_cbs <- function(dta_psbor,
             ## sample by each unique stratum with replacement
             tmp_rst_bs <- data_org
             for (i_ustrata in 1:n_ustrata) {
-                new_id <- sample(rst_id[[i_ustrata]], rst_n_id[i_ustrata],
-                                 replace = TRUE)
+                new_id <- sample(rst_id[[i_ustrata]], replace = TRUE)
                 tmp_rst_bs[rst_id[[i_ustrata]],] <- data_org[new_id,]
             }
 
