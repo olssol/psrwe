@@ -221,7 +221,7 @@ get_ps_cl_km_cbs <- function(dta_psbor,
 
     ## update rst
     stopifnot(n_bootstrap_noerr > 1)
-    nc_bootstrap <- (n_bootstrap_noerr - 1) / n_bootstrap_noerr
+    nc_bootstrap <- 1 / n_bootstrap_noerr
     rst$Control$Stratum_Estimate$StdErr <- sqrt(sdf_sm_ctl * nc_bootstrap)
     rst$Control$Overall_Estimate$StdErr <- sqrt(sdf_om_ctl * nc_bootstrap)
 
