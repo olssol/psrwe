@@ -234,7 +234,7 @@ get_ps_lrk_rmst_sbs <- function(dta_psbor,
     }
 
     ## update rst
-    nc_bootstrap <- (n_bootstrap - 1) / n_bootstrap
+    nc_bootstrap <- 1 / n_bootstrap
     rst$Effect$Overall_Estimate$StdErr <- sqrt(sdf_om * nc_bootstrap)
 
     ## return
@@ -324,7 +324,7 @@ get_ps_lrk_rmst_cbs <- function(dta_psbor,
 
     ## update rst
     stopifnot(n_bootstrap_noerr > 1)
-    nc_bootstrap <- (n_bootstrap_noerr - 1) / n_bootstrap_noerr
+    nc_bootstrap <- 1 / n_bootstrap_noerr
     rst$Effect$Overall_Estimate$StdErr <- sqrt(sdf_om * nc_bootstrap)
 
     ## return
