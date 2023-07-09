@@ -58,6 +58,7 @@ psrwe_survrmst <- function(dta_psbor, pred_tp,
                            v_event       = "event",
                            stderr_method = c("naive", "jk", "sjk", "cjk",
                                              "sbs", "cbs", "none"), 
+                           n_bootstrap = 200,
                            ...) {
 
     ## check

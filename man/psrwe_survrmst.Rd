@@ -10,6 +10,7 @@ psrwe_survrmst(
   v_time = "time",
   v_event = "event",
   stderr_method = c("naive", "jk", "sjk", "cjk", "sbs", "cbs", "none"),
+  n_bootstrap = 200,
   ...
 )
 }
