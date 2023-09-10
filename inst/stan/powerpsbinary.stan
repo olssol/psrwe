@@ -6,12 +6,12 @@ data {
   int<lower = 1> S;
 
   //existing data
-  int<lower = 0> N0[S];
-  real<lower = 0, upper = 1> YBAR0[S];
+  array[S] int<lower = 0> N0;
+  array[S] real<lower = 0, upper = 1> YBAR0;
 
   //current data
-  int<lower = 1> N1[S];
-  int<lower = 0> YSUM1[S];
+  array[S] int<lower = 1> N1;
+  array[S] int<lower = 0> YSUM1;
 
   //prior of vs
   vector<lower=0>[S] RS;
@@ -40,9 +40,9 @@ parameters {
 }
 
 transformed parameters {
-  real<lower = 0, upper = 1> as[S];
-  real<lower = 0> alphas[S];
-  real<lower = 0> betas[S];
+  array[S] real<lower = 0, upper = 1> as;
+  array[S] real<lower = 0> alphas;
+  array[S] real<lower = 0> betas;
 
   for (i in 1:S) {
     if (0 == N0[i]) {
