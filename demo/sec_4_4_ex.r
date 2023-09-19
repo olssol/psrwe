@@ -28,8 +28,8 @@ rst_km
 
 ### Plot PSKM.
 plot(rst_km)
-plot(rst_km, add_ci = FALSE, add_stratum = TRUE)
-plot(rst_km, conf_type = "plain")
+plot(rst_km, add_ci = FALSE, add_stratum = TRUE, ylim = c(0.35, 1))
+plot(rst_km, conf_type = "plain", ylim = c(0.35, 1))
 
 ### Outcome analysis.
 oa_km <- psrwe_outana(rst_km, mu = 0.70, alternative = "greater")

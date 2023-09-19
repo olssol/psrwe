@@ -860,6 +860,8 @@ plot_km_rst <- function(x,
                         ylab = "Survival Probability",
                         add_ci = TRUE,
                         add_stratum = FALSE,
+                        km_lwd = 1,
+                        km_ci_lwd = 1,
                         ...) {
 
     ## check args
@@ -936,7 +938,8 @@ plot_km_rst <- function(x,
     # lt_a <- rep(2, length(rst$Arm))
     # lt_a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
-        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
+        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm),
+                      size = km_lwd) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
@@ -944,8 +947,10 @@ plot_km_rst <- function(x,
 
     if (add_ci) {
       rst_plt <- rst_plt +
-          geom_step(aes(x = T, y = Lower, col = Arm), linetype = 3) +
-          geom_step(aes(x = T, y = Upper, col = Arm), linetype = 3)
+          geom_step(aes(x = T, y = Lower, col = Arm),
+                        size = km_ci_lwd, linetype = 3) +
+          geom_step(aes(x = T, y = Upper, col = Arm),
+                        size = km_ci_lwd, linetype = 3)
     }
 
     rst_plt
