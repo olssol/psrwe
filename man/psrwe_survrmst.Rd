@@ -27,9 +27,9 @@ psrwe_survrmst(
 
 \item{stderr_method}{Method for computing StdErr, see Details}
 
-\item{...}{Additional Parameters}
-
 \item{n_bootstrap}{Number of bootstrap samples (for bootstrap stderr)}
+
+\item{...}{Additional Parameters}
 }
 \value{
 A data frame with class name \code{PSRWE_RST_TESTANA}.
