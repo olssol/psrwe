@@ -140,7 +140,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 #' @noRd
 #'
 get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
-    f_curd <- function(i, d1, d0 = NULL, d0_w = 1) {
+    f_curd <- function(i, d1, d0 = NULL, d0_watt_di = NULL) {
         cur_d <- c(N1    = length(d1),
                    YBAR1 = mean(d1),
                    YSUM1 = sum(d1))
@@ -151,10 +151,14 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
                        YBAR0 = 0,
                        SD0   = 0)
         } else {
+            if (is.null(d0_watt_di)) {
+                d0_watt_di <- rep(1 / n , length(d0))
+            }
+
             cur_d <- c(cur_d,
                        N0    = length(d0),
-                       YBAR0 = mean(d0 * d0_w),  # Need to check continuous
-                       SD0   = sd(d0 * d0_w))    # Need to check continuous
+                       YBAR0 = sum(d0 * d0_watt_di),  # Need to check continuous
+                       SD0   = sd(d0 * d0_watt_di))   # Need to check continuous
         }
 
         list(stan_d = cur_d,
@@ -186,9 +190,9 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
         cur_01_e  <- get_cur_d(data, strata[i], "_ps_")
         cur_d0_e  <- cur_01_e$cur_d0
         cur_d0_watt  <- cur_d0_e / (1 - cur_d0_e)
-        cur_d0_watt  <- cur_d0_watt / sum(cur_d0_watt)
+        cur_d0_watt_di  <- cur_d0_watt / sum(cur_d0_watt)
 
-        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt)
+        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt_di)
         ctl_stan_d <- rbind(ctl_stan_d, ctl_cur$stan_d)
         ctl_y1     <- c(ctl_y1,   ctl_cur$y1)
         ctl_inx1   <- c(ctl_inx1, ctl_cur$inx1)
