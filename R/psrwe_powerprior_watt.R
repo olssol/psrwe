@@ -152,7 +152,7 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
                        SD0   = 0)
         } else {
             if (is.null(d0_watt_di)) {
-                d0_watt_di <- rep(1 / n , length(d0))
+                d0_watt_di <- rep(1 / length(d0) , length(d0))
             }
 
             cur_d <- c(cur_d,
