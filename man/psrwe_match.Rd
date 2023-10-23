@@ -11,6 +11,7 @@ psrwe_match(
   caliper = 1,
   seed = NULL,
   method = c("nnwor", "optm"),
+  .drop_arg_fml = FALSE,
   ...
 )
 }
@@ -30,12 +31,15 @@ width (euclidean distance) on the probability scale.}
 
 \item{method}{matching algorithm for PS matching.}
 
+\item{.drop_arg_fml}{internal use to drop arguments and call, this is
+only used in cjk.}
+
 \item{...}{Additional parameters for matching}
 }
 \value{
 A list of class \code{PSRWE_DTA_MAT} with items:
 
-\itemize{
+\describe{
 
 \item{data}{Original data with column \code{_ps_} for estimated PS scores,
   \code{match_id} for matched current study subject ID, and \code{_strata_}

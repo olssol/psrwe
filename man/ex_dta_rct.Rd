@@ -3,12 +3,11 @@
 \docType{data}
 \name{ex_dta_rct}
 \alias{ex_dta_rct}
-\title{Example dataset
-
-Example dataset of a randomized study.}
+\title{Example dataset}
 \format{
 A data frame with the following variables:
-\itemize{
+
+\describe{
   \item{Group}{current, rwd}
   \item{Arm}{control, treatment}
   \item{Y_Con}{Continuous outcome}
@@ -19,8 +18,6 @@ A data frame with the following variables:
 data(ex_dta_rct)
 }
 \description{
-Example dataset
-
 Example dataset of a randomized study.
 }
 \keyword{datasets}

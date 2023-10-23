@@ -2,9 +2,7 @@
 % Please edit documentation in R/psrwe_outana.R
 \name{psrwe_outana}
 \alias{psrwe_outana}
-\title{Outcome Analysis for PS-Integrated Estimation
-
-Report outcome analysis for the PS-integrated approach.}
+\title{Outcome Analysis for PS-Integrated Estimation}
 \usage{
 psrwe_outana(
   dta_psrst,
@@ -47,8 +45,6 @@ single arm study (i.e., comparing with a PG set by \code{mu})}
 A list with class name \code{PSRWE_EST_OUTANA}.
 }
 \description{
-Outcome Analysis for PS-Integrated Estimation
-
 Report outcome analysis for the PS-integrated approach.
 }
 \details{

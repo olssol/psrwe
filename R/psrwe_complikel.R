@@ -7,13 +7,20 @@
 #' @inheritParams psrwe_powerp
 #'
 #' @param stderr_method Method for computing StdErr, see Details
+#' @param n_bootstrap Number of bootstrap samples (for bootstrap stderr)
 #' @param ... Parameters for \code{rwe_cl}
 #'
 #' @details \code{stderr_method} include \code{jk} as default
-#'     using Jackknife method within each stratum, or
-#'     \code{jkoverall} for Jackknife method for overall/combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT.
-#'     Note that \code{jkoverall} may take a while longer to finish.
+#'     using Jackknife method within each stratum,
+#'     \code{sjk} for simple Jackknife method for combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     \code{cjk} for complex Jackknife method including refitting PS model,
+#'     matching, trimming, calculating borrowing parameters, and
+#'     combining overall estimates.
+#'     Note that \code{sjk} may take a while longer to finish and
+#'     \code{cjk} will take even much longer to finish.
+#'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+#'     methods.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -36,7 +43,9 @@
 #'
 psrwe_compl <- function(dta_psbor, v_outcome = "Y",
                       outcome_type = c("continuous", "binary"),
-                      stderr_method = c("jk", "jkoverall", "ignore"), 
+                      stderr_method = c("jk", "sjk", "cjk",
+                                        "sbs", "cbs", "none"), 
+                      n_bootstrap = 200,
                       ...) {
 
     ## check
@@ -53,16 +62,40 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## call estimation
-    if (stderr_method %in% c("jk", "ignore")) {
+    if (stderr_method[1] %in% c("jk", "none")) {
         rst <- get_ps_cl_km(dta_psbor, v_outcome = v_outcome,
                             outcome_type = outcome_type,
                             f_stratum = get_cl_stratum,
-                            stderr_method = stderr_method, ...)
+                            stderr_method = stderr_method,
+                            ...)
+    } else if (stderr_method[1] %in% c("sjk")) {
+        rst <- get_ps_cl_km_sjk(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                ...)
+    } else if (stderr_method[1] %in% c("cjk")) {
+        rst <- get_ps_cl_km_cjk(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                ...)
+    } else if (stderr_method[1] %in% c("sbs")) {
+        rst <- get_ps_cl_km_sbs(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
+    } else if (stderr_method[1] %in% c("cbs")) {
+        rst <- get_ps_cl_km_cbs(dta_psbor, v_outcome = v_outcome,
+                                outcome_type = outcome_type,
+                                f_stratum = get_cl_stratum,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
     } else {
-        rst <- get_ps_cl_km_jkoverall(dta_psbor, v_outcome = v_outcome,
-                                      outcome_type = outcome_type,
-                                      f_stratum = get_cl_stratum,
-                                      stderr_method = stderr_method, ...)
+        stop("stderr_errmethod is not implemented.")
     }
 
     ## return
@@ -144,7 +177,7 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
     if (0 == n_borrow) {
         ## placeholder
         dta_ext  <- dta_cur
-        equal_sd <- TRUE;
+        equal_sd <- TRUE
     }
 
     init_theta <- (n1 / (n1 + n_borrow)) * mean(dta_cur) +
@@ -192,10 +225,10 @@ get_cl_stratum <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
     dta_ext <- d0
     ns0     <- length(dta_ext)
 
-    ##  overall estimate
+    ## overall estimate
     overall_theta  <- rwe_cl(dta_cur, dta_ext, n_borrow, ...)
 
-    ##jackknife
+    ## jackknife stderr
     if (stderr_method == "jk") {
         jk_theta <- NULL
         for (j in seq_len(ns1)) {

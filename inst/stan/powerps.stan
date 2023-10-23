@@ -6,15 +6,15 @@ data {
   int<lower = 1> S;
 
   //existing data
-  int<lower = 0>  N0[S];
-  real            YBAR0[S];
-  real<lower = 0> SD0[S];
+  array[S] int<lower = 0>  N0;
+  array[S] real            YBAR0;
+  array[S] real<lower = 0> SD0;
 
   //current data
-  int<lower = 1> N1[S];
+  array[S] int<lower = 1> N1;
   int<lower = 1> TN1;
-  real           Y1[TN1];
-  int<lower = 1> INX1[TN1];
+  array[TN1] real           Y1;
+  array[TN1] int<lower = 1> INX1;
 
   //prior of vs
   vector<lower=0>[S] RS;
@@ -36,12 +36,12 @@ transformed data {
 parameters {
   simplex[S]    vs;
   vector[S]     thetas;
-  real<lower=0> taus[S];
+  array[S] real<lower=0> taus;
 }
 
 transformed parameters {
-  real<lower = 0, upper = 1> as[S];
-  real<lower = 0> sds[S];
+  array[S] real<lower = 0, upper = 1> as;
+  array[S] real<lower = 0> sds;
 
   for (i in 1:S) {
     if (0 == N0[i]) {
