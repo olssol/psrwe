@@ -177,7 +177,7 @@ rwe_cl <- function(dta_cur, dta_ext, n_borrow = 0,
     if (0 == n_borrow) {
         ## placeholder
         dta_ext  <- dta_cur
-        equal_sd <- TRUE;
+        equal_sd <- TRUE
     }
 
     init_theta <- (n1 / (n1 + n_borrow)) * mean(dta_cur) +

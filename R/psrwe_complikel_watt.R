@@ -64,41 +64,17 @@ psrwe_compl_watt <- function(dta_psbor, v_outcome = "Y",
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## call estimation
-    if (stderr_method[1] %in% c("jk", "none")) {
-        rst <- get_ps_cl_watt(dta_psbor, v_outcome = v_outcome,
-                              outcome_type = outcome_type,
-                              f_stratum = get_cl_stratum_watt,
-                              stderr_method = stderr_method,
-                              ...)
-    } else if (stderr_method[1] %in% c("sjk")) {
-        rst <- get_ps_cl_watt_sjk(dta_psbor, v_outcome = v_outcome,
-                                  outcome_type = outcome_type,
-                                  f_stratum = get_cl_stratum_watt,
-                                  stderr_method = "none",
-                                  ...)
-    } else if (stderr_method[1] %in% c("cjk")) {
-        rst <- get_ps_cl_watt_cjk(dta_psbor, v_outcome = v_outcome,
-                                  outcome_type = outcome_type,
-                                  f_stratum = get_cl_stratum_watt,
-                                  stderr_method = "none",
-                                  ...)
-    } else if (stderr_method[1] %in% c("sbs")) {
-        rst <- get_ps_cl_watt_sbs(dta_psbor, v_outcome = v_outcome,
-                                  outcome_type = outcome_type,
-                                  f_stratum = get_cl_stratum_watt,
-                                  stderr_method = "none",
-                                  n_bootstrap = n_bootstrap,
-                                  ...)
-    } else if (stderr_method[1] %in% c("cbs")) {
-        rst <- get_ps_cl_watt_cbs(dta_psbor, v_outcome = v_outcome,
-                                  outcome_type = outcome_type,
-                                  f_stratum = get_cl_stratum_watt,
-                                  stderr_method = "none",
-                                  n_bootstrap = n_bootstrap,
-                                  ...)
-    } else {
-        stop("stderr_errmethod is not implemented.")
-    }
+    f_get_ps_cl_km_watt <- switch(stderr_method[1],
+                                  jk = get_ps_cl_km_watt,
+                                  sjk = get_ps_cl_km_watt_sjk,
+                                  cjk = get_ps_cl_km_watt_cjk,
+                                  sbs = get_ps_cl_km_watt_sbs,
+                                  cbs = get_ps_cl_km_watt_cbs,
+                                  none = get_ps_cl_km_watt_none)
+    rst <- f_get_ps_cl_km_watt(dta_psbor, v_outcome = v_outcome,
+                               outcome_type = outcome_type,
+                               f_stratum = get_cl_stratum_watt,
+                               ...)
 
     ## return
     rst$Observed      <- rst_obs
@@ -122,7 +98,7 @@ psrwe_compl_watt <- function(dta_psbor, v_outcome = "Y",
 #' @param dta_cur Vector of outcome from a PS stratum in current study
 #' @param dta_ext Vector of outcome from a PS stratum in external data source
 #' @param n_borrow Number of subjects to be borrowed
-#' @param dta_ext_watt Weights of ATT for subjects in external data source
+#' @param dta_ext_watt_di Weights of ATT for subjects in external data source
 #' @param equal_sd Boolean. whether sd is the same between the current study and
 #'     external data source
 #'
@@ -136,7 +112,7 @@ psrwe_compl_watt <- function(dta_psbor, v_outcome = "Y",
 #' @export
 #'
 rwe_cl_watt <- function(dta_cur, dta_ext, n_borrow = 0,
-                        dta_ext_watt = NULL,
+                        dta_ext_watt_di = NULL,
                         outcome_type = c("continuous", "binary"),
                         equal_sd = TRUE) {
 
@@ -148,7 +124,8 @@ rwe_cl_watt <- function(dta_cur, dta_ext, n_borrow = 0,
         ll <- - n1 * log(sig2_1) / 2
         ll <- ll - n1 * mean((dta_cur - theta)^2) / 2 / sig2_1
         ll <- ll - n_borrow * log(sig2_0) / 2
-        ll <- ll - n_borrow * mean((dta_ext - theta)^2) / 2 / sig2_0
+        # ll <- ll - n_borrow * mean((dta_ext - theta)^2) / 2 / sig2_0
+        ll <- ll - n_borrow * sum((dta_ext - theta)^2 * dta_ex_watt_di) / 2 / sig2_0
 
         ll
     }
@@ -182,16 +159,16 @@ rwe_cl_watt <- function(dta_cur, dta_ext, n_borrow = 0,
     if (0 == n_borrow) {
         ## placeholder
         dta_ext  <- dta_cur
-        equal_sd <- TRUE;
+        equal_sd <- TRUE
     }
 
-    if (is.null(dta_ext_watt)) {
-        dta_ext_watt <- rep(1, length(dta_ext))
+    # init_theta <- (n1 / (n1 + n_borrow)) * mean(dta_cur) +
+    #     (n_borrow / (n1 + n_borrow)) * mean(dta_ext)
+    if (is.null(dta_ext_watt_di)) {
+        dta_ext_watt_di <- rep(1 / length(dta_ext), length(dta_ext))
     }
-    dta_ext_watt_di <- dta_ext_watt / sum(dta_ext_watt)
-
     init_theta <- (n1 / (n1 + n_borrow)) * mean(dta_cur) +
-        (n_borrow / (n1 + n_borrow)) * sum(dta_ext * dta_ext_watt_di)
+                  (n_borrow / (n1 + n_borrow)) * sum(dta_ext * dta_ext_watt_di)
 
     if (("continuous" == type & equal_sd) |
         "binary" == type) {
@@ -218,7 +195,7 @@ rwe_cl_watt <- function(dta_cur, dta_ext, n_borrow = 0,
 #'
 get_cl_stratum_watt <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
                                 stderr_method = "jk",
-                                d0_watt = NULL,
+                                d0_watt_di = NULL,
                                 ...) {
 
     ## treatment or control only
@@ -236,11 +213,11 @@ get_cl_stratum_watt <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
     ## overall ps-cl
     dta_ext <- d0
     ns0     <- length(dta_ext)
-    dta_ext_watt <- d0_watt
+    dta_ext_watt_di <- d0_watt_di
 
     ## overall estimate
     overall_theta  <- rwe_cl_watt(dta_cur, dta_ext, n_borrow = n_borrow,
-                                  dta_ext_watt = dta_ext_watt,
+                                  dta_ext_watt_di = dta_ext_watt_di,
                                   ...)
 
     ## jackknife stderr
@@ -248,7 +225,7 @@ get_cl_stratum_watt <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
         jk_theta <- NULL
         for (j in seq_len(ns1)) {
             cur_jk   <- rwe_cl_watt(dta_cur[-j], dta_ext, n_borrow = n_borrow,
-                                    dta_ext_watt = dta_ext_watt,
+                                    dta_ext_watt_di = dta_ext_watt_di,
                                     ...)
             jk_theta <- c(jk_theta, cur_jk)
         }
@@ -256,7 +233,7 @@ get_cl_stratum_watt <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
         if (ns0 > 0) {
             for (j in seq_len(ns0)) {
                 cur_jk <- rwe_cl_watt(dta_cur, dta_ext[-j], n_borrow = n_borrow,
-                                      dta_ext_watt = dta_ext_watt[-j],
+                                      dta_ext_watt_di = dta_ext_watt_di[-j],
                                       ...)
                 jk_theta <- c(jk_theta, cur_jk)
             }
@@ -278,13 +255,13 @@ get_cl_stratum_watt <- function(d1, d0 = NULL, n_borrow = 0, outcome_type,
 #'
 #' @noRd
 #'
-get_ps_cl_watt <- function(dta_psbor,
-                           v_outcome     = NULL,
-                           v_event       = NULL,
-                           v_time        = NULL,
-                           f_stratum     = get_cl_stratum_watt,
-                           f_overall_est = get_overall_est,
-                           ...) {
+get_ps_cl_km_watt <- function(dta_psbor,
+                              v_outcome     = NULL,
+                              v_event       = NULL,
+                              v_time        = NULL,
+                              f_stratum     = get_cl_stratum_watt,
+                              f_overall_est = get_overall_est,
+                              ...) {
 
     ## prepare data
     is_rct  <- dta_psbor$is_rct
@@ -311,10 +288,11 @@ get_ps_cl_watt <- function(dta_psbor,
         cur_01_e  <- get_cur_d(data, strata[i], "_ps_")
         cur_d0_e  <- cur_01_e$cur_d0
         cur_d0_watt  <- cur_d0_e / (1 - cur_d0_e)
+        cur_d0_watt_di  <- cur_d0_watt / sum(cur_d0_watt)
 
         ## control with borrowing
         cur_ctl   <- f_stratum(cur_d1, cur_d0, n_borrow = borrow[i],
-                               d0_watt = cur_d0_watt,
+                               d0_watt_di = cur_d0_watt_di,
                                ...)
         ctl_theta <- rbind(ctl_theta, cur_ctl)
         if (is_rct) {
@@ -347,3 +325,25 @@ get_ps_cl_watt <- function(dta_psbor,
 }
 
 
+#' Get estimates for composite likelihood and survival (WATT) skip stderr
+#'
+#'
+#'
+#' @noRd
+#'
+get_ps_cl_km_watt_none <- function(dta_psbor,
+                                   v_outcome     = NULL,
+                                   v_event       = NULL,
+                                   v_time        = NULL,
+                                   f_stratum     = get_cl_stratum_watt,
+                                   f_overall_est = get_overall_est,
+                                   ...) {
+    get_ps_cl_km_watt(dta_psbor,
+                      v_outcome     = v_outcome,
+                      v_event       = v_event,
+                      v_timet       = v_time,
+                      v_stratum     = v_stragum,
+                      f_overall_est = f_overall_est,
+                      stderr_method = "none",
+                      ...)
+}
