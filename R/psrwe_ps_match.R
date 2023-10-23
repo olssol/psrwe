@@ -18,7 +18,7 @@
 #'
 #' @return A list of class \code{PSRWE_DTA_MAT} with items:
 #'
-#' \itemize{
+#' \describe{
 #'
 #' \item{data}{Original data with column \code{_ps_} for estimated PS scores,
 #'   \code{match_id} for matched current study subject ID, and \code{_strata_}
@@ -145,7 +145,8 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #' @param ... Additional parameters.
 #'
 #' @return A list with columns:
-#'   \itemize{
+#'
+#' \describe{
 #'
 #'     \item{Summary}{A data frame with Stratum (defined by covariates), number
 #'     of subjects in RWD, current study, number of subjects in control and

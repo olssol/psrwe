@@ -34,7 +34,7 @@
 #'
 #' @return A list of class \code{PSRWE_DAT} with items:
 #'
-#' \itemize{
+#' \describe{
 #'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
 #'               and \code{_strata_} for PS stratum added.}
 #'   \item{ps_fml}{PS formula for estimated PS scores.}
@@ -185,7 +185,8 @@ psrwe_est <- function(data,
 #' @param ... Additional parameters.
 #'
 #' @return A list with columns:
-#'   \itemize{
+#'
+#' \describe{
 #'     \item{Summary}{A data frame with Stratum, number of subjects in RWD,
 #'     current study, number of subjects in control and treatment arms for RCT
 #'     studies, and distance in PS distributions.}
@@ -371,9 +372,12 @@ print.PSRWE_DTA <- function(x, ...) {
 #' @description S3 method for visualizing PS adjustment
 #'
 #' @param x Class \code{RWE_DWITHPS} created by \code{psrwe_*} functions
-#' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
-#'     \item{balance}{Covariate balance plot}
-#'     \item{diff}{Standardized mean differences, metric = std or astd}}
+#' @param plot_type Types of plots.
+#' \describe{
+#'   \item{ps}{PS density plot}
+#'   \item{balance}{Covariate balance plot}
+#'   \item{diff}{Standardized mean differences, metric = std or astd}
+#' }
 #' @param ... Additional parameter for the plot
 #'
 #' @method plot PSRWE_DTA

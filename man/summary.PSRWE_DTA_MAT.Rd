@@ -14,7 +14,8 @@ the \code{\link{psrwe_match}} function.}
 }
 \value{
 A list with columns:
-  \itemize{
+
+\describe{
 
     \item{Summary}{A data frame with Stratum (defined by covariates), number
     of subjects in RWD, current study, number of subjects in control and

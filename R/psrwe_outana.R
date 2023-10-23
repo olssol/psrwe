@@ -1,5 +1,6 @@
 #' @title Outcome Analysis for PS-Integrated Estimation
 #'
+#' @description
 #' Report outcome analysis for the PS-integrated approach.
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}

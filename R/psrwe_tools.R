@@ -596,7 +596,6 @@ get_strata <- function(data, strata_covs  = NULL) {
 
 #' @title Print information
 #'
-#'
 #' @noRd
 #'
 cat_ps_dta <- function(x, rst_sum) {
@@ -851,7 +850,6 @@ plot_pp_rst <- function(x,
 }
 
 #' @title Plot KM at all time points
-#'
 #'
 #' @noRd
 #'

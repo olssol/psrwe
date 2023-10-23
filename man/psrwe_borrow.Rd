@@ -34,7 +34,7 @@ only used in cjk.}
 A class \code{PSRWE_BORR} list. It appends the following items to
     the \code{dtaps}:
 
-  \itemize{
+\describe{
 
     \item{Proportion}{Proportion splitting the number of total borrow among
     strata.}

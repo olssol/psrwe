@@ -63,7 +63,7 @@ used in \code{randomForest} or \code{glm} .}
 \value{
 A list of class \code{PSRWE_DAT} with items:
 
-\itemize{
+\describe{
   \item{data}{Original data with column \code{_ps_} for estimated PS scores
               and \code{_strata_} for PS stratum added.}
   \item{ps_fml}{PS formula for estimated PS scores.}

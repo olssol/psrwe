@@ -9,9 +9,12 @@
 \arguments{
 \item{x}{Class \code{RWE_DWITHPS} created by \code{psrwe_*} functions}
 
-\item{plot_type}{Types of plots. \itemize{\item{ps}{PS density plot}
-\item{balance}{Covariate balance plot}
-\item{diff}{Standardized mean differences, metric = std or astd}}}
+\item{plot_type}{Types of plots.
+\describe{
+  \item{ps}{PS density plot}
+  \item{balance}{Covariate balance plot}
+  \item{diff}{Standardized mean differences, metric = std or astd}
+}}
 
 \item{...}{Additional parameter for the plot}
 }
