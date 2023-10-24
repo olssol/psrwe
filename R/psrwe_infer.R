@@ -1,5 +1,6 @@
 #' @title Inference for the PS-Integrated Estimation
 #'
+#' @description
 #' Inference for the PS-integrated approach.
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}

@@ -83,7 +83,7 @@ Two Jackknife options have been implemented for estimating standard
 errors of the survival estimates via the options for the
 function `psrwe_survkm()`:
 * `stderr_method = "jk"` applies Jackknife by each stratum.
-* `stderr_method = "jkoverall"` applies Jackknife on the overall
+* `stderr_method = "sjk"` applies simple Jackknife on the overall
 survival probability.
 Both results may be similar but slightly different
 since the overall weights are fixed and close to one over the

@@ -230,6 +230,8 @@ plot_ps <- function(data_withps,
                     overall_inc = TRUE,
                     add_text = TRUE,
                     facet_scales = "free_y",
+                    transparency_alpha = 0.2,
+                    fill_manual_color = c("gray20", "gray80"),
                     ...) {
 
     N0 <- N1 <- Dist <- Ps <- Group <- NULL
@@ -273,7 +275,7 @@ plot_ps <- function(data_withps,
     all_data$Group <- as.factor(all_data$Group)
 
     rst <- ggplot(data = all_data, aes(x = Ps)) +
-        geom_density(alpha = 0.2,
+        geom_density(alpha = transparency_alpha,
                      aes(group = Group,
                          fill  = Group,
                          linetype = Group),
@@ -282,7 +284,7 @@ plot_ps <- function(data_withps,
         labs(x = "Propensity Score", y = "Density") +
         scale_y_continuous(breaks = NULL) +
         scale_x_continuous(limits = xlim) +
-        scale_fill_manual(values = c("gray20", "gray80")) +
+        scale_fill_manual(values = fill_manual_color) +
         theme_bw() +
         theme(strip.background = element_blank(),
               panel.grid = element_blank(),
@@ -305,7 +307,9 @@ plot_ps <- function(data_withps,
 #'
 #' @noRd
 plot_balance_fac <- function(dtaps, v,
-                             overall_inc = TRUE) {
+                             overall_inc = TRUE,
+                             transparency_alpha = 0.4,
+                             fill_manual_color = c("gray20", "gray80")) {
 
     cur_d <- get_freq_tbl(dtaps,
                           var_groupby = c("Strata", "Group"),
@@ -325,13 +329,13 @@ plot_balance_fac <- function(dtaps, v,
     cur_d$Value <- as.factor(cur_d$Value)
 
     rst <- ggplot(data = cur_d, aes(x = .data$Value, y = .data$Freq)) +
-        geom_bar(alpha = 0.4,
+        geom_bar(alpha = transparency_alpha,
                  stat = "identity",
                  position = "dodge",
                  color = "black",
                  aes(group = .data$Group,
                      fill  = .data$Group)) +
-        scale_fill_manual(values = c("gray20", "gray80")) +
+        scale_fill_manual(values = fill_manual_color) +
         scale_y_continuous(breaks = NULL, limits = c(0, 1)) +
         labs(x = "", y = "") +
         facet_grid(Strata ~ .)
@@ -345,7 +349,9 @@ plot_balance_fac <- function(dtaps, v,
 #' @noRd
 plot_balance_cont <- function(dtaps, v, strata,
                               overall_inc = TRUE,
-                              facet_scales = "free_y") {
+                              facet_scales = "free_y",
+                              transparency_alpha = 0.2,
+                              fill_manual_color = c("gray20", "white")) {
 
   Value <- Group <- NULL
   cur_d <- NULL
@@ -369,13 +375,13 @@ plot_balance_cont <- function(dtaps, v, strata,
   cur_d$Group <- as.factor(cur_d$Group)
 
   rst <- ggplot(data = cur_d, aes(x = Value)) +
-    geom_density(alpha = 0.2,
+    geom_density(alpha = transparency_alpha,
                  aes(group = Group,
                      fill  = Group,
                      linetype = Group),
                  na.rm = TRUE) +
     scale_y_continuous(breaks = NULL) +
-    scale_fill_manual(values = c("gray20", "white")) +
+    scale_fill_manual(values = fill_manual_color) +
     labs(x = "", y = "") +
     facet_grid(Strata ~ ., scales = facet_scales)
 
@@ -392,6 +398,10 @@ plot_balance <- function(data_withps,
                          facet_scales = "free_y",
                          label_cov = v_cov,
                          legend_width = 0.08,
+                         fac_transparency_alpha = 0.4,
+                         fac_fill_manual_color = c("gray20", "gray80"),
+                         cont_transparency_alpha = 0.2,
+                         cont_fill_manual_color = c("gray20", "white"),
                          ...) {
 
     if (is.null(v_cov)) {
@@ -417,11 +427,15 @@ plot_balance <- function(data_withps,
     rst <- list()
     for (v in v_cov) {
         if (is.factor(dtaps[[v]])) {
-            cur_p <- plot_balance_fac(dtaps, v, overall_inc = overall_inc)
+            cur_p <- plot_balance_fac(dtaps, v, overall_inc = overall_inc,
+                                      transparency_alpha = fac_transparency_alpha,
+                                      fill_manual_color = fac_fill_manual_color)
         } else {
             cur_p <- plot_balance_cont(dtaps, v, strata = strata,
                                        overall_inc = overall_inc,
-                                       facet_scales = facet_scales)
+                                       facet_scales = facet_scales,
+                                       transparency_alpha = cont_transparency_alpha,
+                                       fill_manual_color = cont_fill_manual_color)
         }
 
         cur_p <- cur_p +
@@ -581,7 +595,6 @@ get_strata <- function(data, strata_covs  = NULL) {
 }
 
 #' @title Print information
-#'
 #'
 #' @noRd
 #'
@@ -838,7 +851,6 @@ plot_pp_rst <- function(x,
 
 #' @title Plot KM at all time points
 #'
-#'
 #' @noRd
 #'
 plot_km_rst <- function(x,
@@ -846,6 +858,8 @@ plot_km_rst <- function(x,
                         ylab = "Survival Probability",
                         add_ci = TRUE,
                         add_stratum = FALSE,
+                        km_lwd = 1,
+                        km_ci_lwd = 1,
                         ...) {
 
     ## check args
@@ -922,7 +936,8 @@ plot_km_rst <- function(x,
     # lt_a <- rep(2, length(rst$Arm))
     # lt_a[grep(".* Overall$", rst$Arm)] <- 1
     rst_plt <- ggplot(data = rst) +
-        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm)) +
+        geom_step(aes(x = T, y = Mean, col = Arm, linetype = Arm),
+                      size = km_lwd) +
         scale_y_continuous(limits = ylim) +
         scale_x_continuous(limits = xlim) +
         labs(x = xlab, y = ylab) +
@@ -930,8 +945,10 @@ plot_km_rst <- function(x,
 
     if (add_ci) {
       rst_plt <- rst_plt +
-          geom_step(aes(x = T, y = Lower, col = Arm), linetype = 3) +
-          geom_step(aes(x = T, y = Upper, col = Arm), linetype = 3)
+          geom_step(aes(x = T, y = Lower, col = Arm),
+                        size = km_ci_lwd, linetype = 3) +
+          geom_step(aes(x = T, y = Upper, col = Arm),
+                        size = km_ci_lwd, linetype = 3)
     }
 
     rst_plt

@@ -75,6 +75,7 @@ NULL
 
 #' @title Example dataset
 #'
+#' @description
 #' Example dataset of a single arm study.
 #'
 #' @usage data(ex_dta)
@@ -82,7 +83,8 @@ NULL
 #' @keywords datasets
 #'
 #' @format A data frame with the following variables:
-#' \itemize{
+#'
+#' \describe{
 #'   \item{Group}{current, rwd}
 #'   \item{Y_Bin}{Binary outcome}
 #'   \item{Y_Con}{Continuous outcome}
@@ -95,6 +97,7 @@ NULL
 
 #' @title Example dataset
 #'
+#' @description
 #' Example dataset of a randomized study.
 #'
 #' @usage data(ex_dta_rct)
@@ -102,7 +105,8 @@ NULL
 #' @keywords datasets
 #'
 #' @format A data frame with the following variables:
-#' \itemize{
+#'
+#' \describe{
 #'   \item{Group}{current, rwd}
 #'   \item{Arm}{control, treatment}
 #'   \item{Y_Con}{Continuous outcome}

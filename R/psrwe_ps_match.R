@@ -12,11 +12,13 @@
 #'     width (euclidean distance) on the probability scale.
 #' @param seed Random seed.
 #' @param method matching algorithm for PS matching.
+#' @param .drop_arg_fml internal use to drop arguments and call, this is
+#'     only used in cjk.
 #' @param ... Additional parameters for matching
 #'
 #' @return A list of class \code{PSRWE_DTA_MAT} with items:
 #'
-#' \itemize{
+#' \describe{
 #'
 #' \item{data}{Original data with column \code{_ps_} for estimated PS scores,
 #'   \code{match_id} for matched current study subject ID, and \code{_strata_}
@@ -58,8 +60,21 @@
 #'
 psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
                          caliper = 1, seed = NULL,
-                         method = c("nnwor", "optm"), ...) {
+                         method = c("nnwor", "optm"),
+			 .drop_arg_fml = FALSE,
+                         ...) {
 
+    ## save arguments and call first (overwrite the drop if in cjk)
+    if (.drop_arg_fml) {
+        call_arg <- NA
+        call_fml <- NA
+    } else {
+        call_arg <- c(as.list(environment()), list(...))
+        call_arg[["dta_ps"]] <- NA
+        call_fml <- as.character(match.call()[[1]])
+    }
+
+    ## prepare
     stopifnot(get_rwe_class("DWITHPS") %in% class(dta_ps))
 
     mat_method <- match.arg(method)
@@ -107,12 +122,14 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     ## result
     rst             <- dta_ps
-    rst$data        <- as.data.frame(data)
+    rst$data_match  <- as.data.frame(data)
     rst$nstrata     <- nstrata
     rst$ratio       <- ratio
     rst$caliper     <- caliper
     rst$strata_covs <- strata_covs
     rst$mat_method  <- mat_method
+    rst$Call_arg$psrwe_match <- call_arg
+    rst$Call_fml$psrwe_match <- call_fml
     class(rst)      <- get_rwe_class("DPSMATCH")
     return(rst)
 }
@@ -128,7 +145,8 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #' @param ... Additional parameters.
 #'
 #' @return A list with columns:
-#'   \itemize{
+#'
+#' \describe{
 #'
 #'     \item{Summary}{A data frame with Stratum (defined by covariates), number
 #'     of subjects in RWD, current study, number of subjects in control and
@@ -172,7 +190,7 @@ summary.PSRWE_DTA_MAT <- function(object, ...) {
     # }
 
     ## check matching ratio
-    match_n   <- object$data %>%
+    match_n   <- object$data_match %>%
         dplyr::filter(1 == `_grp_` &
                       0 == `_arm_`) %>%
         select(`_matchn_`)

@@ -35,11 +35,11 @@ rst_cl_rct
 oa_cl_rct <- psrwe_outana(rst_cl_rct, alternative = "greater")
 print(oa_cl_rct, show_rct = TRUE)
 
-### Use Jackknife overall stderr. This may take a while longer.
+### Use simple Jackknife stderr. This may take a while longer.
 rst_cl_rct_jko <- psrwe_compl(ps_bor_rct,
                               outcome_type = "continuous",
                               v_outcome = "Y_Con",
-                              stderr_method = "jkoverall")
+                              stderr_method = "sjk")
 oa_cl_rct_jko <- psrwe_outana(rst_cl_rct_jko, alternative = "greater")
 print(oa_cl_rct_jko, show_rct = TRUE)
 

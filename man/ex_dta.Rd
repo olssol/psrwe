@@ -3,12 +3,11 @@
 \docType{data}
 \name{ex_dta}
 \alias{ex_dta}
-\title{Example dataset
-
-Example dataset of a single arm study.}
+\title{Example dataset}
 \format{
 A data frame with the following variables:
-\itemize{
+
+\describe{
   \item{Group}{current, rwd}
   \item{Y_Bin}{Binary outcome}
   \item{Y_Con}{Continuous outcome}
@@ -21,8 +20,6 @@ A data frame with the following variables:
 data(ex_dta)
 }
 \description{
-Example dataset
-
 Example dataset of a single arm study.
 }
 \keyword{datasets}

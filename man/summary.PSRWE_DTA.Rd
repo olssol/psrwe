@@ -35,7 +35,8 @@ distance to 0. Default value 10.}
 }
 \value{
 A list with columns:
-  \itemize{
+
+\describe{
     \item{Summary}{A data frame with Stratum, number of subjects in RWD,
     current study, number of subjects in control and treatment arms for RCT
     studies, and distance in PS distributions.}
