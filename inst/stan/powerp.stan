@@ -11,7 +11,7 @@ data {
 
   //current data
   int<lower = 1>  TN1;
-  real            Y1[TN1];
+  array[TN1] real            Y1;
 
   //target borrowing
   real<lower = 0> A;

@@ -1,5 +1,6 @@
 #' @title Outcome Analysis for PS-Integrated Estimation
 #'
+#' @description
 #' Report outcome analysis for the PS-integrated approach.
 #'
 #' @param dta_psrst A returned object with class \code{PSRWE_EST}
@@ -176,7 +177,7 @@ psrwe_outana <- function(dta_psrst,
     if (dta_psrst$Method == "ps_pp") {
         colnames(dtype) <- "PostPr"
     } else {
-        colnames(dtype) <- "p-value"
+        colnames(dtype) <- "p.value"
     }
     rst_est <- cbind(rst_est, dtype)
 

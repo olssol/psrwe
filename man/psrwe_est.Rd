@@ -16,6 +16,7 @@ psrwe_est(
   stra_ctl_only = TRUE,
   nstrata = 5,
   trim_ab = c("both", "above", "below", "none"),
+  .drop_arg_fml = FALSE,
   ...
 )
 }
@@ -53,13 +54,16 @@ range of current study. Default \code{both} trims both above and below.
 Other options include \code{above} for above only, \code{below} for
 below only, and \code{none} for no trimming.}
 
+\item{.drop_arg_fml}{internal use to drop arguments and call, this is
+only used in cjk.}
+
 \item{...}{Additional parameters for calculating the propensity score to be
 used in \code{randomForest} or \code{glm} .}
 }
 \value{
 A list of class \code{PSRWE_DAT} with items:
 
-\itemize{
+\describe{
   \item{data}{Original data with column \code{_ps_} for estimated PS scores
               and \code{_strata_} for PS stratum added.}
   \item{ps_fml}{PS formula for estimated PS scores.}

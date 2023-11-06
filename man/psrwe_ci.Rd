@@ -2,9 +2,7 @@
 % Please edit documentation in R/psrwe_confintv.R
 \name{psrwe_ci}
 \alias{psrwe_ci}
-\title{Confidence/Credible Interval for PS-Integrated Estimation
-
-Estimate the confidence/credible interval for the PS-integrated approach.}
+\title{Confidence/Credible Interval for PS-Integrated Estimation}
 \usage{
 psrwe_ci(
   dta_psrst,
@@ -31,8 +29,6 @@ of PSKM approach}
 A list with class name \code{PSRWE_EST}.
 }
 \description{
-Confidence/Credible Interval for PS-Integrated Estimation
-
 Estimate the confidence/credible interval for the PS-integrated approach.
 }
 \details{

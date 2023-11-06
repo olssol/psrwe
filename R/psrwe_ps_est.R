@@ -27,12 +27,14 @@
 #'     range of current study. Default \code{both} trims both above and below.
 #'     Other options include \code{above} for above only, \code{below} for
 #'     below only, and \code{none} for no trimming.
+#' @param .drop_arg_fml internal use to drop arguments and call, this is
+#'     only used in cjk.
 #' @param ... Additional parameters for calculating the propensity score to be
 #'     used in \code{randomForest} or \code{glm} .
 #'
 #' @return A list of class \code{PSRWE_DAT} with items:
 #'
-#' \itemize{
+#' \describe{
 #'   \item{data}{Original data with column \code{_ps_} for estimated PS scores
 #'               and \code{_strata_} for PS stratum added.}
 #'   \item{ps_fml}{PS formula for estimated PS scores.}
@@ -60,8 +62,20 @@ psrwe_est <- function(data,
                        stra_ctl_only = TRUE,
                        nstrata       = 5,
                        trim_ab       = c("both", "above", "below", "none"),
+		       .drop_arg_fml = FALSE,
                        ...) {
 
+    ## save arguments and call first (overwrite the drop if in cjk)
+    if (.drop_arg_fml) {
+        call_arg <- NA
+        call_fml <- NA
+    } else {
+        call_arg <- c(as.list(environment()), list(...))
+        call_arg[["data"]] <- NA
+        call_fml <- as.character(match.call()[[1]])
+    }
+
+    ## prepare
     if (!identical("data.frame", class(data))) {
         warning("data should be a data.frame object")
     }
@@ -148,7 +162,9 @@ psrwe_est <- function(data,
                 ps_method = ps_method,
                 is_rct    = is_rct,
                 nstrata   = nstrata,
-                trim_ab   = trim_ab)
+                trim_ab   = trim_ab,
+                Call_arg  = list(psrwe_est = call_arg),
+                Call_fml  = list(psrwe_est = call_fml))
 
     class(rst) <- get_rwe_class("DWITHPS")
     return(rst)
@@ -169,7 +185,8 @@ psrwe_est <- function(data,
 #' @param ... Additional parameters.
 #'
 #' @return A list with columns:
-#'   \itemize{
+#'
+#' \describe{
 #'     \item{Summary}{A data frame with Stratum, number of subjects in RWD,
 #'     current study, number of subjects in control and treatment arms for RCT
 #'     studies, and distance in PS distributions.}
@@ -355,9 +372,12 @@ print.PSRWE_DTA <- function(x, ...) {
 #' @description S3 method for visualizing PS adjustment
 #'
 #' @param x Class \code{RWE_DWITHPS} created by \code{psrwe_*} functions
-#' @param plot_type Types of plots. \itemize{\item{ps}{PS density plot}
-#'     \item{balance}{Covariate balance plot}
-#'     \item{diff}{Standardized mean differences, metric = std or astd}}
+#' @param plot_type Types of plots.
+#' \describe{
+#'   \item{ps}{PS density plot}
+#'   \item{balance}{Covariate balance plot}
+#'   \item{diff}{Standardized mean differences, metric = std or astd}
+#' }
 #' @param ... Additional parameter for the plot
 #'
 #' @method plot PSRWE_DTA

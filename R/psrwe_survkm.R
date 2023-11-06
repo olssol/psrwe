@@ -11,14 +11,21 @@
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
 #' @param stderr_method Method for computing StdErr, see Details
+#' @param n_bootstrap Number of bootstrap samples (for bootstrap stderr)
 #' @param ... Additional Parameters
 #'
 #' @details \code{stderr_method} includes \code{naive} as default which
 #'     mostly follows Greenwood formula,
-#'     \code{jk} using Jackknife method within each stratum, or
-#'     \code{jkoverall} using Jackknife method for overall/combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT.
-#'     Note that \code{jkoverall} may take a while longer to finish.
+#'     \code{jk} using Jackknife method within each stratum,
+#'     \code{sjk} using simple Jackknife method for combined estimates
+#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     \code{cjk} for complex Jackknife method including refitting PS model,
+#'     matching, trimming, calculating borrowing parameters, and
+#'     combining overall estimates.
+#'     Note that \code{sjk} may take a while longer to finish and
+#'     \code{cjk} will take even much longer to finish.
+#'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
+#'     methods.
 #'
 #' @return A data frame with class name \code{PSRWE_RST}. It contains the
 #'     composite estimation of the mean for each stratum as well as the
@@ -46,7 +53,9 @@
 psrwe_survkm <- function(dta_psbor, pred_tp,
                          v_time     = "time",
                          v_event    = "event",
-                         stderr_method = c("naive", "jk", "jkoverall"), 
+                         stderr_method = c("naive", "jk", "sjk", "cjk",
+                                           "sbs", "cbs", "none"), 
+                         n_bootstrap = 200,
                          ...) {
 
     ## check
@@ -69,20 +78,45 @@ psrwe_survkm <- function(dta_psbor, pred_tp,
     rst_obs <- get_km_observed(data, v_time, v_event, all_tps)
 
     ## call estimation
-    if (stderr_method %in% c("naive", "jk")) {
+    if (stderr_method[1] %in% c("naive", "jk", "none")) {
         rst <- get_ps_cl_km(dta_psbor,
                             v_event = v_event, v_time = v_time,
                             f_stratum = get_surv_stratum,
                             pred_tp = all_tps,
                             stderr_method = stderr_method,
                             ...)
+    } else if (stderr_method[1] %in% c("sjk")) {
+        rst <- get_ps_cl_km_sjk(dta_psbor,
+                                v_event = v_event, v_time = v_time,
+                                f_stratum = get_surv_stratum,
+                                pred_tp = all_tps,
+                                stderr_method = "none",
+                                ...)
+    } else if (stderr_method[1] %in% c("cjk")) {
+        rst <- get_ps_cl_km_cjk(dta_psbor,
+                                v_event = v_event, v_time = v_time,
+                                f_stratum = get_surv_stratum,
+                                pred_tp = all_tps,
+                                stderr_method = "none",
+                                ...)
+    } else if (stderr_method[1] %in% c("sbs")) {
+        rst <- get_ps_cl_km_sbs(dta_psbor,
+                                v_event = v_event, v_time = v_time,
+                                f_stratum = get_surv_stratum,
+                                pred_tp = all_tps,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
+    } else if (stderr_method[1] %in% c("cbs")) {
+        rst <- get_ps_cl_km_cbs(dta_psbor,
+                                v_event = v_event, v_time = v_time,
+                                f_stratum = get_surv_stratum,
+                                pred_tp = all_tps,
+                                stderr_method = "none",
+                                n_bootstrap = n_bootstrap,
+                                ...)
     } else {
-        rst <- get_ps_cl_km_jkoverall(dta_psbor,
-                                      v_event = v_event, v_time = v_time,
-                                      f_stratum = get_surv_stratum,
-                                      pred_tp = all_tps,
-                                      stderr_method = stderr_method,
-                                      ...)
+        stop("stderr_errmethod is not implemented.")
     }
 
     ## return
@@ -101,20 +135,20 @@ psrwe_survkm <- function(dta_psbor, pred_tp,
 #' @noRd
 #'
 get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tps,
-                             stderr_method, ...) {
+                             stderr_method = "jk", ...) {
 
     ## treatment or control only
     dta_cur <- d1
     dta_ext <- d0
 
-    ##  overall estimate
+    ## overall estimate
     overall  <- rwe_km(dta_cur,
                        dta_ext       = dta_ext,
                        n_borrow      = n_borrow,
                        pred_tps      = pred_tps,
                        stderr_method = stderr_method)
 
-    ##jackknife stderr
+    ## jackknife stderr
     if (stderr_method == "jk") {
         ns1     <- nrow(dta_cur)
         if (is.null(d0)) {
@@ -210,7 +244,7 @@ rwe_km <- function(dta_cur, dta_ext = NULL, n_borrow = 0, pred_tps = NULL,
     if (stderr_method == "naive") {
         rst <- cbind(rst$surv, rst$std.err, pred_tps)
     } else {
-        ## For jk or jkoverall
+        ## For none, jk, sjk, cjk, sbs, or cbs
         rst <- cbind(rst$surv, rep(NA, length(rst$std.err)), pred_tps)
     }
 

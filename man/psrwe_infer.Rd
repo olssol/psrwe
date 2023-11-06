@@ -2,9 +2,7 @@
 % Please edit documentation in R/psrwe_infer.R
 \name{psrwe_infer}
 \alias{psrwe_infer}
-\title{Inference for the PS-Integrated Estimation
-
-Inference for the PS-integrated approach.}
+\title{Inference for the PS-Integrated Estimation}
 \usage{
 psrwe_infer(
   dta_psrst,
@@ -36,8 +34,6 @@ single arm study (i.e., comparing with a PG set by \code{mu})}
 A list with class name \code{PSRWE_EST}.
 }
 \description{
-Inference for the PS-Integrated Estimation
-
 Inference for the PS-integrated approach.
 }
 \examples{
