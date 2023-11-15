@@ -10,6 +10,9 @@
 #' @param outcome_type Type of outcomes: \code{continuous} or \code{binary}.
 #' @param prior_type Whether treat power parameter as fixed (\code{fixed}) or
 #'     fully Bayesian (\code{random}).
+#' @param mcmc_binary MCMC sampling via either \code{rstan} or \code{analytic}
+#'     (only for \code{outcome_type = "binary"} and
+#'     \code{prior_type = "fixed"}).
 #' @param seed Random seed.
 #' @param ... extra parameters for calling function \code{\link{rwe_stan}}.
 #'
@@ -50,6 +53,7 @@
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                           outcome_type = c("continuous", "binary"),
                           prior_type = c("fixed", "random"),
+                          mcmc_binary = c("rstan", "analytic"),
                           ..., seed = NULL) {
 
     ## check
@@ -58,6 +62,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 
     type       <- match.arg(outcome_type)
     prior_type <- match.arg(prior_type)
+    mcmc_binary <- match.arg(mcmc_binary)
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
 
     ## save the seed from global if any then set random seed
@@ -80,32 +85,54 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                         "powerps",
                         "powerpsbinary")
 
-    ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
-    ctl_thetas <- extract(ctl_post, "thetas")$thetas
-
+    ## for summary
     is_rct     <- dta_psbor$is_rct
     trt_post   <- NULL
     trt_thetas <- NULL
-    if (is_rct) {
-        trt_post <- rwe_stan(lst_data = lst_dta$trt,
-                             stan_mdl = stan_mdl, ...)
-        trt_thetas <- extract(trt_post, "thetas")$thetas
-    }
-
-    ## summary
     rst_trt    <- NULL
     rst_effect <- NULL
-    if (is_rct) {
-        rst_trt    <- get_post_theta(trt_thetas, dta_psbor$Borrow$N_Cur_TRT)
-        rst_effect <- get_post_theta(trt_thetas - ctl_thetas,
-                                     dta_psbor$Borrow$N_Current)
-        n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
-    } else {
-        n_ctl      <- dta_psbor$Borrow$N_Current
-    }
-    rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
 
-    ## reset the orignal seed back to the global or
+    if (!(type[1] == "binary" &&
+          prior_type[1] == "fixed" &&
+          mcmc_binary[1] == "analytic")) {
+        ## original MCMC via rstan
+        ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
+        ctl_thetas <- extract(ctl_post, "thetas")$thetas
+        n_ctl      <- dta_psbor$Borrow$N_Current
+
+        if (is_rct) {
+            trt_post <- rwe_stan(lst_data = lst_dta$trt,
+                                 stan_mdl = stan_mdl, ...)
+            trt_thetas <- extract(trt_post, "thetas")$thetas
+
+            rst_trt    <- get_post_theta(trt_thetas, dta_psbor$Borrow$N_Cur_TRT)
+            rst_effect <- get_post_theta(trt_thetas - ctl_thetas,
+                                         dta_psbor$Borrow$N_Current)
+            n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
+        }
+
+        rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
+    } else {
+        ## special case via the analytic solution for binary only
+        ctl_post   <- rwe_binana(lst_data = lst_dta$ctl)
+        ctl_thetas <- ctl$thetas
+        n_ctl      <- dta_psbor$Borrow$N_Current
+
+        if (is_rct) {
+            trt_post <- rwe_binana(lst_data = lst_dta$trt)
+            trt_thetas <- trt$thetas
+
+            rst_trt    <- get_post_theta_binana(trt_thetas,
+                                                dta_psbor$Borrow$N_Cur_TRT)
+            rst_effect <- get_post_theta_binana(trt_thetas - ctl_thetas,
+                                                dta_psbor$Borrow$N_Current)
+            n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
+        }
+
+        rst_ctl <- get_post_theta_binana(ctl_thetas, n_ctl)
+    }
+
+    ## reset the original seed back to the global or
     ## remove the one set within this session earlier.
     if (!is.null(seed)) {
         if (!is.null(old_seed)) {
@@ -127,6 +154,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                  Method        = "ps_pp",
                  Method_weight = "WATT",
                  Outcome_type  = type,
+                 Prior_type    = prior_type,
+                 MCMC_binary   = mcmc_binary,
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
@@ -240,3 +269,70 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
     list(ctl = ctl_lst_data,
          trt = trt_lst_data)
 }
+
+
+#' RWE binary analytical posterior
+#'
+#'
+#' @noRd
+#'
+rwe_binana <- function(lst_data) {
+    alpha0 <- lst_data$A * lst_data$vs / lst_data$N0
+    alpha0[alpha0 > 1] <- 1
+
+    n0 <- lst_data$N0
+    n1 <- lst_data$N1
+    p0 <- lst_data$YBAR0
+    p1 <- lst_data$YBAR1
+
+    ### initial beta prior
+    beta_a_init <- 1
+    beta_b_init <- 1
+
+    ### beta mean and var
+    get_beta_mean_var <- function(a, b) {
+        list(mean = a / (a + b),
+             var = a * b / ((a + b)^2 * (a + b + 1)))
+    }
+
+    ### posterior
+    beta_a <- alpha0 * n0 * p0 + beta_a_init
+    beta_b <- alpha0 * n0 * (1 - p0) + beta_b_init
+    beta_a_watt <- n1 * p1 + beta_a
+    beta_b_watt <- n1 * (1 - p1) + beta_b
+    thetas <- get_beta_mean_var(beta_a_watt, beta_b_watt)
+
+    ### return
+    rst <- list(beta_a = beta_a,
+                beta_b = beta_b,
+                beta_a_watt = beta_a_watt,
+                beta_b_watt = beta_b_watt,
+                thetas = theta_watt)
+    return(rst)
+}
+
+
+#' Get results for control, treatment and effect for binary analytical posterior
+#'
+#'
+#' @noRd
+#'
+get_post_theta_binana <- function(thetas, weights) {
+    ws      <- weights / sum(weights)
+    samples <- NA
+    overall <- NA
+
+    means <- thetas$mean
+    sds   <- sqrt(theta$var)
+
+    mean_overall <- sum(thetas$mean * ws)
+    sd_overall   <- sqrt(sum(theta$var * ws^2))
+
+    list(Stratum_Samples  = samples,
+         Overall_Samples  = overall,
+         Stratum_Estimate = cbind(Mean   = means,
+                                  StdErr = sds),
+         Overall_Estimate = cbind(Mean   = mean_overall,
+                                  StdErr = sd_overall))
+}
+

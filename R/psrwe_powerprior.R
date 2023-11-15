@@ -146,7 +146,7 @@ psrwe_powerp <- function(dta_psbor, v_outcome = "Y",
     }
     rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
 
-    ## reset the orignal seed back to the global or
+    ## reset the original seed back to the global or
     ## remove the one set within this session earlier.
     if (!is.null(seed)) {
         if (!is.null(old_seed)) {
@@ -167,6 +167,7 @@ psrwe_powerp <- function(dta_psbor, v_outcome = "Y",
                  Total_borrow = dta_psbor$Total_borrow,
                  Method       = "ps_pp",
                  Outcome_type = type,
+                 Prior_type   = prior_type,
                  is_rct       = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
