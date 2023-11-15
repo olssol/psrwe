@@ -95,7 +95,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     if (!(type[1] == "binary" &&
           prior_type[1] == "fixed" &&
           mcmc_binary[1] == "analytic")) {
-        ## original MCMC via rstan
+        ## regular MCMC via rstan
         ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
         ctl_thetas <- extract(ctl_post, "thetas")$thetas
         n_ctl      <- dta_psbor$Borrow$N_Current
@@ -115,12 +115,12 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     } else {
         ## special case via the analytic solution for binary only
         ctl_post   <- rwe_binana(lst_data = lst_dta$ctl)
-        ctl_thetas <- ctl$thetas
+        ctl_thetas <- ctl_post$thetas
         n_ctl      <- dta_psbor$Borrow$N_Current
 
         if (is_rct) {
             trt_post <- rwe_binana(lst_data = lst_dta$trt)
-            trt_thetas <- trt$thetas
+            trt_thetas <- trt_post$thetas
 
             rst_trt    <- get_post_theta_binana(trt_thetas,
                                                 dta_psbor$Borrow$N_Cur_TRT)
@@ -276,38 +276,32 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
 #'
 #' @noRd
 #'
-rwe_binana <- function(lst_data) {
-    alpha0 <- lst_data$A * lst_data$vs / lst_data$N0
+rwe_binana <- function(lst_data, beta_a_init = 1, beta_b_init = 1) {
+    alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
     alpha0[alpha0 > 1] <- 1
 
     n0 <- lst_data$N0
     n1 <- lst_data$N1
-    p0 <- lst_data$YBAR0
+    p0 <- lst_data$YBAR0  # watt
     p1 <- lst_data$YBAR1
 
-    ### initial beta prior
-    beta_a_init <- 1
-    beta_b_init <- 1
-
-    ### beta mean and var
-    get_beta_mean_var <- function(a, b) {
-        list(mean = a / (a + b),
-             var = a * b / ((a + b)^2 * (a + b + 1)))
-    }
-
     ### posterior
-    beta_a <- alpha0 * n0 * p0 + beta_a_init
-    beta_b <- alpha0 * n0 * (1 - p0) + beta_b_init
-    beta_a_watt <- n1 * p1 + beta_a
-    beta_b_watt <- n1 * (1 - p1) + beta_b
-    thetas <- get_beta_mean_var(beta_a_watt, beta_b_watt)
+    beta_a0   <- alpha0 * n0 * p0 + beta_a_init
+    beta_b0   <- alpha0 * n0 * (1 - p0) + beta_b_init
+    beta_a    <- n1 * p1 + beta_a0
+    beta_b    <- n1 * (1 - p1) + beta_b0
+    post_mean <- beta_a / (beta_a + beta_b)
+    post_var  <- beta_a * beta_b / ((beta_a + beta_b)^2 *
+                                    (beta_a + beta_b + 1))
+    post_dsn  <- list(beta_a0 = beta_a0,
+                      beta_b0 = beta_b0,
+                      beta_a  = beta_a,
+                      beta_b  = beta_b,
+                      mean    = post_mean,
+                      var     = post_var)
 
     ### return
-    rst <- list(beta_a = beta_a,
-                beta_b = beta_b,
-                beta_a_watt = beta_a_watt,
-                beta_b_watt = beta_b_watt,
-                thetas = theta_watt)
+    rst <- list(thetas = post_dsn)
     return(rst)
 }
 
@@ -317,16 +311,18 @@ rwe_binana <- function(lst_data) {
 #'
 #' @noRd
 #'
-get_post_theta_binana <- function(thetas, weights) {
+get_post_theta_binana <- function(thetas, weights, n_resample = 4000) {
+    ns      <- length(weights)
     ws      <- weights / sum(weights)
-    samples <- NA
-    overall <- NA
+    samples <- matrix(rbeta(ns * n_resample, thetas$beta_a, thetas$beta_b),
+                      nrow = ns, ncol = n_resample)
+    overall <- apply(samples, 2, function(x) sum(x * ws))
 
     means <- thetas$mean
-    sds   <- sqrt(theta$var)
+    sds   <- sqrt(thetas$var)
 
     mean_overall <- sum(thetas$mean * ws)
-    sd_overall   <- sqrt(sum(theta$var * ws^2))
+    sd_overall   <- sqrt(sum(thetas$var * ws^2))
 
     list(Stratum_Samples  = samples,
          Overall_Samples  = overall,

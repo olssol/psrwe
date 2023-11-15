@@ -2,6 +2,7 @@
 suppressMessages(library(psrwe, quietly = TRUE))
 options(digits = 3)
 data(ex_dta_rct)
+ex_dta_rct$Y_Bin <- ifelse(ex_dta_rct$Y_Con < 320, 1, 0)
 
 ### First parts of Data.
 head(ex_dta_rct)
@@ -23,7 +24,7 @@ rst_pp_rct <- psrwe_powerp_watt(ps_bor_rct,
                             v_outcome    = "Y_Bin",
                             seed         = 1234)
 }) })
-rst_pp
+rst_pp_rct
 
 ### PSPP, single arm study, binary outcome, weights of ATT, analytic solution.
 rst_ppana_rct <- psrwe_powerp_watt(ps_bor_rct,
