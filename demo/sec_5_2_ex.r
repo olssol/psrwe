@@ -1,41 +1,43 @@
-### Example of Section 5.1.
+### Example of Section 5.3.
 suppressMessages(library(psrwe, quietly = TRUE))
 options(digits = 3)
-data(ex_dta)
+data(ex_dta_rct)
+ex_dta_rct$Y_Bin <- ifelse(ex_dta_rct$Y_Con < 320, 1, 0)
 
 ### First parts of Data.
-head(ex_dta)
+head(ex_dta_rct)
 
 ### Obtain PSs.
-dta_ps_single_ns5 <- psrwe_est(ex_dta,
-                     v_covs = paste("V", 1:7, sep = ""),
-                     v_grp = "Group", cur_grp_level = "current",
-                     ps_method = "logistic", nstrata = 5)
-dta_ps_single_ns1 <- psrwe_est(ex_dta,
+dta_ps_rct <- psrwe_est(ex_dta_rct,
                      v_covs = paste("V", 1:7, sep = ""),
                      v_grp = "Group", cur_grp_level = "current",
                      ps_method = "logistic", nstrata = 1)
 
 ### Obtain discounting parameters.
-ps_bor_single_ns5 <- psrwe_borrow(dta_ps_single_ns5, total_borrow = 30)
-ps_bor_single_ns1 <- psrwe_borrow(dta_ps_single_ns1, total_borrow = 30)
+ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
-### PSCL, single arm study, binary outcome, weights of ATT.
-rst_cl_ns1 <- psrwe_compl(ps_bor_single_ns1,
-                      outcome_type = "binary",
-                      v_outcome    = "Y_Bin")
-rst_cl_ns1
+### PSPP, RCT, binary outcome, weights of ATT.
+options(mc.cores = 1)
+.msg <- capture.output({ suppressWarnings({
+rst_pp_rct <- psrwe_powerp_watt(ps_bor_rct,
+                            outcome_type = "binary",
+                            v_outcome    = "Y_Bin",
+                            seed         = 1234)
+}) })
+rst_pp_rct
 
-### PSCL, single arm study, binary outcome (from sec_4_1_ex)
-rst_cl <- psrwe_compl(ps_bor_single_ns5,
-                      outcome_type = "binary",
-                      v_outcome    = "Y_Bin")
-rst_cl
-
+### PSPP, single arm study, binary outcome, weights of ATT, analytic solution.
+rst_ppana_rct <- psrwe_powerp_watt(ps_bor_rct,
+                            outcome_type = "binary",
+                            v_outcome    = "Y_Bin",
+                            prior_type   = "fixed",
+                            mcmc_binary  = "analytic",
+                            seed         = 1234)
+rst_ppana_rct
 
 ### Outcome analysis.
-oa_cl_ns1 <- psrwe_outana(rst_cl_ns1, mu = 0.4)
-oa_cl_ns1
-oa_cl <- psrwe_outana(rst_cl, mu = 0.4)
-oa_cl
+oa_pp_rct <- psrwe_outana(rst_pp_rct, mu = 0.4)
+oa_pp_rct
+oa_ppana_rct <- psrwe_outana(rst_ppana_rct, mu = 0.4)
+oa_ppana_rct
 
