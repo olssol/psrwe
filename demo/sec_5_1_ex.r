@@ -29,8 +29,7 @@ rst_pp
 rst_ppana <- psrwe_powerp_watt(ps_bor_single,
                             outcome_type = "binary",
                             v_outcome    = "Y_Bin",
-                            prior_type   = "fixed",
-                            mcmc_binary  = "analytic",
+                            mcmc_method  = "analytic",
                             seed         = 1234)
 rst_ppana
 

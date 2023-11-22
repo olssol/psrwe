@@ -8,11 +8,7 @@
 #'     \code{\link{psrwe_borrow}}.
 #' @param v_outcome Column name corresponding to the outcome.
 #' @param outcome_type Type of outcomes: \code{continuous} or \code{binary}.
-#' @param prior_type Whether treat power parameter as fixed (\code{fixed}) or
-#'     fully Bayesian (\code{random}).
-#' @param mcmc_binary MCMC sampling via either \code{rstan} or \code{analytic}
-#'     (only for \code{outcome_type = "binary"} and
-#'     \code{prior_type = "fixed"}).
+#' @param mcmc_method MCMC sampling via either \code{rstan} or \code{analytic}.
 #' @param seed Random seed.
 #' @param ... extra parameters for calling function \code{\link{rwe_stan}}.
 #'
@@ -52,8 +48,7 @@
 #'
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                           outcome_type = c("continuous", "binary"),
-                          prior_type = c("fixed", "random"),
-                          mcmc_binary = c("rstan", "analytic"),
+                          mcmc_method = c("rstan", "analytic"),
                           ..., seed = NULL) {
 
     ## check
@@ -61,9 +56,10 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                        what = get_rwe_class("PSDIST")))
 
     type       <- match.arg(outcome_type)
-    prior_type <- match.arg(prior_type)
-    mcmc_binary <- match.arg(mcmc_binary)
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
+
+    mcmc_method <- match.arg(mcmc_method)
+    stopifnot(dta_psbor$nstrata != 1)
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -78,59 +74,50 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## prepare stan data
-    lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, prior_type)
+    lst_dta <- get_stan_data_watt(dta_psbor, v_outcome)
 
     ## sampling
     stan_mdl <- if_else("continuous" == type,
                         "powerps",
                         "powerpsbinary")
 
-    ## for summary
+    ## run stan or get from analytical solution
     is_rct     <- dta_psbor$is_rct
     trt_post   <- NULL
     trt_thetas <- NULL
-    rst_trt    <- NULL
-    rst_effect <- NULL
-
-    if (!(type[1] == "binary" &&
-          prior_type[1] == "fixed" &&
-          mcmc_binary[1] == "analytic")) {
-        ## regular MCMC via rstan
+    if (mcmc_method[1] == "rstan") {
         ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
         ctl_thetas <- extract(ctl_post, "thetas")$thetas
-        n_ctl      <- dta_psbor$Borrow$N_Current
 
         if (is_rct) {
             trt_post <- rwe_stan(lst_data = lst_dta$trt,
                                  stan_mdl = stan_mdl, ...)
             trt_thetas <- extract(trt_post, "thetas")$thetas
-
-            rst_trt    <- get_post_theta(trt_thetas, dta_psbor$Borrow$N_Cur_TRT)
-            rst_effect <- get_post_theta(trt_thetas - ctl_thetas,
-                                         dta_psbor$Borrow$N_Current)
-            n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
         }
-
-        rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
     } else {
-        ## special case via the analytic solution for binary only
-        ctl_post   <- rwe_binana(lst_data = lst_dta$ctl)
+        ctl_post   <- rwe_ana(lst_data = lst_dta$ctl,
+                              outcome_type = type[1], ...)
         ctl_thetas <- ctl_post$thetas
-        n_ctl      <- dta_psbor$Borrow$N_Current
 
         if (is_rct) {
-            trt_post <- rwe_binana(lst_data = lst_dta$trt)
+            trt_post <- rwe_ana(lst_data = lst_dta$trt,
+                                outcome_type = type[1], ...)
             trt_thetas <- trt_post$thetas
-
-            rst_trt    <- get_post_theta_binana(trt_thetas,
-                                                dta_psbor$Borrow$N_Cur_TRT)
-            rst_effect <- get_post_theta_binana(trt_thetas - ctl_thetas,
-                                                dta_psbor$Borrow$N_Current)
-            n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
         }
-
-        rst_ctl <- get_post_theta_binana(ctl_thetas, n_ctl)
     }
+
+    ## summary
+    rst_trt    <- NULL
+    rst_effect <- NULL
+    if (is_rct) {
+        rst_trt    <- get_post_theta(trt_thetas, dta_psbor$Borrow$N_Cur_TRT)
+        rst_effect <- get_post_theta(trt_thetas - ctl_thetas,
+                                     dta_psbor$Borrow$N_Current)
+        n_ctl      <- dta_psbor$Borrow$N_Cur_CTL
+    } else {
+        n_ctl      <- dta_psbor$Borrow$N_Current
+    }
+    rst_ctl <- get_post_theta(ctl_thetas, n_ctl)
 
     ## reset the original seed back to the global or
     ## remove the one set within this session earlier.
@@ -154,8 +141,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                  Method        = "ps_pp",
                  Method_weight = "WATT",
                  Outcome_type  = type,
-                 Prior_type    = prior_type,
-                 MCMC_binary   = mcmc_binary,
+                 Prior_type    = "fixed",
+                 MCMC_method   = mcmc_method,
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
@@ -168,7 +155,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 #'
 #' @noRd
 #'
-get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
+get_stan_data_watt <- function(dta_psbor, v_outcome) {
     f_curd <- function(i, d1, d0 = NULL, d0_watt_di = NULL) {
         cur_d <- c(N1    = length(d1),
                    YBAR1 = mean(d1),
@@ -237,7 +224,7 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
     ctl_lst_data  <- list(S     = nstrata,
                           A     = dta_psbor$Total_borrow,
                           RS    = as.array(dta_psbor$Borrow$Proportion),
-                          FIXVS = as.numeric(prior_type == "fixed"),
+                          FIXVS = 1,
                           N0    = as.array(ctl_stan_d[, "N0"]),
                           N1    = as.array(ctl_stan_d[, "N1"]),
                           YBAR0 = as.array(ctl_stan_d[, "YBAR0"]),
@@ -253,7 +240,7 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
         trt_lst_data  <- list(S     = nstrata,
                               A     = 0,
                               RS    = as.array(dta_psbor$Borrow$Proportion),
-                              FIXVS = as.numeric("fixed" == "fixed"),
+                              FIXVS = 1,
                               N0    = as.array(trt_stan_d[, "N0"]),
                               N1    = as.array(trt_stan_d[, "N1"]),
                               YBAR0 = as.array(trt_stan_d[, "YBAR0"]),
@@ -271,12 +258,34 @@ get_stan_data_watt <- function(dta_psbor, v_outcome, prior_type) {
 }
 
 
+#' RWE analytical posterior
+#'
+#'
+#' @noRd
+#'
+rwe_ana <- function(lst_data, outcome_type, ...) {
+    if (outcome_type[1] == "binary") {
+        rst <- rwe_ana_bin(lst_data, ...)
+    } else if (outcome_type[1] == "continuous") {
+        rst <- rwe_ana_cont(lst_data, ...)
+    } else {
+        stop("The outcome_type is not implemented.")
+    }
+    return(rst)
+}
+
+
 #' RWE binary analytical posterior
 #'
 #'
 #' @noRd
 #'
-rwe_binana <- function(lst_data, beta_a_init = 1, beta_b_init = 1) {
+rwe_ana_bin <- function(lst_data,
+                        n_resample = 4000,
+                        beta_a_init = 1,
+                        beta_b_init = 1,
+                        ...) {
+    ns <- lst_data$S
     alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
     alpha0[alpha0 > 1] <- 1
 
@@ -285,7 +294,7 @@ rwe_binana <- function(lst_data, beta_a_init = 1, beta_b_init = 1) {
     p0 <- lst_data$YBAR0  # watt
     p1 <- lst_data$YBAR1
 
-    ### posterior
+    ## posterior
     beta_a0   <- alpha0 * n0 * p0 + beta_a_init
     beta_b0   <- alpha0 * n0 * (1 - p0) + beta_b_init
     beta_a    <- n1 * p1 + beta_a0
@@ -300,35 +309,56 @@ rwe_binana <- function(lst_data, beta_a_init = 1, beta_b_init = 1) {
                       mean    = post_mean,
                       var     = post_var)
 
-    ### return
-    rst <- list(thetas = post_dsn)
+    ## posterior samples
+    thetas <- matrix(rbeta(ns * n_resample, post_dsn$beta_a, post_dsn$beta_b),
+                     nrow = ns, ncol = n_resample)
+
+    ## return
+    rst <- list(post_dsn = post_dsn,
+                thetas = thetas)
     return(rst)
 }
 
 
-#' Get results for control, treatment and effect for binary analytical posterior
+#' RWE continuous analytical posterior
 #'
 #'
 #' @noRd
 #'
-get_post_theta_binana <- function(thetas, weights, n_resample = 4000) {
-    ns      <- length(weights)
-    ws      <- weights / sum(weights)
-    samples <- matrix(rbeta(ns * n_resample, thetas$beta_a, thetas$beta_b),
-                      nrow = ns, ncol = n_resample)
-    overall <- apply(samples, 2, function(x) sum(x * ws))
+rwe_ana_cont <- function(lst_data,
+                         n_sample = 4000,
+                         ...) {
+    ns <- lst_data$S
+    alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
+    alpha0[alpha0 > 1] <- 1
 
-    means <- thetas$mean
-    sds   <- sqrt(thetas$var)
+    n0 <- lst_data$N0
+    n1 <- lst_data$N1
+    ybar0 <- lst_data$YBAR0  # watt
+    ybar1 <- lst_data$YBAR1
+    sigma0 <- lst_data$SD0   # watt
+    sigma1 <- sd(lst_data$Y1)
 
-    mean_overall <- sum(thetas$mean * ws)
-    sd_overall   <- sqrt(sum(thetas$var * ws^2))
+    ## posterior
+    post_var <- 1 / (n1 / sigma1^2 + alpha0 * n0 / sigma0^2)
+    post_mean <- (n1 / sigma1^2 * ybar1 + alpha0 * n0 / sigma0^2 * ybar0) *
+                 post_var
+    post_dsn  <- list(n0     = n0,
+                      n1     = n1,
+                      ybar0  = ybar0,
+                      ybar1  = ybar1,
+                      sigma0 = sigma0,
+                      sigma1 = sigma1,
+                      mean   = post_mean,
+                      var    = post_var)
 
-    list(Stratum_Samples  = samples,
-         Overall_Samples  = overall,
-         Stratum_Estimate = cbind(Mean   = means,
-                                  StdErr = sds),
-         Overall_Estimate = cbind(Mean   = mean_overall,
-                                  StdErr = sd_overall))
+    ## posterior samples
+    thetas <- matrix(rnorm(ns * n_resample, post_dsn$mean, sqrt(post_dsn$var)),
+                     nrow = ns, ncol = n_resample)
+
+    ## return
+    rst <- list(post_dsn = post_dsn,
+                thetas = thetas)
+    return(rst)
 }
 
