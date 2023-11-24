@@ -59,7 +59,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     stopifnot(v_outcome %in% colnames(dta_psbor$data))
 
     mcmc_method <- match.arg(mcmc_method)
-    stopifnot(dta_psbor$nstrata != 1)
+    stopifnot(dta_psbor$nstrata == 1)
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -156,7 +156,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 #' @noRd
 #'
 get_stan_data_watt <- function(dta_psbor, v_outcome) {
-    f_curd <- function(i, d1, d0 = NULL, d0_watt_di = NULL) {
+    f_curd <- function(i, d1, d0 = NULL, d0_watt = NULL) {
         cur_d <- c(N1    = length(d1),
                    YBAR1 = mean(d1),
                    YSUM1 = sum(d1))
@@ -167,14 +167,14 @@ get_stan_data_watt <- function(dta_psbor, v_outcome) {
                        YBAR0 = 0,
                        SD0   = 0)
         } else {
-            if (is.null(d0_watt_di)) {
-                d0_watt_di <- rep(1 / length(d0) , length(d0))
+            if (is.null(d0_watt)) {
+                d0_watt <- rep(1, length(d0))
             }
 
             cur_d <- c(cur_d,
                        N0    = length(d0),
-                       YBAR0 = sum(d0 * d0_watt_di),  # Need to check continuous
-                       SD0   = sd(d0 * d0_watt_di))   # Need to check continuous
+                       YBAR0 = sum(d0 * d0_watt) / sum(d0_watt),
+                       SD0   = sd(d0) * sqrt(sum(d0_watt^2)) / sum(d0_watt))
         }
 
         list(stan_d = cur_d,
@@ -206,9 +206,8 @@ get_stan_data_watt <- function(dta_psbor, v_outcome) {
         cur_01_e  <- get_cur_d(data, strata[i], "_ps_")
         cur_d0_e  <- cur_01_e$cur_d0
         cur_d0_watt  <- cur_d0_e / (1 - cur_d0_e)
-        cur_d0_watt_di  <- cur_d0_watt / sum(cur_d0_watt)
 
-        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt_di)
+        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt)
         ctl_stan_d <- rbind(ctl_stan_d, ctl_cur$stan_d)
         ctl_y1     <- c(ctl_y1,   ctl_cur$y1)
         ctl_inx1   <- c(ctl_inx1, ctl_cur$inx1)
@@ -267,7 +266,7 @@ rwe_ana <- function(lst_data, outcome_type, ...) {
     if (outcome_type[1] == "binary") {
         rst <- rwe_ana_bin(lst_data, ...)
     } else if (outcome_type[1] == "continuous") {
-        rst <- rwe_ana_cont(lst_data, ...)
+        rst <- rwe_ana_con(lst_data, ...)
     } else {
         stop("The outcome_type is not implemented.")
     }
@@ -286,8 +285,12 @@ rwe_ana_bin <- function(lst_data,
                         beta_b_init = 1,
                         ...) {
     ns <- lst_data$S
-    alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
-    alpha0[alpha0 > 1] <- 1
+    if (lst_data$N0 > 0) {
+        alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
+        alpha0[alpha0 > 1] <- 1
+    } else{
+        alpha0 <- 1
+    }
 
     n0 <- lst_data$N0
     n1 <- lst_data$N1
@@ -312,6 +315,7 @@ rwe_ana_bin <- function(lst_data,
     ## posterior samples
     thetas <- matrix(rbeta(ns * n_resample, post_dsn$beta_a, post_dsn$beta_b),
                      nrow = ns, ncol = n_resample)
+    thetas <- t(thetas)
 
     ## return
     rst <- list(post_dsn = post_dsn,
@@ -325,12 +329,16 @@ rwe_ana_bin <- function(lst_data,
 #'
 #' @noRd
 #'
-rwe_ana_cont <- function(lst_data,
-                         n_sample = 4000,
-                         ...) {
+rwe_ana_con <- function(lst_data,
+                        n_resample = 4000,
+                        ...) {
     ns <- lst_data$S
-    alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
-    alpha0[alpha0 > 1] <- 1
+    if (lst_data$N0 > 0) {
+        alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
+        alpha0[alpha0 > 1] <- 1
+    } else{
+        alpha0 <- 1
+    }
 
     n0 <- lst_data$N0
     n1 <- lst_data$N1
@@ -355,6 +363,7 @@ rwe_ana_cont <- function(lst_data,
     ## posterior samples
     thetas <- matrix(rnorm(ns * n_resample, post_dsn$mean, sqrt(post_dsn$var)),
                      nrow = ns, ncol = n_resample)
+    thetas <- t(thetas)
 
     ## return
     rst <- list(post_dsn = post_dsn,
