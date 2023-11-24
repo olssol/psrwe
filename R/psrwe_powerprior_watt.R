@@ -174,7 +174,9 @@ get_stan_data_watt <- function(dta_psbor, v_outcome) {
             cur_d <- c(cur_d,
                        N0    = length(d0),
                        YBAR0 = sum(d0 * d0_watt) / sum(d0_watt),
-                       SD0   = sd(d0) * sqrt(sum(d0_watt^2)) / sum(d0_watt))
+                       SD0   = sd(d0 * d0_watt) /      # w_i * Y_i
+                               sqrt(sum(d0_watt)) *    # new nominal sample size
+                               sqrt(length(d0)))       # cancel out n0 in stan
         }
 
         list(stan_d = cur_d,
@@ -289,7 +291,7 @@ rwe_ana_bin <- function(lst_data,
         alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
         alpha0[alpha0 > 1] <- 1
     } else{
-        alpha0 <- 1
+        alpha0 <- rep(1, ns)
     }
 
     n0 <- lst_data$N0
@@ -337,7 +339,7 @@ rwe_ana_con <- function(lst_data,
         alpha0 <- lst_data$A * lst_data$RS / lst_data$N0
         alpha0[alpha0 > 1] <- 1
     } else{
-        alpha0 <- 1
+        alpha0 <- rep(1, ns)
     }
 
     n0 <- lst_data$N0
@@ -348,9 +350,15 @@ rwe_ana_con <- function(lst_data,
     sigma1 <- sd(lst_data$Y1)
 
     ## posterior
-    post_var <- 1 / (n1 / sigma1^2 + alpha0 * n0 / sigma0^2)
-    post_mean <- (n1 / sigma1^2 * ybar1 + alpha0 * n0 / sigma0^2 * ybar0) *
-                 post_var
+    if (n0 > 0) {
+      post_var <- 1 / (n1 / sigma1^2 + alpha0 * n0 / sigma0^2)
+      post_mean <- (n1 / sigma1^2 * ybar1 + alpha0 * n0 / sigma0^2 * ybar0) *
+                   post_var
+    } else {
+      post_var <- 1 / (n1 / sigma1^2)
+      post_mean <- (n1 / sigma1^2 * ybar1) *
+                   post_var
+    }
     post_dsn  <- list(n0     = n0,
                       n1     = n1,
                       ybar0  = ybar0,
