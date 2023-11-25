@@ -9,6 +9,8 @@
 #' @param v_outcome Column name corresponding to the outcome.
 #' @param outcome_type Type of outcomes: \code{continuous} or \code{binary}.
 #' @param mcmc_method MCMC sampling via either \code{rstan} or \code{analytic}.
+#' @param tau0_method Method for estimating SD0 via either \code{wang2019} or
+#'     \code{weighted} for continuous outcomes only.
 #' @param seed Random seed.
 #' @param ... extra parameters for calling function \code{\link{rwe_stan}}.
 #'
@@ -49,6 +51,7 @@
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                           outcome_type = c("continuous", "binary"),
                           mcmc_method = c("rstan", "analytic"),
+                          tau0_method = c("wang2019", "weighted"),
                           ..., seed = NULL) {
 
     ## check
@@ -60,6 +63,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 
     mcmc_method <- match.arg(mcmc_method)
     stopifnot(dta_psbor$nstrata == 1)
+    tau0_method <- match.arg(tau0_method)
 
     ## save the seed from global if any then set random seed
     old_seed <- NULL
@@ -74,7 +78,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
     ## prepare stan data
-    lst_dta <- get_stan_data_watt(dta_psbor, v_outcome)
+    lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, tau0_method[1])
 
     ## sampling
     stan_mdl <- if_else("continuous" == type,
@@ -155,8 +159,10 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 #'
 #' @noRd
 #'
-get_stan_data_watt <- function(dta_psbor, v_outcome) {
-    f_curd <- function(i, d1, d0 = NULL, d0_watt = NULL) {
+get_stan_data_watt <- function(dta_psbor, v_outcome,
+                               tau0_method = "wang2019") {
+    f_curd <- function(i, d1, d0 = NULL, d0_watt = NULL,
+                       tau0_method = "wang2019") {
         cur_d <- c(N1    = length(d1),
                    YBAR1 = mean(d1),
                    YSUM1 = sum(d1))
@@ -171,12 +177,20 @@ get_stan_data_watt <- function(dta_psbor, v_outcome) {
                 d0_watt <- rep(1, length(d0))
             }
 
+            if (tau0_method[1] == "wang2019") {
+                SD0 <- sd(d0)
+            } else if (tau0_method[1] == "weighted") {
+                SD0 <- sd(d0 * d0_watt) /      # w_i * Y_i
+                       sqrt(sum(d0_watt)) *    # new nominal sample size
+                       sqrt(length(d0))        # cancel out n0 in stan
+            } else {
+                stop("The tau0_method is not implemented.")
+            }
+
             cur_d <- c(cur_d,
                        N0    = length(d0),
                        YBAR0 = sum(d0 * d0_watt) / sum(d0_watt),
-                       SD0   = sd(d0 * d0_watt) /      # w_i * Y_i
-                               sqrt(sum(d0_watt)) *    # new nominal sample size
-                               sqrt(length(d0)))       # cancel out n0 in stan
+                       SD0   = SD0)
         }
 
         list(stan_d = cur_d,
@@ -209,13 +223,14 @@ get_stan_data_watt <- function(dta_psbor, v_outcome) {
         cur_d0_e  <- cur_01_e$cur_d0
         cur_d0_watt  <- cur_d0_e / (1 - cur_d0_e)
 
-        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt)
+        ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt,
+                             tau0_method = tau0_method[1])
         ctl_stan_d <- rbind(ctl_stan_d, ctl_cur$stan_d)
         ctl_y1     <- c(ctl_y1,   ctl_cur$y1)
         ctl_inx1   <- c(ctl_inx1, ctl_cur$inx1)
 
         if (is_rct) {
-            trt_cur    <- f_curd(i, cur_d1t)
+            trt_cur    <- f_curd(i, cur_d1t, tau0_method = tau0_method[1])
             trt_stan_d <- rbind(trt_stan_d, trt_cur$stan_d)
             trt_y1     <- c(trt_y1,   trt_cur$y1)
             trt_inx1   <- c(trt_inx1, trt_cur$inx1)

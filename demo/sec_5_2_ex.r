@@ -42,6 +42,7 @@ print(oa_pp_rct, show_rct = TRUE)
 oa_ppana_rct <- psrwe_outana(rst_ppana_rct, alternative = "greater")
 print(oa_ppana_rct, show_rct = TRUE)
 
+
 ### PSPP, RCT, continuous outcome, weights of ATT.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
@@ -65,4 +66,31 @@ oa_pp_rct_con <- psrwe_outana(rst_pp_rct_con, alternative = "greater")
 print(oa_pp_rct_con, show_rct = TRUE)
 oa_ppana_rct_con <- psrwe_outana(rst_ppana_rct_con, alternative = "greater")
 print(oa_ppana_rct_con, show_rct = TRUE)
+
+
+### PSPP, RCT, continuous outcome, weights of ATT, weighted for tau0.
+.msg <- capture.output({ suppressWarnings({
+rst_ppwtau_rct_con <- psrwe_powerp_watt(ps_bor_rct,
+                                        outcome_type = "continuous",
+                                        v_outcome    = "Y_Con",
+                                        tau0_method  = "weighted",
+                                        seed         = 1234)
+}) })
+rst_ppwtau_rct_con
+
+### PSPP, RCT, continuous outcome, weights of ATT, analytic solution,
+### weighted for tau0.
+rst_ppanawtau_rct_con <- psrwe_powerp_watt(ps_bor_rct,
+                                           outcome_type = "continuous",
+                                           v_outcome    = "Y_Con",
+                                           mcmc_method  = "analytic",
+                                           tau0_method  = "weighted",
+                                           seed         = 1234)
+rst_ppanawtau_rct_con
+
+### Outcome analysis.
+oa_ppwtau_rct_con <- psrwe_outana(rst_ppwtau_rct_con, alternative = "greater")
+print(oa_ppwtau_rct_con, show_rct = TRUE)
+oa_ppanawtau_rct_con <- psrwe_outana(rst_ppanawtau_rct_con, alternative = "greater")
+print(oa_ppanawtau_rct_con, show_rct = TRUE)
 

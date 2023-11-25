@@ -40,6 +40,7 @@ oa_pp
 oa_ppana <- psrwe_outana(rst_ppana, mu = 0.4)
 oa_ppana
 
+
 ### PSPP, single arm study, continuous outcome, weights of ATT.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
@@ -50,7 +51,8 @@ rst_pp_con <- psrwe_powerp_watt(ps_bor_single,
 }) })
 rst_pp_con
 
-### PSPP, single arm study, binary outcome, weights of ATT, analytic solution.
+### PSPP, single arm study, continuous outcome, weights of ATT,
+### analytic solution.
 rst_ppana_con <- psrwe_powerp_watt(ps_bor_single,
                                    outcome_type = "continuous",
                                    v_outcome    = "Y_Con",
@@ -63,4 +65,31 @@ oa_pp_con <- psrwe_outana(rst_pp_con, mu = 362)
 oa_pp_con
 oa_ppana_con <- psrwe_outana(rst_ppana_con, mu = 362)
 oa_ppana_con
+
+
+### PSPP, single arm study, continuous outcome, weights of ATT.
+.msg <- capture.output({ suppressWarnings({
+rst_ppwtau_con <- psrwe_powerp_watt(ps_bor_single,
+                                    outcome_type = "continuous",
+                                    v_outcome    = "Y_Con",
+                                    tau0_method  = "weighted",
+                                    seed         = 1234)
+}) })
+rst_ppwtau_con
+
+### PSPP, single arm study, continuous outcome, weights of ATT,
+### analytic solution, weighted for tau0.
+rst_ppanawtau_con <- psrwe_powerp_watt(ps_bor_single,
+                                       outcome_type = "continuous",
+                                       v_outcome    = "Y_Con",
+                                       mcmc_method  = "analytic",
+                                       tau0_method  = "weighted",
+                                       seed         = 1234)
+rst_ppanawtau_con
+
+### Outcome analysis.
+oa_ppwtau_con <- psrwe_outana(rst_ppwtau_con, mu = 362)
+oa_ppwtau_con
+oa_ppanawtau_con <- psrwe_outana(rst_ppanawtau_con, mu = 362)
+oa_ppanawtau_con
 
