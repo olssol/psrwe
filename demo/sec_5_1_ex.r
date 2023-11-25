@@ -93,3 +93,18 @@ oa_ppwtau_con
 oa_ppanawtau_con <- psrwe_outana(rst_ppanawtau_con, mu = 362)
 oa_ppanawtau_con
 
+
+### PSPP, single arm study, continuous outcome, weights of ATT, wattcon.
+.msg <- capture.output({ suppressWarnings({
+rst_pp_wattcon <- psrwe_powerp_watt(ps_bor_single,
+                                    outcome_type = "continuous",
+                                    v_outcome    = "Y_Con",
+                                    mcmc_method  = "wattcon",
+                                    seed         = 1234)
+}) })
+rst_pp_wattcon
+
+### Outcome analysis.
+oa_pp_wattcon <- psrwe_outana(rst_pp_wattcon, mu = 362)
+oa_pp_wattcon
+
