@@ -16,8 +16,8 @@ data {
 }
 
 parameters {
-  vector[1]                  thetas;
-  array[1] real<lower=0>     taus;
+  real              thetas;
+  real<lower=0>     taus;
 }
 
 transformed parameters {
@@ -40,5 +40,4 @@ model {
   //likelihood
   Y1 ~ normal(thetas, taus);
 }
-
 

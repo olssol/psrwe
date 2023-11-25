@@ -146,7 +146,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                  Method_weight = "WATT",
                  Outcome_type  = type,
                  Prior_type    = "fixed",
-                 MCMC_method   = mcmc_method,
+                 MCMC_method   = mcmc_method[1],
+                 tau0_method   = tau0_method[1]
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")

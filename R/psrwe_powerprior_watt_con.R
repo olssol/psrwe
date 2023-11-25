@@ -82,11 +82,13 @@ psrwe_powerp_watt_con <- function(dta_psbor, v_outcome = "Y",
 
     ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
     ctl_thetas <- extract(ctl_post, "thetas")$thetas
+    ctl_thetas <- matrix(ctl_thetas, ncol = 1)
 
     if (is_rct) {
         trt_post <- rwe_stan(lst_data = lst_dta$trt,
                              stan_mdl = stan_mdl, ...)
         trt_thetas <- extract(trt_post, "thetas")$thetas
+        trt_thetas <- matrix(trt_thetas, ncol = 1)
     }
 
     ## summary
@@ -125,7 +127,7 @@ psrwe_powerp_watt_con <- function(dta_psbor, v_outcome = "Y",
                  Method_weight = "WATT",
                  Outcome_type  = type,
                  Prior_type    = "fixed",
-                 MCMC_method   = mcmc_method,
+                 MCMC_method   = "rstan_con",
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
@@ -142,18 +144,18 @@ get_stan_data_watt_con <- function(dta_psbor, v_outcome) {
     is_rct  <- dta_psbor$is_rct
     data    <- dta_psbor$data
     data    <- data[!is.na(data[["_strata_"]]), ]
+    strata  <- levels(data[["_strata_"]])
     A       <- dta_psbor$Total_borrow
 
     ctl_y1      <- NULL
     trt_y1      <- NULL
 
-browser()
-    cur_01  <- get_cur_d(data, 1, v_outcome)
+    cur_01  <- get_cur_d(data, strata[1], v_outcome)
     cur_d1  <- cur_01$cur_d1
     cur_d0  <- cur_01$cur_d0
     cur_d1t <- cur_01$cur_d1t
 
-    cur_01_e <- get_cur_d(data, 1, "_ps_")
+    cur_01_e <- get_cur_d(data, strata[1], "_ps_")
     cur_d0_e <- cur_01_e$cur_d0
     cur_d0_watt <- cur_d0_e / (1 - cur_d0_e)
 

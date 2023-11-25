@@ -41,7 +41,6 @@ rst_ppana_con
 rst_pprstan_con <- psrwe_powerp_watt_con(ps_bor_single,
                                          outcome_type = "continuous",
                                          v_outcome    = "Y_Con",
-                                         mcmc_method  = "rstan_watt",
                                          seed         = 1234)
 }) })
 rst_pprstan_con
