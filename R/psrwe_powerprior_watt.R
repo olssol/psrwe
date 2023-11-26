@@ -88,11 +88,11 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
         ## prepare stan data
         lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, tau0_method[1])
 
-    } else {
         ## sampling
         stan_mdl <- if_else("continuous" == type,
                             "powerps",
                             "powerpsbinary")
+    } else {
         ## prepare stan data
         lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome)
 
@@ -454,11 +454,12 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
 
     trt_lst_data <- NULL
     if (is_rct) {
-        trt_lst_data  <- list(A     = 0,
-                              N0    = 0,
-                              Y0    = 0,
-                              N1    = length(trt_y1),
-                              Y1    = trt_y1)
+        trt_lst_data  <- list(A         = 0,
+                              N0        = 1,
+                              Y0        = 0,
+                              A_WATT_DI = 0,
+                              N1        = length(trt_y1),
+                              Y1        = trt_y1)
     }
 
     list(ctl = ctl_lst_data,

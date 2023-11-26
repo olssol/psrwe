@@ -16,6 +16,7 @@ dta_ps_single <- psrwe_est(ex_dta,
 ### Obtain discounting parameters.
 ps_bor_single <- psrwe_borrow(dta_ps_single, total_borrow = 30)
 
+
 ### PSPP, single arm study, binary outcome, weights of ATT.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({

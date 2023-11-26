@@ -18,6 +18,7 @@ dta_ps_rct <- psrwe_est(ex_dta_rct,
 ### Obtain discounting parameters.
 ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
+
 ### PSPP, RCT, binary outcome, weights of ATT.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
@@ -93,4 +94,19 @@ oa_ppwtau_rct_con <- psrwe_outana(rst_ppwtau_rct_con, alternative = "greater")
 print(oa_ppwtau_rct_con, show_rct = TRUE)
 oa_ppanawtau_rct_con <- psrwe_outana(rst_ppanawtau_rct_con, alternative = "greater")
 print(oa_ppanawtau_rct_con, show_rct = TRUE)
+
+
+### PSPP, single arm study, continuous outcome, weights of ATT, wattcon.
+.msg <- capture.output({ suppressWarnings({
+rst_pp_rct_wattcon <- psrwe_powerp_watt(ps_bor_rct,
+                                        outcome_type = "continuous",
+                                        v_outcome    = "Y_Con",
+                                        mcmc_method  = "wattcon",
+                                        seed         = 1234)
+}) })
+rst_pp_rct_wattcon
+
+### Outcome analysis.
+oa_pp_rct_wattcon <- psrwe_outana(rst_pp_rct_wattcon, alternative = "greater")
+print(oa_pp_rct_wattcon, show_rct = TRUE)
 
