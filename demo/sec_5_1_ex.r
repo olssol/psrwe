@@ -16,6 +16,7 @@ dta_ps_single <- psrwe_est(ex_dta,
 ### Obtain discounting parameters.
 ps_bor_single <- psrwe_borrow(dta_ps_single, total_borrow = 30)
 
+
 ### PSPP, single arm study, binary outcome, weights of ATT.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
@@ -92,4 +93,19 @@ oa_ppwtau_con <- psrwe_outana(rst_ppwtau_con, mu = 362)
 oa_ppwtau_con
 oa_ppanawtau_con <- psrwe_outana(rst_ppanawtau_con, mu = 362)
 oa_ppanawtau_con
+
+
+### PSPP, single arm study, continuous outcome, weights of ATT, wattcon.
+.msg <- capture.output({ suppressWarnings({
+rst_pp_wattcon <- psrwe_powerp_watt(ps_bor_single,
+                                    outcome_type = "continuous",
+                                    v_outcome    = "Y_Con",
+                                    mcmc_method  = "wattcon",
+                                    seed         = 1234)
+}) })
+rst_pp_wattcon
+
+### Outcome analysis.
+oa_pp_wattcon <- psrwe_outana(rst_pp_wattcon, mu = 362)
+oa_pp_wattcon
 

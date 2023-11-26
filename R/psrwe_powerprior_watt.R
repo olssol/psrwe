@@ -8,7 +8,8 @@
 #'     \code{\link{psrwe_borrow}}.
 #' @param v_outcome Column name corresponding to the outcome.
 #' @param outcome_type Type of outcomes: \code{continuous} or \code{binary}.
-#' @param mcmc_method MCMC sampling via either \code{rstan} or \code{analytic}.
+#' @param mcmc_method MCMC sampling via either \code{rstan}, \code{analytic},
+#'     or \code{wattcon}.
 #' @param tau0_method Method for estimating SD0 via either \code{wang2019} or
 #'     \code{weighted} for continuous outcomes only.
 #' @param seed Random seed.
@@ -50,7 +51,7 @@
 #'
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                           outcome_type = c("continuous", "binary"),
-                          mcmc_method = c("rstan", "analytic"),
+                          mcmc_method = c("rstan", "analytic", "wattcon"),
                           tau0_method = c("wang2019", "weighted"),
                           ..., seed = NULL) {
 
@@ -65,6 +66,12 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     stopifnot(dta_psbor$nstrata == 1)
     tau0_method <- match.arg(tau0_method)
 
+    if (mcmc_method[1] == "wattcon") {
+       if (type[1] != "continuous") {
+          stop("The 'wattcon' is for continuous outcomes only.")
+       }
+    }
+
     ## save the seed from global if any then set random seed
     old_seed <- NULL
     if (!is.null(seed)) {
@@ -77,26 +84,36 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     ## observed
     rst_obs <- get_observed(dta_psbor$data, v_outcome)
 
-    ## prepare stan data
-    lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, tau0_method[1])
+    if (mcmc_method[1] %in% c("rstan", "analytic")) {
+        ## prepare stan data
+        lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, tau0_method[1])
 
-    ## sampling
-    stan_mdl <- if_else("continuous" == type,
-                        "powerps",
-                        "powerpsbinary")
+        ## sampling
+        stan_mdl <- if_else("continuous" == type,
+                            "powerps",
+                            "powerpsbinary")
+    } else {
+        ## prepare stan data
+        lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome)
+
+        ## sampling
+        stan_mdl <- "powerps_wattcon"
+    }
 
     ## run stan or get from analytical solution
     is_rct     <- dta_psbor$is_rct
     trt_post   <- NULL
     trt_thetas <- NULL
-    if (mcmc_method[1] == "rstan") {
+    if (mcmc_method[1] %in% c("rstan", "wattcon")) {
         ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
         ctl_thetas <- extract(ctl_post, "thetas")$thetas
+        ctl_thetas <- matrix(ctl_thetas, ncol = 1)
 
         if (is_rct) {
             trt_post <- rwe_stan(lst_data = lst_dta$trt,
                                  stan_mdl = stan_mdl, ...)
             trt_thetas <- extract(trt_post, "thetas")$thetas
+            trt_thetas <- matrix(trt_thetas, ncol = 1)
         }
     } else {
         ctl_post   <- rwe_ana(lst_data = lst_dta$ctl,
@@ -146,7 +163,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                  Method_weight = "WATT",
                  Outcome_type  = type,
                  Prior_type    = "fixed",
-                 MCMC_method   = mcmc_method,
+                 MCMC_method   = mcmc_method[1],
+                 tau0_method   = tau0_method[1],
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
@@ -392,5 +410,59 @@ rwe_ana_con <- function(lst_data,
     rst <- list(post_dsn = post_dsn,
                 thetas = thetas)
     return(rst)
+}
+
+
+#' Get data for STAN watt for continuous outcomes
+#'
+#'
+#' @noRd
+#'
+get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
+    is_rct  <- dta_psbor$is_rct
+    data    <- dta_psbor$data
+    data    <- data[!is.na(data[["_strata_"]]), ]
+    strata  <- levels(data[["_strata_"]])
+    A       <- dta_psbor$Total_borrow
+
+    ctl_y1      <- NULL
+    trt_y1      <- NULL
+
+    cur_01  <- get_cur_d(data, strata[1], v_outcome)
+    cur_d1  <- cur_01$cur_d1
+    cur_d0  <- cur_01$cur_d0
+    cur_d1t <- cur_01$cur_d1t
+
+    cur_01_e <- get_cur_d(data, strata[1], "_ps_")
+    cur_d0_e <- cur_01_e$cur_d0
+    cur_d0_watt <- cur_d0_e / (1 - cur_d0_e)
+
+    ctl_y1 <- cur_d1
+    ctl_y0 <- cur_d0
+    ctl_a_watt_di <- A * cur_d0_watt / sum(cur_d0_watt)
+
+    if (is_rct) {
+        trt_y1 <- cur_d1t
+    }
+
+    ctl_lst_data  <- list(A         = A,
+                          N0        = length(ctl_y0),
+                          Y0        = ctl_y0,
+                          A_WATT_DI = ctl_a_watt_di,
+                          N1        = length(ctl_y1),
+                          Y1        = ctl_y1)
+
+    trt_lst_data <- NULL
+    if (is_rct) {
+        trt_lst_data  <- list(A         = 0,
+                              N0        = 1,
+                              Y0        = 0,
+                              A_WATT_DI = 0,
+                              N1        = length(trt_y1),
+                              Y1        = trt_y1)
+    }
+
+    list(ctl = ctl_lst_data,
+         trt = trt_lst_data)
 }
 
