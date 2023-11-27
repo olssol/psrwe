@@ -11,13 +11,14 @@ data {
   array[S] real<lower = 0> SD0;
 
   //current data
-  array[S] int<lower = 1> N1;
-  int<lower = 1> TN1;
+  array[S] int<lower = 1>   N1;
+  int<lower = 1>            TN1;
   array[TN1] real           Y1;
   array[TN1] int<lower = 1> INX1;
 
   //prior of vs
   vector<lower=0>[S] RS;
+
   //fix vs
   int<lower = 0, upper = 1> FIXVS;
 
@@ -34,8 +35,8 @@ transformed data {
 }
 
 parameters {
-  simplex[S]    vs;
-  vector[S]     thetas;
+  simplex[S]             vs;
+  vector[S]              thetas;
   array[S] real<lower=0> taus;
 }
 

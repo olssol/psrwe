@@ -50,10 +50,10 @@
 #' @export
 #'
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
-                          outcome_type = c("continuous", "binary"),
-                          mcmc_method = c("rstan", "analytic", "wattcon"),
-                          tau0_method = c("wang2019", "weighted"),
-                          ..., seed = NULL) {
+                              outcome_type = c("continuous", "binary"),
+                              mcmc_method = c("rstan", "analytic", "wattcon"),
+                              tau0_method = c("wang2019", "weighted"),
+                              ..., seed = NULL) {
 
     ## check
     stopifnot(inherits(dta_psbor,
@@ -104,8 +104,11 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     is_rct     <- dta_psbor$is_rct
     trt_post   <- NULL
     trt_thetas <- NULL
+
     if (mcmc_method[1] %in% c("rstan", "wattcon")) {
-        ctl_post   <- rwe_stan(lst_data = lst_dta$ctl, stan_mdl = stan_mdl, ...)
+        ctl_post   <- rwe_stan(lst_data = lst_dta$ctl,
+                               stan_mdl = stan_mdl,
+                               ...)
         ctl_thetas <- extract(ctl_post, "thetas")$thetas
         ctl_thetas <- matrix(ctl_thetas, ncol = 1)
 
@@ -237,9 +240,9 @@ get_stan_data_watt <- function(dta_psbor, v_outcome,
         cur_d0  <- cur_01$cur_d0
         cur_d1t <- cur_01$cur_d1t
 
-        cur_01_e  <- get_cur_d(data, strata[i], "_ps_")
-        cur_d0_e  <- cur_01_e$cur_d0
-        cur_d0_watt  <- cur_d0_e / (1 - cur_d0_e)
+        cur_01_e    <- get_cur_d(data, strata[i], "_ps_")
+        cur_d0_e    <- cur_01_e$cur_d0
+        cur_d0_watt <- cur_d0_e / (1 - cur_d0_e)
 
         ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt,
                              tau0_method = tau0_method[1])
@@ -316,8 +319,8 @@ rwe_ana <- function(lst_data, outcome_type, ...) {
 #'
 rwe_ana_bin <- function(lst_data,
                         n_resample = 4000,
-                        beta_a_init = 1,
-                        beta_b_init = 1,
+                        beta_a_init = 0.01,
+                        beta_b_init = 0.01,
                         ...) {
     ns <- lst_data$S
     if (lst_data$N0 > 0) {
@@ -465,4 +468,3 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     list(ctl = ctl_lst_data,
          trt = trt_lst_data)
 }
-

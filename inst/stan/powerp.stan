@@ -11,7 +11,7 @@ data {
 
   //current data
   int<lower = 1>  TN1;
-  array[TN1] real            Y1;
+  array[TN1] real Y1;
 
   //target borrowing
   real<lower = 0> A;
@@ -22,8 +22,8 @@ transformed data {
   real<lower = 0> sn0;
 
   if (N0 > 0) {
-    a0  = 1 < A/N0 ? 1 : A/N0;
-    sn0 = SD0/sqrt(N0*1.0);
+    a0  = 1 < A / N0 ? 1 : A/N0;
+    sn0 = SD0 / sqrt(N0 * 1.0);
   } else {
     a0  = 0;
     sn0 = 1;
