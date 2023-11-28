@@ -201,9 +201,13 @@ get_stan_data_watt <- function(dta_psbor, v_outcome,
             if (tau0_method[1] == "wang2019") {
                 SD0 <- sd(d0)
             } else if (tau0_method[1] == "weighted") {
-                SD0 <- sd(d0 * d0_watt) /      # w_i * Y_i
-                       sqrt(sum(d0_watt)) *    # new nominal sample size
-                       sqrt(length(d0))        # cancel out n0 in stan
+                # SD0 <- sd(d0 * d0_watt) /      # w_i * Y_i
+                #        sqrt(sum(d0_watt)) *    # new nominal sample size
+                #        sqrt(length(d0))        # cancel out n0 in stan "powerps"
+                SD0 <- sd(d0) *                # Y_i
+                       sqrt(sum(d0_watt^2)) /  # w_i^2
+                       sum(d0_watt) *          # normalized and nominal
+                       sqrt(length(d0))        # cancel out n0 in stan "powerps"
             } else {
                 stop("The tau0_method is not implemented.")
             }
