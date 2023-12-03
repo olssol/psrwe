@@ -428,21 +428,21 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     strata  <- levels(data[["_strata_"]])
     A       <- dta_psbor$Total_borrow
 
-    ctl_y1      <- NULL
-    trt_y1      <- NULL
+    ctl_y1  <- NULL
+    trt_y1  <- NULL
 
     cur_01  <- get_cur_d(data, strata[1], v_outcome)
     cur_d1  <- cur_01$cur_d1
     cur_d0  <- cur_01$cur_d0
     cur_d1t <- cur_01$cur_d1t
 
-    cur_01_e <- get_cur_d(data, strata[1], "_ps_")
-    cur_d0_e <- cur_01_e$cur_d0
+    cur_01_e    <- get_cur_d(data, strata[1], "_ps_")
+    cur_d0_e    <- cur_01_e$cur_d0
     cur_d0_watt <- cur_d0_e / (1 - cur_d0_e)
 
-    ctl_y1 <- cur_d1
-    ctl_y0 <- cur_d0
-    ctl_a_watt_di <- A * cur_d0_watt / sum(cur_d0_watt)
+    ctl_y1        <- cur_d1
+    ctl_y0        <- cur_d0
+    ctl_watt_di   <- cur_d0_watt / sum(cur_d0_watt)
 
     if (is_rct) {
         trt_y1 <- cur_d1t
@@ -451,7 +451,9 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     ctl_lst_data  <- list(A         = A,
                           N0        = length(ctl_y0),
                           Y0        = as.array(ctl_y0),
-                          A_WATT_DI = as.array(ctl_a_watt_di),
+                          Y0Tilde   = sum(ctl_watt_di * ctl_y0),
+                          SD0       = sd(ctl_y0),
+                          A_WATT_DI = A * as.array(ctl_watt_di),
                           N1        = length(ctl_y1),
                           Y1        = as.array(ctl_y1))
 

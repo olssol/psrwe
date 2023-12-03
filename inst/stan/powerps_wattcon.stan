@@ -4,12 +4,11 @@
 //
 data {
   //target borrowing
-  real<lower = 0>   A;
+  real<lower = 0>  A;
 
   //existing data
-  int<lower = 0>            N0;
-  array[N0] real            Y0;
-  array[N0] real<lower = 0> A_WATT_DI;
+  real             Y0Tilde;
+  real<lower = 0>  SD0;
 
   //current data
   int<lower = 1> N1;
@@ -18,21 +17,18 @@ data {
 
 parameters {
   real           thetas;
-  real<lower=0>  taus[2];
+  real<lower=0>  taus;
 }
 
 
 model {
-
   //prior
   taus ~ cauchy(0, 2.5);
 
   if (A > 0) {
-    for (i in 1:N0) {
-      target += A_WATT_DI[i] * normal_lpdf(Y0[i] | thetas, taus[1]);
-    }
+    target += normal_lpdf(Y0Tilde | thetas, SD0 / sqrt(A));
   }
 
   //likelihood
-  Y1 ~ normal(thetas, taus[2]);
+  Y1 ~ normal(thetas, taus);
 }
