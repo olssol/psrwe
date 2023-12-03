@@ -96,7 +96,8 @@ oa_ppanawtau_rct_con <- psrwe_outana(rst_ppanawtau_rct_con, alternative = "great
 print(oa_ppanawtau_rct_con, show_rct = TRUE)
 
 
-### PSPP, single arm study, continuous outcome, weights of ATT, wattcon.
+### PSPP, RCT, continuous outcome, weights of ATT, wattcon,
+### unknown and different sd.
 .msg <- capture.output({ suppressWarnings({
 rst_pp_rct_wattcon <- psrwe_powerp_watt(ps_bor_rct,
                                         outcome_type = "continuous",
@@ -109,4 +110,39 @@ rst_pp_rct_wattcon
 ### Outcome analysis.
 oa_pp_rct_wattcon <- psrwe_outana(rst_pp_rct_wattcon, alternative = "greater")
 print(oa_pp_rct_wattcon, show_rct = TRUE)
+
+
+### PSPP, RCT, continuous outcome, weights of ATT, wattcon,
+### unknown but same sd.
+.msg <- capture.output({ suppressWarnings({
+rst_pp_wattcon_us <- psrwe_powerp_watt(ps_bor_rct,
+                                       outcome_type = "continuous",
+                                       v_outcome    = "Y_Con",
+                                       mcmc_method  = "wattcon",
+                                       sds_method   = "unknown_same",
+                                       seed         = 1234)
+}) })
+rst_pp_wattcon_us
+
+### Outcome analysis.
+oa_pp_wattcon_us <- psrwe_outana(rst_pp_wattcon_us, mu = 362)
+print(oa_pp_rct_wattcon_us, show_rct = TRUE)
+
+
+### PSPP, RCT, continuous outcome, weights of ATT, wattcon,
+### known SD0.
+.msg <- capture.output({ suppressWarnings({
+rst_pp_wattcon_ks <- psrwe_powerp_watt(ps_bor_rct,
+                                       outcome_type = "continuous",
+                                       v_outcome    = "Y_Con",
+                                       mcmc_method  = "wattcon",
+                                       sds_method   = "known_sd0",
+                                       seed         = 1234)
+}) })
+rst_pp_wattcon_ks
+
+### Outcome analysis.
+oa_pp_wattcon_ks <- psrwe_outana(rst_pp_wattcon_ks, mu = 362)
+print(oa_pp_rct_wattcon_ks, show_rct = TRUE)
+
 

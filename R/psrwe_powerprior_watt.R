@@ -11,7 +11,11 @@
 #' @param mcmc_method MCMC sampling via either \code{rstan}, \code{analytic},
 #'     or \code{wattcon}.
 #' @param tau0_method Method for estimating SD0 via either \code{wang2019} or
-#'     \code{weighted} for continuous outcomes only.
+#'     \code{weighted} for continuous outcomes only and when \code{mcmc_method}
+#'     is either \code{rstan} or \code{analytic}.
+#' @param sds_method Method for estimating SD0 and SD1 assuming either
+#'     \code{unknown_diff} (default), \code{unknown_same}, or \code{known_sd0}
+#'     for continuous outcomes only and when \code{mcmc_method = "wattcon"}.
 #' @param seed Random seed.
 #' @param ... extra parameters for calling function \code{\link{rwe_stan}}.
 #'
@@ -53,6 +57,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                               outcome_type = c("continuous", "binary"),
                               mcmc_method = c("rstan", "analytic", "wattcon"),
                               tau0_method = c("wang2019", "weighted"),
+                              sds_method = c("unknown_diff", "unknown_same",
+                                             "known_sd0"),
                               ..., seed = NULL) {
 
     ## check
@@ -65,6 +71,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     mcmc_method <- match.arg(mcmc_method)
     stopifnot(dta_psbor$nstrata == 1)
     tau0_method <- match.arg(tau0_method)
+    sds_method <- match.arg(sds_method)
 
     if (mcmc_method[1] == "wattcon") {
        if (type[1] != "continuous") {
@@ -94,10 +101,13 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                             "powerpsbinary")
     } else {
         ## prepare stan data
-        lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome)
+        lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome, sds_method[1])
 
         ## sampling
-        stan_mdl <- "powerps_wattcon"
+        stan_mdl <- switch(sds_method[1],
+                           "unknown_diff" = "powerps_wattcon",
+                           "unknown_same" = "powerps_wattcon_unknown_same",
+                           "known_sd0"    = "powerps_wattcon_known_sd0")
     }
 
     ## run stan or get from analytical solution
@@ -168,6 +178,7 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                  Prior_type    = "fixed",
                  MCMC_method   = mcmc_method[1],
                  tau0_method   = tau0_method[1],
+                 sds_method    = sds_method[1],
                  is_rct        = is_rct)
 
     class(rst) <- get_rwe_class("ANARST")
@@ -425,7 +436,8 @@ rwe_ana_con <- function(lst_data,
 #'
 #' @noRd
 #'
-get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
+get_stan_data_wattcon <- function(dta_psbor, v_outcome,
+                                  sds_method = "unknown_diff") {
     is_rct  <- dta_psbor$is_rct
     data    <- dta_psbor$data
     data    <- data[!is.na(data[["_strata_"]]), ]
@@ -439,6 +451,7 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     cur_d1  <- cur_01$cur_d1
     cur_d0  <- cur_01$cur_d0
     cur_d1t <- cur_01$cur_d1t
+    SD0     <- sd(cur_d0)
 
     cur_01_e <- get_cur_d(data, strata[1], "_ps_")
     cur_d0_e <- cur_01_e$cur_d0
@@ -458,6 +471,11 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
                           A_WATT_DI = as.array(ctl_a_watt_di),
                           N1        = length(ctl_y1),
                           Y1        = as.array(ctl_y1))
+
+    ### feed observed SD0 back to stan
+    if (sds_method[1] == "known_sd0") {
+        ctl_lst_data$SD0 <- SD0
+    }
 
     trt_lst_data <- NULL
     if (is_rct) {

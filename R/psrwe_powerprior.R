@@ -23,7 +23,9 @@
 #'
 rwe_stan <- function(lst_data,
                      stan_mdl = c("powerps", "powerpsbinary", "powerp",
-                                  "powerps_wattcon"),
+                                  "powerps_wattcon",
+                                  "powerps_wattcon_unknown_same",
+                                  "powerps_wattcon_known_sd0"),
                      chains = 4, iter = 2000, warmup = 1000,
                      control = list(adapt_delta = 0.95), ...) {
 
