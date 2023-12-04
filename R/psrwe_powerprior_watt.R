@@ -453,8 +453,8 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     }
 
     ctl_lst_data  <- list(A         = A,
-                          N0        = length(ctl_y0),
-                          Y0        = as.array(ctl_y0),
+                          # N0        = length(ctl_y0),
+                          # Y0        = as.array(ctl_y0),
                           Y0Tilde   = sum(ctl_watt_di * ctl_y0),
                           SD0       = sd(ctl_y0),
                           # A_WATT_DI = A * as.array(ctl_watt_di),
@@ -464,8 +464,10 @@ get_stan_data_wattcon <- function(dta_psbor, v_outcome) {
     trt_lst_data <- NULL
     if (is_rct) {
         trt_lst_data  <- list(A         = 0,
-                              N0        = 1,
-                              Y0        = as.array(0),
+                              # N0        = 1,
+                              # Y0        = as.array(0),
+                              Y0Tilde   = 0,
+                              SD0       = 0,
                               # A_WATT_DI = as.array(0),
                               N1        = length(trt_y1),
                               Y1        = as.array(trt_y1))
