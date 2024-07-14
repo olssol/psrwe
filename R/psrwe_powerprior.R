@@ -10,9 +10,9 @@
 #'     \item{powerp}{Power prior model}
 #' }
 #'
-#' @param chains STAN parameter. Number of Markov chainsm
+#' @param chains STAN parameter. Number of Markov chains
 #' @param iter STAN parameter. Number of iterations
-#' @param warmup STAN parameter. Number of burnin.
+#' @param warmup STAN parameter. Number of burn-in.
 #' @param control STAN parameter. See \code{rstan::stan} for details.
 #' @param ... other options to call STAN sampling such as \code{thin},
 #'     \code{algorithm}. See \code{rstan::sampling} for details.#'
