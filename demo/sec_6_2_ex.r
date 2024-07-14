@@ -18,9 +18,6 @@ dta_ps_rct <- psrwe_est(ex_dta_rct,
 ### Obtain discounting parameters.
 ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
-### Obtain discounting parameters (A = 1 and eps in Xi.Ada.Wang).
-ps_bor_xaw <- psrwe_borrow(dta_ps_rct, total_borrow = 1)
-
 
 ### PSPP, RCT, binary outcome, weights of ATT.
 options(mc.cores = 1)
@@ -35,8 +32,9 @@ rst_pp_rct
 ### PSPP, RCT, binary outcome, weights of ATT, Xi.Ada.Wang.
 options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
-rst_pp_xaw <- psrwe_powerp_watt(ps_bor_xaw,
+rst_pp_xaw <- psrwe_powerp_watt(ps_bor_rct,
                                 outcome_type = "binary",
+                                ipw_method   = "Xi.Ada.Wang",
                                 v_outcome    = "Y_Bin",
                                 seed         = 1234)
 }) })
