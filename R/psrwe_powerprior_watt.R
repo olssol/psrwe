@@ -10,8 +10,10 @@
 #' @param outcome_type Type of outcomes: \code{continuous} or \code{binary}.
 #' @param mcmc_method MCMC sampling via either \code{rstan}, \code{analytic},
 #'     or \code{wattcon}.
-#' @param tau0_method Method for estimating SD0 via either \code{wang2019} or
+#' @param tau0_method Method for estimating SD0 via either \code{Wang2019} or
 #'     \code{weighted} for continuous outcomes only.
+#' @param ipw_method Method for IPW via either \code{Heng.Li} or
+#'     \code{Xi.Ada.Wang}.
 #' @param seed Random seed.
 #' @param ... extra parameters for calling function \code{\link{rwe_stan}}.
 #'
@@ -52,7 +54,8 @@
 psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                               outcome_type = c("continuous", "binary"),
                               mcmc_method = c("rstan", "analytic", "wattcon"),
-                              tau0_method = c("wang2019", "weighted"),
+                              tau0_method = c("Wang2019", "weighted"),
+                              ipw_method = c("Heng.Li", "Xi.Ada.Wang"),
                               ..., seed = NULL) {
 
     ## check
@@ -65,11 +68,18 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
     mcmc_method <- match.arg(mcmc_method)
     stopifnot(dta_psbor$nstrata == 1)
     tau0_method <- match.arg(tau0_method)
+    ipw_method <- match.arg(ipw_method)
 
     if (mcmc_method[1] == "wattcon") {
        if (type[1] != "continuous") {
           stop("The 'wattcon' is for continuous outcomes only.")
        }
+    }
+
+    if (ipw_method[1] == "Xi.Ada.Wang") {
+        if (outcome_type != "binary" || mcmc_method != "rstan") {
+            stop("The 'Xi.Ada.Wang' is for binary outcomes and rstan only.")
+        }
     }
 
     ## save the seed from global if any then set random seed
@@ -86,7 +96,9 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 
     if (mcmc_method[1] %in% c("rstan", "analytic")) {
         ## prepare stan data
-        lst_dta <- get_stan_data_watt(dta_psbor, v_outcome, tau0_method[1])
+        lst_dta <- get_stan_data_watt(dta_psbor, v_outcome,
+                                      tau0_method = tau0_method[1],
+                                      ipw_method = ipw_method[1])
 
         ## sampling
         stan_mdl <- if_else("continuous" == type,
@@ -94,7 +106,8 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
                             "powerpsbinary")
     } else {
         ## prepare stan data
-        lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome)
+        lst_dta <- get_stan_data_wattcon(dta_psbor, v_outcome,
+                                         ipw_method = ipw_method[1])
 
         ## sampling
         stan_mdl <- "powerps_wattcon"
@@ -181,9 +194,10 @@ psrwe_powerp_watt <- function(dta_psbor, v_outcome = "Y",
 #' @noRd
 #'
 get_stan_data_watt <- function(dta_psbor, v_outcome,
-                               tau0_method = "wang2019") {
+                               tau0_method = "Wang2019",
+                               ipw_method = "Heng.Li") {
     f_curd <- function(i, d1, d0 = NULL, d0_watt = NULL,
-                       tau0_method = "wang2019") {
+                       tau0_method = "Wang2019") {
         cur_d <- c(N1    = length(d1),
                    YBAR1 = mean(d1),
                    YSUM1 = sum(d1))
@@ -198,7 +212,7 @@ get_stan_data_watt <- function(dta_psbor, v_outcome,
                 d0_watt <- rep(1, length(d0))
             }
 
-            if (tau0_method[1] == "wang2019") {
+            if (tau0_method[1] == "Wang2019") {
                 SD0 <- sd(d0)
             } else if (tau0_method[1] == "weighted") {
                 # SD0 <- sd(d0 * d0_watt) /      # w_i * Y_i
@@ -248,6 +262,11 @@ get_stan_data_watt <- function(dta_psbor, v_outcome,
         cur_d0_e    <- cur_01_e$cur_d0
         cur_d0_watt <- cur_d0_e / (1 - cur_d0_e)
 
+        ### overwrite watt for ipw_method of Xi.Ada.Wang
+        if (ipw_method[1] == "Xi.Ada.Wang") {
+            cur_d0_watt <- cur_d0_e * cur_d0_watt
+        }
+
         ctl_cur    <- f_curd(i, cur_d1, cur_d0, cur_d0_watt,
                              tau0_method = tau0_method[1])
         ctl_stan_d <- rbind(ctl_stan_d, ctl_cur$stan_d)
@@ -292,7 +311,6 @@ get_stan_data_watt <- function(dta_psbor, v_outcome,
                               YBAR1 = as.array(trt_stan_d[, "YBAR1"]),
                               YSUM1 = as.array(trt_stan_d[, "YSUM1"]))
     }
-
 
     list(ctl = ctl_lst_data,
          trt = trt_lst_data)
