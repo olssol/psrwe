@@ -1,0 +1,11 @@
+citHeader("To cite psrwe package use:")
+
+bibentry(
+  "Misc",
+  title = "{psrwe}: PS-Integrated Methods for Incorporating Real-World Evidence in Clinical Studies",
+  author = c("Chenguang Wang", "Wei-Chen Chen"),
+  year = 2026,
+  note = "{R} Package, URL https://cran.r-project.org/package=psrwe",
+  key = "psrwepackage"
+)
+

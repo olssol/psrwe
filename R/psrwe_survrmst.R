@@ -1,13 +1,13 @@
 #' PS-Integrated Restricted Mean Survival Time (RMST) Test For Comparing Time-to-event Outcomes
 #'
-#' RMST test evaluates two-arm RCT for up to a given time point.
-#' Variance can be estimated by Jackknife methods.
+#' RMST test evaluates a two-arm RCT for up to a given time point.
+#' Variance can be estimated by the Jackknife method.
 #' Apply to the case when there is only one external data source and
 #' two-arm RCT.
 #'
 #' @inheritParams psrwe_survkm
 #'
-#' @param pred_tp A numeric value corresponding to time of interest
+#' @param pred_tp A numeric value corresponding to the time of interest
 #'                (e.g., 365 days or 1 year)
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
@@ -16,15 +16,15 @@
 #' @param ... Additional Parameters
 #'
 #' @details \code{stderr_method} includes \code{naive} as default which
-#'     mostly follows Greenwood formula,
-#'     \code{jk} using Jackknife method within each stratum,
+#'     mostly follows the Greenwood formula,
+#'     \code{jk} using the Jackknife method within each stratum,
 #'     \code{sjk} using simple Jackknife method for combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     such as point estimates in single-arm or treatment effects in RCT, or
 #'     \code{cjk} for complex Jackknife method including refitting PS model,
 #'     matching, trimming, calculating borrowing parameters, and
 #'     combining overall estimates.
 #'     Note that \code{sjk} may take a while longer to finish and
-#'     \code{cjk} will take even much longer to finish.
+#'     \code{cjk} will take even longer to finish.
 #'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
 #'     methods.
 #'
@@ -32,7 +32,7 @@
 #'     It contains the test statistics of each stratum as well as the
 #'     Jackknife estimation. The results can be further
 #'     summarized by its S3 method \code{summary}.
-#'     The results can be also analyzed by \code{psrwe_outana} for outcome
+#'     The results can also be analyzed by \code{psrwe_outana} for outcome
 #'     analysis and inference.
 #'
 #'
@@ -200,10 +200,10 @@ get_surv_stratum_rmst <- function(d1, d0 = NULL, d1t, n_borrow = 0, pred_tps,
 #' stratum
 #'
 #'
-#' @param dta_cur Matrix of time and event from a PS stratum in current study
-#'                (control arm only)
-#' @param dta_ext Matrix of time and event from a PS stratum in external data
-#'                source (control arm only)
+#' @param dta_cur Matrix of time and event from a PS stratum in the current
+#'                study (control arm only)
+#' @param dta_ext Matrix of time and event from a PS stratum in the external
+#'                data source (control arm only)
 #' @param dta_cur_trt Matrix of time and event from a PS stratum in current
 #'                    study (treatment arm only)
 #' @param n_borrow Number of subjects to be borrowed

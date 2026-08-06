@@ -13,9 +13,9 @@ rwe_cl(
 )
 }
 \arguments{
-\item{dta_cur}{Vector of outcome from a PS stratum in current study}
+\item{dta_cur}{Vector of outcome from a PS stratum in the current study}
 
-\item{dta_ext}{Vector of outcome from a PS stratum in external data source}
+\item{dta_ext}{Vector of outcome from a PS stratum in the external data source}
 
 \item{n_borrow}{Number of subjects to be borrowed}
 
@@ -28,7 +28,7 @@ external data source}
 Maximum composite likelihood estimator of the mean
 }
 \description{
-Estimate parameter of interest based composite likelihood for a single PS
+Estimate parameter of interest based on composite likelihood for a single PS
 stratum
 }
 \examples{

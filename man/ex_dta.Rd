@@ -13,7 +13,13 @@ A data frame with the following variables:
   \item{Y_Con}{Continuous outcome}
   \item{Y_Surv}{Survival outcome in days}
   \item{Status}{Event status (0=alive, 1=dead)}
-  \item{V1-V7}{Covariates}
+  \item{V1}{Baseline covariate}
+  \item{V2}{Baseline covariate}
+  \item{V3}{Baseline covariate}
+  \item{V4}{Baseline covariate}
+  \item{V5}{Baseline covariate}
+  \item{V6}{Baseline covariate}
+  \item{V7}{Baseline covariate}
 }
 }
 \usage{

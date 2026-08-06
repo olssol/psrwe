@@ -1,7 +1,7 @@
 #' PS-Integrated Composite Likelihood Estimation
 #'
 #' Estimate the mean of the outcome based on PS-integrated composite likelihood
-#' approach. Variance is estimated by Jack-Knife method. Applies to the case
+#' approach. Variance is estimated by the Jackknife method. Applies to the case
 #' when there is only one external data source.
 #'
 #' @inheritParams psrwe_powerp
@@ -11,9 +11,9 @@
 #' @param ... Parameters for \code{rwe_cl}
 #'
 #' @details \code{stderr_method} include \code{jk} as default
-#'     using Jackknife method within each stratum,
+#'     using the Jackknife method within each stratum,
 #'     \code{sjk} for simple Jackknife method for combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     such as point estimates in single-arm or treatment effects in RCT, or
 #'     \code{cjk} for complex Jackknife method including refitting PS model,
 #'     matching, trimming, calculating borrowing parameters, and
 #'     combining overall estimates.
@@ -26,7 +26,7 @@
 #'     composite estimation of the mean for each stratum as well as the
 #'     jackknife estimation for each subject. The results can be further
 #'     summarized by its S3 method \code{summary}.
-#'     The results can be also analyzed by \code{psrwe_outana} for outcome
+#'     The results can also be analyzed by \code{psrwe_outana} for outcome
 #'     analysis and inference.
 #'
 #' @examples
@@ -111,13 +111,13 @@ psrwe_compl <- function(dta_psbor, v_outcome = "Y",
 
 #' Composite Likelihood Estimation
 #'
-#' Estimate parameter of interest based composite likelihood for a single PS
+#' Estimate parameter of interest based on composite likelihood for a single PS
 #' stratum
 #'
 #' @inheritParams psrwe_powerp
 #'
-#' @param dta_cur Vector of outcome from a PS stratum in current study
-#' @param dta_ext Vector of outcome from a PS stratum in external data source
+#' @param dta_cur Vector of outcome from a PS stratum in the current study
+#' @param dta_ext Vector of outcome from a PS stratum in the external data source
 #' @param n_borrow Number of subjects to be borrowed
 #' @param equal_sd Boolean. whether sd is the same between the current study and
 #'     external data source

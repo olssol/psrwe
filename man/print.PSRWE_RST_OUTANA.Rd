@@ -18,6 +18,9 @@
 
 \item{...}{Additional parameters}
 }
+\value{
+None (invisible \code{NULL})
+}
 \description{
-Print detail information of outcome analysis results
+Print detailed information of outcome analysis results
 }

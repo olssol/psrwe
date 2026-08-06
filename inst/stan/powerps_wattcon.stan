@@ -13,6 +13,9 @@ data {
   //current data
   int<lower = 1> N1;
   array[N1] real Y1;
+
+  //prior only
+  int<lower = 0, upper = 1> PRIORONLY;
 }
 
 parameters {
@@ -30,5 +33,7 @@ model {
   }
 
   //likelihood
-  Y1 ~ normal(thetas, taus);
+  if (0 == PRIORONLY) {
+    Y1 ~ normal(thetas, taus);
+  }
 }

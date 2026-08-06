@@ -15,6 +15,9 @@ data {
 
   //target borrowing
   real<lower = 0> A;
+
+  //prior only
+  int<lower = 0, upper = 1> PRIORONLY;
 }
 
 transformed data {
@@ -45,5 +48,8 @@ model {
     target +=  normal_lpdf(YBAR0 | theta, sn0) * a0;
   }
 
-  Y1 ~ normal(theta, tau1);
+  //likelihood
+  if (0 == PRIORONLY) {
+    Y1 ~ normal(theta, tau1);
+  }
 }

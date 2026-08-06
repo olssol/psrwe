@@ -1,12 +1,13 @@
 #' PS-Integrated Kaplan-Meier Estimation
 #'
 #' Estimate the mean of a survival outcome at a given time point based on
-#' PS-integrated Kaplan-Meier approach. Variance can be estimated by Jackknife
-#' methods. Apply to the case when there is only one external data source.
+#' PS-integrated Kaplan-Meier approach. Variance can be estimated by the
+#' Jackknife methods. Apply to the case when there is only one external
+#' data source.
 #'
 #' @inheritParams psrwe_powerp
 #'
-#' @param pred_tp A numeric value corresponding to time of interest
+#' @param pred_tp A numeric value corresponding to the time of interest
 #'                (e.g., 365 days or 1 year)
 #' @param v_time Column name corresponding to event time
 #' @param v_event Column name corresponding to event status
@@ -15,15 +16,15 @@
 #' @param ... Additional Parameters
 #'
 #' @details \code{stderr_method} includes \code{naive} as default which
-#'     mostly follows Greenwood formula,
-#'     \code{jk} using Jackknife method within each stratum,
+#'     mostly follows the Greenwood formula,
+#'     \code{jk} using the Jackknife method within each stratum,
 #'     \code{sjk} using simple Jackknife method for combined estimates
-#'     such as point estimates in single arm or treatment effects in RCT, or
+#'     such as point estimates in single-arm or treatment effects in RCT, or
 #'     \code{cjk} for complex Jackknife method including refitting PS model,
 #'     matching, trimming, calculating borrowing parameters, and
 #'     combining overall estimates.
 #'     Note that \code{sjk} may take a while longer to finish and
-#'     \code{cjk} will take even much longer to finish.
+#'     \code{cjk} will take even longer to finish.
 #'     The \code{sbs} and \code{cbs} is for simple and complex Bootstrap
 #'     methods.
 #'
@@ -31,7 +32,7 @@
 #'     composite estimation of the mean for each stratum as well as the
 #'     Jackknife estimation. The results can be further
 #'     summarized by its S3 method \code{summary}.
-#'     The results can be also analyzed by \code{psrwe_outana} for outcome
+#'     The results can also be analyzed by \code{psrwe_outana} for outcome
 #'     analysis and inference.
 #'
 #'
@@ -195,9 +196,10 @@ get_surv_stratum <- function(d1, d0 = NULL, n_borrow = 0, pred_tps,
 #' stratum
 #'
 #'
-#' @param dta_cur Matrix of time and event from a PS stratum in current study
-#' @param dta_ext Matrix of time and event from a PS stratum in external data
-#'     source
+#' @param dta_cur Matrix of time and event from a PS stratum in the current
+#'     study
+#' @param dta_ext Matrix of time and event from a PS stratum in the external
+#'     data source
 #' @param n_borrow Number of subjects to be borrowed
 #' @param pred_tps Time points to be estimated (unique and sorted)
 #' @param stderr_method Method for computing StdErr (available for naive only)

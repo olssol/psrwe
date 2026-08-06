@@ -12,6 +12,9 @@ the \code{\link{psrwe_match}} function.}
 
 \item{...}{Parameters for \code{plot.PSRWE_DAT}}
 }
+\value{
+A plot of class in ggplot2
+}
 \description{
 S3 method for visualizing PS adjustment based on matching.
 }

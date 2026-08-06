@@ -1,6 +1,6 @@
 ### Example of Section 5.2.
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta_rct)
 ex_dta_rct$Y_Bin <- ifelse(ex_dta_rct$Y_Con < 320, 1, 0)
 
@@ -21,7 +21,7 @@ ps_bor_xaworg <- psrwe_borrow(dta_ps_rct, total_borrow = 1)  # Original
 
 
 ### PSPP, RCT, binary outcome, weights of ATT.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp_rct <- psrwe_powerp_watt(ps_bor_rct,
                                 outcome_type = "binary",
@@ -31,7 +31,7 @@ rst_pp_rct <- psrwe_powerp_watt(ps_bor_rct,
 rst_pp_rct
 
 ### PSPP, RCT, binary outcome, weights of ATT, Xi.Ada.Wang.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp_xaw <- psrwe_powerp_watt(ps_bor_rct,
                                 outcome_type = "binary",
@@ -42,7 +42,7 @@ rst_pp_xaw <- psrwe_powerp_watt(ps_bor_rct,
 rst_pp_xaw
 
 ### PSPP, RCT, binary outcome, weights of ATT, Xi.Ada.Wang original.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp_xaworg <- psrwe_powerp_watt(ps_bor_xaworg,                 # A = 1
                                    outcome_type = "binary",
@@ -65,4 +65,7 @@ print(oa_pp_xaworg, show_rct = TRUE)
 eps <- ps_bor_rct$data$"_ps_"[ps_bor_rct$data$"_grp_" == 0]
 A_xaworg <- 1 / mean(eps / (1 - eps))
 print(A_xaworg)
+
+### Reset to user's options.
+options(c(org_digits, org_mc.cores))
 

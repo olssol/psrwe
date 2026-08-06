@@ -6,7 +6,7 @@
 \usage{
 rwe_stan(
   lst_data,
-  stan_mdl = c("powerps", "powerpsbinary", "powerp"),
+  stan_mdl = c("powerps", "powerpsbinary", "powerp", "powerps_wattcon"),
   chains = 4,
   iter = 2000,
   warmup = 1000,
@@ -22,13 +22,14 @@ rwe_stan(
     \item{powerps}{PS-power prior model for continuous outcomes}
     \item{powerpsbinary}{PS-power prior model for binary outcomes}
     \item{powerp}{Power prior model}
+    \item{powerps_wattcon}{Power prior model with ATT weights for continuous outcomes}
 }}
 
-\item{chains}{STAN parameter. Number of Markov chainsm}
+\item{chains}{STAN parameter. Number of Markov chains}
 
 \item{iter}{STAN parameter. Number of iterations}
 
-\item{warmup}{STAN parameter. Number of burnin.}
+\item{warmup}{STAN parameter. Number of burn-in.}
 
 \item{control}{STAN parameter. See \code{rstan::stan} for details.}
 

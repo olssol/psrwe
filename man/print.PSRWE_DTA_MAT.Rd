@@ -12,6 +12,9 @@ the \code{\link{psrwe_match}} function.}
 
 \item{...}{Additional parameters}
 }
+\value{
+A list from \code{summary(x)} with additional information
+}
 \description{
 Print summary information of PS estimation results
 }

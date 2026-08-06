@@ -11,7 +11,7 @@ vignette: >
 
 ```{r, eval=T, echo=FALSE}
 suppressMessages(require(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 set.seed(1000)
 ```
 <br>
@@ -184,4 +184,12 @@ Journal of Biopharmaceutical Statistics, 29(5), 731-748.
 Propensity score-integrated composite likelihood approach for
 incorporating real-world evidence in single-arm clinical studies.
 Journal of Biopharmaceutical Statistics, 30(3), 495-507.
+
+<br>
+
+```{r, eval=T, echo=FALSE}
+## Reset to user's options.
+options(org_digits)
+```
+<br>
 

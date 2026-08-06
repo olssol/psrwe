@@ -14,11 +14,11 @@ rwe_rmst(
 )
 }
 \arguments{
-\item{dta_cur}{Matrix of time and event from a PS stratum in current study
-(control arm only)}
+\item{dta_cur}{Matrix of time and event from a PS stratum in the current
+study (control arm only)}
 
-\item{dta_ext}{Matrix of time and event from a PS stratum in external data
-source (control arm only)}
+\item{dta_ext}{Matrix of time and event from a PS stratum in the external
+data source (control arm only)}
 
 \item{dta_cur_trt}{Matrix of time and event from a PS stratum in current
 study (treatment arm only)}

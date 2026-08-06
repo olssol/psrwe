@@ -1,6 +1,6 @@
 ### Example of Section 5.2.
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta_rct)
 ex_dta_rct$Y_Bin <- ifelse(ex_dta_rct$Y_Con < 320, 1, 0)
 
@@ -20,7 +20,7 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
 
 ### PSPP, RCT, binary outcome, weights of ATT.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp_rct <- psrwe_powerp_watt(ps_bor_rct,
                                 outcome_type = "binary",
@@ -45,7 +45,7 @@ print(oa_ppana_rct, show_rct = TRUE)
 
 
 ### PSPP, RCT, continuous outcome, weights of ATT.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp_rct_con <- psrwe_powerp_watt(ps_bor_rct,
                                     outcome_type = "continuous",
@@ -109,4 +109,7 @@ rst_pp_rct_wattcon
 ### Outcome analysis.
 oa_pp_rct_wattcon <- psrwe_outana(rst_pp_rct_wattcon, alternative = "greater")
 print(oa_pp_rct_wattcon, show_rct = TRUE)
+
+### Reset to user's options.
+options(c(org_digits, org_mc.cores))
 

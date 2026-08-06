@@ -24,9 +24,9 @@ must be one of \code{"less"} (default), \code{"greater"}, or
 \code{mu = 0} when the test is log-rank or RMST}
 
 \item{method_pval}{A method name for p-value (default wald),
-no impact for Bayesian method, and
-\code{method = "score"} only is for binary outcome in
-single arm study (i.e., comparing with a PG set by \code{mu})}
+no effect on Bayesian methods, and
+\code{method = "score"} only is for binary outcomes in
+single arm studes (i.e., comparing with a PG set by \code{mu})}
 
 \item{...}{Other options}
 }

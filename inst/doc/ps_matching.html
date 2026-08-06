@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2022-10-10" />
+<meta name="date" content="2026-01-10" />
 
 <title>Propensity Score-Integrated Matching Method</title>
 
@@ -28,38 +28,31 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 });
 </script>
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
-  }
-});
-</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -71,55 +64,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -128,13 +120,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -338,29 +337,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Propensity Score-Integrated Matching Method</h1>
-<h4 class="date">2022-10-10</h4>
+<h1 class="title toc-ignore">Propensity Score-Integrated Matching
+Method</h1>
+<h4 class="date">2026-01-10</h4>
 
 
 
 <p><br></p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>In the <strong>psrwe</strong>, PS-integrated matching method (Chen, et al., 2021) is also implemented for leveraging real-world evidence in evaluation of diagnostic tests for low prevalence diseases. This example is based on PS matching and stratification on an important baseline covariate (e.g., disease stage) which may have major impact on the sensitivity of diagnostic.</p>
-<p>Not that this example is only for demonstrating PS matching on low prevalent disease and when the resource may be very limited. For different scenarios, other PS-integrated approaches may be more appropriate.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">data</span>(ex_dta)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>dta_ps &lt;-<span class="st"> </span><span class="kw">psrwe_est</span>(ex_dta,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>                    <span class="dt">v_covs =</span> <span class="kw">paste</span>(<span class="st">&quot;V&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>                    <span class="dt">v_grp =</span> <span class="st">&quot;Group&quot;</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>                    <span class="dt">cur_grp_level =</span> <span class="st">&quot;current&quot;</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>                    <span class="dt">ps_method =</span> <span class="st">&quot;logistic&quot;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>dta_ps</span></code></pre></div>
+<p>In the <strong>psrwe</strong>, PS-integrated matching method (Chen,
+et al., 2021) is also implemented for leveraging real-world evidence in
+evaluation of diagnostic tests for low-prevalence diseases. This example
+is based on PS matching and stratification on an important baseline
+covariate (e.g., disease stage) that may have a major impact on the
+sensitivity of the diagnostic.</p>
+<p>Note that this example is only for demonstrating PS matching on
+low-prevalent disease, and when the resource may be very limited. For
+different scenarios, other PS-integrated approaches may be more
+appropriate.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(ex_dta)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>dta_ps <span class="ot">&lt;-</span> <span class="fu">psrwe_est</span>(ex_dta,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>                    <span class="at">v_covs =</span> <span class="fu">paste</span>(<span class="st">&quot;V&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                    <span class="at">v_grp =</span> <span class="st">&quot;Group&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                    <span class="at">cur_grp_level =</span> <span class="st">&quot;current&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>                    <span class="at">ps_method =</span> <span class="st">&quot;logistic&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>dta_ps</span></code></pre></div>
 <pre><code>## This is a sing-arm study. A total of 1031 RWD subjects and 
 ## 200 current study subjects are used to estimate propensity 
 ## scores by logistic model. A total of 5 RWD subjects are 
-## trimmed and excluded from the final analysis. The following 
-## covariates are adjusted in the propensity score model: V1, 
-## V2, V3, V4, V5, V6, V7.
+## trimmed (trim_ab=both) and excluded from the final 
+## analysis. (PS values of 5 and 0 RWD are below and above 
+## current study) The following covariates are adjusted in the 
+## propensity score model: V1, V2, V3, V4, V5, V6, V7.
 ## 
 ## The following table summarizes the number of subjects in 
 ## each stratum, and the distance in PS distributions 
@@ -368,26 +377,37 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 
 ##     Stratum N_RWD N_Current Distance
 ## 1 Stratum 1   729        40    0.561
-## 2 Stratum 2   156        40    0.721
+## 2 Stratum 2   156        40    0.720
 ## 3 Stratum 3    78        40    0.804
 ## 4 Stratum 4    50        40    0.810
-## 5 Stratum 5    13        40    0.796</code></pre>
+## 5 Stratum 5    13        40    0.795</code></pre>
 <p><br></p>
 </div>
 <div id="ps-integrated-matching-method" class="section level2">
 <h2>PS-integrated matching method</h2>
-<p>The propensity score (PS) estimation above based on <code>psrwe_est()</code> may provide stratification. This matching example <code>psrwe_match()</code> below will match the RWD (real-world data) to the current study with <span class="math inline">\(2:1\)</span> ratio (<code>ratio = 2</code>) based on the covariate <code>V1</code> (<code>strata_covs = &quot;V1&quot;</code>). The (categorical) covariate <code>V1</code> will be used to create strata, then the data will be matched within each stratum based on PS values based on the nearest neighbor algorithm.</p>
-<p>Please see Section of Demo example below for the other option using different matching algorithm and package.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>dta_ps_match &lt;-<span class="st"> </span><span class="kw">psrwe_match</span>(dta_ps,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>                            <span class="dt">ratio =</span> <span class="dv">2</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>                            <span class="dt">strata_covs =</span> <span class="st">&quot;V1&quot;</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>dta_ps_match</span></code></pre></div>
+<p>The propensity score (PS) estimation above is based on
+<code>psrwe_est()</code> may provide stratification. This matching
+example <code>psrwe_match()</code> below will match the RWD (real-world
+data) to the current study with <span class="math inline">\(2:1\)</span>
+ratio (<code>ratio = 2</code>) based on the covariate <code>V1</code>
+(<code>strata_covs = &quot;V1&quot;</code>). The (categorical) covariate
+<code>V1</code> will be used to create strata, then the data will be
+matched within each stratum based on PS values based on the nearest
+neighbor algorithm.</p>
+<p>Please see Section of Demo example below for the other option using a
+different matching algorithm and package.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>dta_ps_match <span class="ot">&lt;-</span> <span class="fu">psrwe_match</span>(dta_ps,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                            <span class="at">ratio =</span> <span class="dv">2</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                            <span class="at">strata_covs =</span> <span class="st">&quot;V1&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                            <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>dta_ps_match</span></code></pre></div>
 <pre><code>## This is a sing-arm study. A total of 1031 RWD subjects and 
 ## 200 current study subjects are used to estimate propensity 
 ## scores by logistic model. A total of 631 RWD subjects are 
-## trimmed and excluded from the final analysis. The following 
-## covariates are adjusted in the propensity score model: V1, 
-## V2, V3, V4, V5, V6, V7.
+## trimmed (trim_ab=both) and excluded from the final 
+## analysis. (PS values of 5 and 0 RWD are below and above 
+## current study) The following covariates are adjusted in the 
+## propensity score model: V1, V2, V3, V4, V5, V6, V7.
 ## 
 ## The matching is stratified by the following covariate(s): 
 ## V1. A total of 0 current study subjects are matched by less 
@@ -401,10 +421,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##   Stratum N_RWD N_Current
 ## 1    V1=0   108        54
 ## 2    V1=1   292       146</code></pre>
-<p>The returned object <code>dta_ps_match</code> will be used to calculate discounting parameters for the study design. Note that the results are based on two stages indicated by <code>V1</code> rather than five strata originally set by <code>dta_ps</code> above.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>ps_bor_match &lt;-<span class="st"> </span><span class="kw">psrwe_borrow</span>(dta_ps_match,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>                             <span class="dt">total_borrow =</span> <span class="dv">30</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>ps_bor_match</span></code></pre></div>
+<p>The returned object <code>dta_ps_match</code> will be used to
+calculate discounting parameters for the study design. Note that the
+results are based on two stages indicated by <code>V1</code> rather than
+five strata originally set by <code>dta_ps</code> above.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>ps_bor_match <span class="ot">&lt;-</span> <span class="fu">psrwe_borrow</span>(dta_ps_match,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                             <span class="at">total_borrow =</span> <span class="dv">30</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>ps_bor_match</span></code></pre></div>
 <pre><code>## A total of 30 subjects will be borrowed from the RWD. The 
 ## number 30 is split proportional to the number of current 
 ## control subjects in each stratum. The following table 
@@ -418,37 +441,55 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="pscl-and-outcome-analyses" class="section level2">
 <h2>PSCL and outcome analyses</h2>
-<p>The PSCL analysis (Wang, et al., 2020) can be done below with the same step as other PSCL examples.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>rst_cl &lt;-<span class="st"> </span><span class="kw">psrwe_compl</span>(ps_bor_match,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>                      <span class="dt">outcome_type =</span> <span class="st">&quot;binary&quot;</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>                      <span class="dt">v_outcome    =</span> <span class="st">&quot;Y_Bin&quot;</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>rst_cl</span></code></pre></div>
+<p>The PSCL analysis (Wang, et al., 2020) can be done below with the
+same steps as other PSCL examples.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>rst_cl <span class="ot">&lt;-</span> <span class="fu">psrwe_compl</span>(ps_bor_match,</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>                      <span class="at">outcome_type =</span> <span class="st">&quot;binary&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                      <span class="at">v_outcome    =</span> <span class="st">&quot;Y_Bin&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>rst_cl</span></code></pre></div>
 <pre><code>## With a total of 30 subject borrowed from the RWD, the point 
 ## estimate is 0.303 with standard error 0.029.</code></pre>
-<p>The outcome analysis can be done in the same way. Note that typically the Wilson score method will be used for constructing confidence intervals.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>oa_cl &lt;-<span class="st"> </span><span class="kw">psrwe_outana</span>(rst_cl, <span class="dt">method_ci =</span> <span class="st">&quot;wilson&quot;</span>, <span class="dt">mu =</span> <span class="fl">0.40</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>oa_cl</span></code></pre></div>
+<p>The outcome analysis can be done in the same way. Note that typically
+the Wilson score method will be used for constructing confidence
+intervals.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>oa_cl <span class="ot">&lt;-</span> <span class="fu">psrwe_outana</span>(rst_cl, <span class="at">method_ci =</span> <span class="st">&quot;wilson&quot;</span>, <span class="at">mu =</span> <span class="fl">0.40</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>oa_cl</span></code></pre></div>
 <pre><code>## - Method: ps_cl, Outcome Type: binary, Study Type: single-arm
 ## - StdErr Method: jk
-## - Confidence Interval: wilson, Level: 0.95
-## - Test Method: p_value
+## - Interval Method: wilson, Level: 0.95, Stderr: original
+## - Test Method: p_value, Method pval: wald
 ##   H0: theta &gt;= 0.400 vs. Ha: theta &lt; 0.400
 ## - Analysis Results:
-##  Stratum  Mean StdErr Lower Upper  p-value
+##  Stratum  Mean StdErr Lower Upper  p.value
 ##  Overall 0.303 0.0285 0.247 0.365 0.000347</code></pre>
 <p><br></p>
 </div>
 <div id="demo-example" class="section level2">
 <h2>Demo example</h2>
-<p>The script in “<strong>psrwe/demo/sec_4_3_ex.r</strong>” source file has the full example for the PS matching which can be run via the <code>demo(&quot;sec_4_3_ex&quot;, package = &quot;psrwe&quot;)</code>.</p>
-<p>Note the <em>R</em> package <strong>optim</strong> may provide other matching algorithms, however, it may need additional license permission. Please check with package announcement if the package is turned on. <br></p>
+<p>The script in “<strong>psrwe/demo/sec_4_3_ex.r</strong>” source file
+has the full example for the PS matching, which can be run via the
+<code>demo(&quot;sec_4_3_ex&quot;, package = &quot;psrwe&quot;)</code>.</p>
+<p>Note that the <em>R</em> package <strong>optim</strong> may provide
+other matching algorithms. However, it may need additional license
+permission. Please check the package announcement to see if the package
+is turned on. <br></p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
 <ol style="list-style-type: decimal">
-<li><p>Chen, W.-C., Li, H., Wang, C., Lu, N., Song, C., Tiwari, R., Xu, Y., and Yue, L.Q. (2021). Evaluation of Diagnostic Tests for Low Prevalence Diseases: A Statistical Approach for Leveraging Real-World Data to Accelerate the Study. Journal of Biopharmaceutical Statistics, 31(3), 375-390.</p></li>
-<li><p>Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., and Yue, L.Q. (2020). Propensity score-integrated composite likelihood approach for incorporating real-world evidence in single-arm clinical studies. Journal of Biopharmaceutical Statistics, 30(3), 495-507.</p></li>
+<li><p>Chen, W.-C., Li, H., Wang, C., Lu, N., Song, C., Tiwari, R., Xu,
+Y., and Yue, L.Q. (2021). Evaluation of Diagnostic Tests for Low
+Prevalence Diseases: A Statistical Approach for Leveraging Real-World
+Data to Accelerate the Study. Journal of Biopharmaceutical Statistics,
+31(3), 375-390.</p></li>
+<li><p>Wang, C., Lu, N., Chen, W. C., Li, H., Tiwari, R., Xu, Y., and
+Yue, L.Q. (2020). Propensity score-integrated composite likelihood
+approach for incorporating real-world evidence in single-arm clinical
+studies. Journal of Biopharmaceutical Statistics, 30(3),
+495-507.</p></li>
 </ol>
+<p><br></p>
+<p><br></p>
 </div>
 
 

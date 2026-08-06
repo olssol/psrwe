@@ -32,19 +32,19 @@ A data frame with class name \code{PSRWE_RST}. It contains the
     composite estimation of the mean for each stratum as well as the
     jackknife estimation for each subject. The results can be further
     summarized by its S3 method \code{summary}.
-    The results can be also analyzed by \code{psrwe_outana} for outcome
+    The results can also be analyzed by \code{psrwe_outana} for outcome
     analysis and inference.
 }
 \description{
 Estimate the mean of the outcome based on PS-integrated composite likelihood
-approach. Variance is estimated by Jack-Knife method. Applies to the case
+approach. Variance is estimated by the Jackknife method. Applies to the case
 when there is only one external data source.
 }
 \details{
 \code{stderr_method} include \code{jk} as default
-    using Jackknife method within each stratum,
+    using the Jackknife method within each stratum,
     \code{sjk} for simple Jackknife method for combined estimates
-    such as point estimates in single arm or treatment effects in RCT, or
+    such as point estimates in single-arm or treatment effects in RCT, or
     \code{cjk} for complex Jackknife method including refitting PS model,
     matching, trimming, calculating borrowing parameters, and
     combining overall estimates.
