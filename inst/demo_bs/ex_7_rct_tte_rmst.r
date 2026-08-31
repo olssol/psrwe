@@ -1,6 +1,6 @@
 ### Example of RCT, time-to-event outcome, and RMST
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta_rct)
 
 ### Obtain PSs.
@@ -45,4 +45,7 @@ rst_rmst_cbs <- psrwe_survrmst(ps_bor_rct,
                                stderr_method = "cbs")
 oa_rmst_cbs <- psrwe_outana(rst_rmst_cbs)
 summary(oa_rmst_cbs, pred_tps = c(180, 365))
+
+## Reset to user's options.
+options(org_digits)
 

@@ -35,7 +35,7 @@ random forest approach.}
 \item{v_grp}{Column name corresponding to group assignment.}
 
 \item{cur_grp_level}{Group level for the current study. Default is
-\code{cur_grp_level = 1}. Ignored for single arm studies.}
+\code{cur_grp_level = 1}. Ignored for single-arm studies.}
 
 \item{v_arm}{Column name corresponding to arm assignment.}
 
@@ -43,7 +43,7 @@ random forest approach.}
 studies.}
 
 \item{stra_ctl_only}{Create strata by control arm patients only. Default
-\code{TRUE}. Ignored by single arm studies. For randomized studies, when
+\code{TRUE}. Ignored by single-arm studies. For randomized studies, when
 \code{stra_ctl_only} is \code{FALSE}, strata are created based on the PS
 scores of the entire current study patients.}
 

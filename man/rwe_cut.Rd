@@ -36,7 +36,7 @@ A vector of stratum assignment for \code{y}. The y's that are outside
 \description{
 Cut a sequence of numbers into bins.
 
-The cut points are chosen such that there will with equal numbers in each bin
+The cut points are chosen such that there will be equal numbers in each bin
 for \code{x}. By default, values of \code{y} that are outside the range of
 \code{x} will be excluded from the bins, unless they are in the
 \code{keep_inx}.

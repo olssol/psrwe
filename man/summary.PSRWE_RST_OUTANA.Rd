@@ -14,6 +14,9 @@
 
 \item{...}{Additional parameters}
 }
+\value{
+A list of class \code{PSRWE_RST_OUTANA} with additiona information
+}
 \description{
 Summary information of outcome analysis results
 }

@@ -13,10 +13,11 @@ rwe_km(
 )
 }
 \arguments{
-\item{dta_cur}{Matrix of time and event from a PS stratum in current study}
+\item{dta_cur}{Matrix of time and event from a PS stratum in the current
+study}
 
-\item{dta_ext}{Matrix of time and event from a PS stratum in external data
-source}
+\item{dta_ext}{Matrix of time and event from a PS stratum in the external
+data source}
 
 \item{n_borrow}{Number of subjects to be borrowed}
 

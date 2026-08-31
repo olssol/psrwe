@@ -19,13 +19,13 @@ psrwe_match(
 \item{dta_ps}{A list of class \code{PSRWE_DAT} that is generated using the
 \code{\link{psrwe_est}} function.}
 
-\item{ratio}{Matching ratio (RWD : Current) with default value 3 meaning 3:1
-matching.}
+\item{ratio}{Matching ratio (RWD : Current). Default is 3
+(i.e., 3:1 matching).}
 
-\item{strata_covs}{Stratification covariates for matching.}
+\item{strata_covs}{Covariates used for stratification in matching.}
 
 \item{caliper}{PS matching caliper width. Default 1. This specifies a
-width (euclidean distance) on the probability scale.}
+width (Euclidean distance) on the probability scale.}
 
 \item{seed}{Random seed.}
 
@@ -51,8 +51,8 @@ A list of class \code{PSRWE_DTA_MAT} with items:
 }
 }
 \description{
-Match patients in external data source with patients in current
-    study based on PS using nearest neighbor method.
+Match patients in the external data source with patients in
+    the current study based on PS using the nearest neighbor method.
 }
 \examples{
 data(ex_dta)

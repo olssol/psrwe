@@ -1,6 +1,6 @@
 ### Example of Section 4.4.
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_options <- options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.
@@ -54,4 +54,7 @@ rst_km_jko <- psrwe_survkm(ps_bor_single,
                            stderr_method = "sjk")
 oa_km_jko <- psrwe_outana(rst_km_jko, mu = 0.70, alternative = "greater")
 summary(oa_km_jko, pred_tps = c(180, 365))
+
+### Reset to user's options.
+options(org_digits)
 

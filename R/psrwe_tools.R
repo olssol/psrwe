@@ -68,11 +68,11 @@ get_ps <- function(dta,
 
 #' @title Get number of subjects borrowed
 #'
-#' @param total_borrow integer. Target number of subjects to be borroqwed.
-#' @param ns0 vector. Number of subjects in historical data (control) arm for
-#'   each stratum.
-#' @param rs vector. Similarity measure; for example, overlapping coefficient
+#' @param total_borrow integer. Target number of subjects to be borrowed.
+#' @param ns0 vector. Number of subjects in the historical data (control) arm
 #'   for each stratum.
+#' @param rs vector. Similarity measure; for example, the overlapping
+#'   coefficient for each stratum.
 #' @param m_lambda character. Method to split \code{total_borrow}, which can be
 #'   based on distance (\code{m_lambda = "dist"}) or inverse distance
 #'   (\code{m_lambda = "inverse"}).
@@ -206,7 +206,8 @@ get_freq_tbl <- function(data, var_groupby, vars = NULL) {
       next
 
     cur_freq <- data %>%
-        count(.dots = c(var_groupby, v)) %>%
+        # count(.dots = c(var_groupby, v)) %>%
+        count(across(all_of(c(var_groupby, v)))) %>%
         group_by(!!as.name(var_groupby)) %>%
         mutate(Sum  = sum(.data$n),
                Freq = .data$n / sum(.data$n)) %>%

@@ -1,6 +1,6 @@
 ### Example of RCT and continuous outcome
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta_rct)
 
 ### Obtain PSs.
@@ -40,4 +40,7 @@ rst_cl_rct_cbs <- psrwe_compl(ps_bor_rct,
                               stderr_method = "cbs")
 oa_cl_rct_cbs <- psrwe_outana(rst_cl_rct_cbs, alternative = "greater")
 print(oa_cl_rct_cbs, show_rct = TRUE)
+
+## Reset to user's options.
+options(org_digits)
 

@@ -21,6 +21,9 @@ data {
 
   //target borrowing
   real<lower = 0> A;
+
+  //prior only
+  int<lower = 0, upper = 1> PRIORONLY;
 }
 
 transformed data {
@@ -70,7 +73,9 @@ model {
   vs ~ dirichlet(RS);
 
   //likelihood
-  YSUM1 ~ binomial(N1, thetas);
+  if (0 == PRIORONLY) {
+    YSUM1 ~ binomial(N1, thetas);
+  }
 }
 
 generated quantities {

@@ -26,14 +26,26 @@ environment:
     GCC_PATH: mingw_64
 
 build_script:
-  #- Rscript -e "install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/rstan_2.21.2.zip')"
+  ##- Rscript -e "install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/rstan_2.21.2.zip')"
+  #- travis-tool.sh install_deps
+  ##- R CMD INSTALL psrwe*.tar.gz
+  #- cd ..\
+  #- R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
+  #- R CMD INSTALL --no-test-load psrwe_3.2.tar.gz
+  ##- pwd
+  ##- dir
+  ##- R CMD check --as-cran --no-manual --no-build-vignettes psrwe_3.2.tar.gz
+  ##- cat ./psrwe.Rcheck/00install.out
+  ##- cat ./psrwe.Rcheck/00check.log
+  - cd psrwe
   - travis-tool.sh install_deps
-  #- R CMD INSTALL psrwe*.tar.gz
-  - cd ..\
+  - cd ..
+  - chmod u+x ./psrwe/configure ./psrwe/cleanup
   - R CMD build --no-build-vignettes --no-manual --no-resave-data psrwe
-  - R CMD INSTALL --no-test-load psrwe_3.2.tar.gz
-  #- pwd
-  #- dir
-  #- R CMD check --as-cran --no-manual --no-build-vignettes psrwe_3.2.tar.gz
-  #- cat ./psrwe.Rcheck/00install.out
-  #- cat ./psrwe.Rcheck/00check.log
+  - cmd: FOR %%F IN ("psrwe_*.tar.gz") DO SET PBD_PKG=%%F
+  - echo %PBD_PKG%
+  - R CMD INSTALL %PBD_PKG% 
+  - R CMD check %PBD_PKG% --as-cran --no-manual --no-vignettes --no-clean
+  - dir psrwe.Rcheck
+  - type psrwe.Rcheck\psrwe-Ex.Rout
+

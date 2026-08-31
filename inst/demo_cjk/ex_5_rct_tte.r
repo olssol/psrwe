@@ -1,6 +1,6 @@
 ### Example of RCT and time-to-event outcome
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta_rct)
 
 ### Obtain PSs.
@@ -34,4 +34,7 @@ rst_km_rct_cjk <- psrwe_survkm(ps_bor_rct,
                                stderr_method = "cjk")
 oa_km_rct_cjk <- psrwe_outana(rst_km_rct_cjk, alternative = "greater")
 summary(oa_km_rct_cjk, pred_tps = c(180, 365))
+
+## Reset to user's options.
+options(org_digits)
 

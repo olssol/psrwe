@@ -27,7 +27,7 @@ the \code{\link{psrwe_est}} function.}
   \item{\code{omkss}}{One minus Kolmogorov-Smirnov statistic}
 }}
 
-\item{min_n0}{threshold for number of external subjects, below which the
+\item{min_n0}{threshold for the number of external subjects, below which the
 external data in the current stratum will be ignored by setting the PS
 distance to 0. Default value 10.}
 
@@ -41,10 +41,10 @@ A list with columns:
     current study, number of subjects in control and treatment arms for RCT
     studies, and distance in PS distributions.}
 
-    \item{Overall}{A data frame with overall number of not-trimmed subjects
-    in RWD, number of patients in current study, number of subjects in
-    control and treatment arms for RCT studies, and distance in PS
-    distributions.}
+    \item{Overall}{A data frame with the overall number of not-trimmed
+    subjects in RWD, number of patients in the current study, number of
+    subjects in control and treatment arms for RCT studies, and distance
+    in PS distributions.}
 
     \item{N}{Vector of total number of total RWD patients, number of trimmed
     RWD patients, and total number of current study patients.}
@@ -54,8 +54,8 @@ A list with columns:
 }
 }
 \description{
-Get number of subjects and the distances of PS distributions for
-  each PS stratum.
+Get the number of subjects and the distances of PS
+  distributions for each PS stratum.
 }
 \examples{
 data(ex_dta)

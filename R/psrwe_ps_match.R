@@ -1,15 +1,15 @@
 #' @title PS matching
 #'
-#' @description Match patients in external data source with patients in current
-#'     study based on PS using nearest neighbor method.
+#' @description Match patients in the external data source with patients in
+#'     the current study based on PS using the nearest neighbor method.
 #'
 #' @param dta_ps A list of class \code{PSRWE_DAT} that is generated using the
 #'     \code{\link{psrwe_est}} function.
-#' @param ratio Matching ratio (RWD : Current) with default value 3 meaning 3:1
-#'     matching.
-#' @param strata_covs Stratification covariates for matching.
+#' @param ratio Matching ratio (RWD : Current). Default is 3
+#'     (i.e., 3:1 matching).
+#' @param strata_covs Covariates used for stratification in matching.
 #' @param caliper PS matching caliper width. Default 1. This specifies a
-#'     width (euclidean distance) on the probability scale.
+#'     width (Euclidean distance) on the probability scale.
 #' @param seed Random seed.
 #' @param method matching algorithm for PS matching.
 #' @param .drop_arg_fml internal use to drop arguments and call, this is
@@ -80,11 +80,11 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
     mat_method <- match.arg(method)
 
     ## save the seed from global if any then set random seed
-    old_seed <- NULL
+    # old_seed <- NULL
     if (!is.null(seed)) {
-        if (exists(".Random.seed", envir = .GlobalEnv)) {
-            old_seed <- get(".Random.seed", envir = .GlobalEnv)
-        }
+        # if (exists(".Random.seed", envir = .GlobalEnv)) {
+        #     old_seed <- get(".Random.seed", envir = .GlobalEnv)
+        # }
         set.seed(seed)
     }
 
@@ -112,17 +112,17 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 
     ## reset the orignal seed back to the global or
     ## remove the one set within this session earlier.
-    if (!is.null(seed)) {
-        if (!is.null(old_seed)) {
-            invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
-        } else {
-            invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
-        }
-    }
+    # if (!is.null(seed)) {
+    #     if (!is.null(old_seed)) {
+    #         invisible(assign(".Random.seed", old_seed, envir = .GlobalEnv))
+    #     } else {
+    #         invisible(rm(list = c(".Random.seed"), envir = .GlobalEnv))
+    #     }
+    # }
 
     ## result
     rst             <- dta_ps
-    rst$data_match  <- as.data.frame(data)
+    rst$data        <- as.data.frame(data)
     rst$nstrata     <- nstrata
     rst$ratio       <- ratio
     rst$caliper     <- caliper
@@ -152,8 +152,9 @@ psrwe_match <- function(dta_ps, ratio = 3, strata_covs  = NULL,
 #'     of subjects in RWD, current study, number of subjects in control and
 #'     treatment arms for RCT studies.}
 #'
-#'     \item{Overall}{A data frame with overall number of not-trimmed subjects
-#'     in RWD, number of patients in current study, number of subjects in
+#'     \item{Overall}{A data frame with the overall number of not-trimmed
+#'     subjects
+#'     in RWD, number of patients in the current study, number of subjects in
 #'     control and treatment arms for RCT studies.}
 #'
 #'     \item{N}{Vector of total number of total RWD patients, number of trimmed
@@ -190,7 +191,7 @@ summary.PSRWE_DTA_MAT <- function(object, ...) {
     # }
 
     ## check matching ratio
-    match_n   <- object$data_match %>%
+    match_n   <- object$data       %>%
         dplyr::filter(1 == `_grp_` &
                       0 == `_arm_`) %>%
         select(`_matchn_`)
@@ -216,6 +217,7 @@ summary.PSRWE_DTA_MAT <- function(object, ...) {
 #'
 #' @method print PSRWE_DTA_MAT
 #'
+#' @return A list from \code{summary(x)} with additional information
 #'
 #' @export
 #'
@@ -265,6 +267,8 @@ print.PSRWE_DTA_MAT <- function(x, ...) {
 #' @seealso  \code{\link{plot.PSRWE_DTA}}
 #'
 #' @method plot PSRWE_DTA_MAT
+#'
+#' @return A plot of class in ggplot2
 #'
 #' @export
 #'

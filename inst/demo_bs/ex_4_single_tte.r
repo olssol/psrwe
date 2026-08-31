@@ -1,6 +1,6 @@
 ### Example of single arm and time-to-event outcome
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta)
 
 ### Obtain PSs.
@@ -43,4 +43,7 @@ rst_km_cbs <- psrwe_survkm(ps_bor_single,
                            stderr_method = "cbs")
 oa_km_cbs <- psrwe_outana(rst_km_cbs, mu = 0.70, alternative = "greater")
 summary(oa_km_cbs, pred_tps = c(180, 365))
+
+## Reset to user's options.
+options(org_digits)
 

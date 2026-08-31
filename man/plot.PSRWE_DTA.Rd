@@ -18,6 +18,9 @@
 
 \item{...}{Additional parameter for the plot}
 }
+\value{
+A plot of class in ggplot2
+}
 \description{
 S3 method for visualizing PS adjustment
 }

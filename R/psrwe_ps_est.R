@@ -11,12 +11,12 @@
 #' @param v_covs Column names corresponding to covariates.
 #' @param v_grp Column name corresponding to group assignment.
 #' @param cur_grp_level Group level for the current study. Default is
-#'     \code{cur_grp_level = 1}. Ignored for single arm studies.
+#'     \code{cur_grp_level = 1}. Ignored for single-arm studies.
 #' @param v_arm Column name corresponding to arm assignment.
 #' @param ctl_arm_level Arm level for the control arm. Ignored for single-arm
 #'     studies.
 #' @param stra_ctl_only Create strata by control arm patients only. Default
-#'     \code{TRUE}. Ignored by single arm studies. For randomized studies, when
+#'     \code{TRUE}. Ignored by single-arm studies. For randomized studies, when
 #'     \code{stra_ctl_only} is \code{FALSE}, strata are created based on the PS
 #'     scores of the entire current study patients.
 #' @param nstrata Number of PS strata to be created.
@@ -172,14 +172,14 @@ psrwe_est <- function(data,
 
 #' @title Summarize PS estimation and stratification results
 #'
-#' @description Get number of subjects and the distances of PS distributions for
-#'   each PS stratum.
+#' @description Get the number of subjects and the distances of PS
+#'   distributions for each PS stratum.
 #'
 #' @inheritParams get_distance
 #'
 #' @param object A list of class \code{PSRWE_DAT} that is generated using
 #'   the \code{\link{psrwe_est}} function.
-#' @param min_n0 threshold for number of external subjects, below which the
+#' @param min_n0 threshold for the number of external subjects, below which the
 #'   external data in the current stratum will be ignored by setting the PS
 #'   distance to 0. Default value 10.
 #' @param ... Additional parameters.
@@ -191,10 +191,10 @@ psrwe_est <- function(data,
 #'     current study, number of subjects in control and treatment arms for RCT
 #'     studies, and distance in PS distributions.}
 #'
-#'     \item{Overall}{A data frame with overall number of not-trimmed subjects
-#'     in RWD, number of patients in current study, number of subjects in
-#'     control and treatment arms for RCT studies, and distance in PS
-#'     distributions.}
+#'     \item{Overall}{A data frame with the overall number of not-trimmed
+#'     subjects in RWD, number of patients in the current study, number of
+#'     subjects in control and treatment arms for RCT studies, and distance
+#'     in PS distributions.}
 #'
 #'     \item{N}{Vector of total number of total RWD patients, number of trimmed
 #'     RWD patients, and total number of current study patients.}
@@ -341,6 +341,7 @@ summary.PSRWE_DTA <- function(object,
 #'
 #' @method print PSRWE_DTA
 #'
+#' @return A list from \code{summary(x)} with additional information
 #'
 #' @export
 #'
@@ -382,6 +383,8 @@ print.PSRWE_DTA <- function(x, ...) {
 #'
 #' @method plot PSRWE_DTA
 #'
+#' @return A plot of class in ggplot2
+#'
 #' @export
 #'
 plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
@@ -398,7 +401,7 @@ plot.PSRWE_DTA <- function(x, plot_type = c("ps", "balance", "diff"), ...) {
 #' @description
 #' Cut a sequence of numbers into bins.
 #'
-#' The cut points are chosen such that there will with equal numbers in each bin
+#' The cut points are chosen such that there will be equal numbers in each bin
 #' for \code{x}. By default, values of \code{y} that are outside the range of
 #' \code{x} will be excluded from the bins, unless they are in the
 #' \code{keep_inx}.

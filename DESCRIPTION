@@ -1,59 +1,52 @@
 Package: psrwe
-Title: PS-Integrated Methods for Incorporating RWE in Clinical Studies
-Version: 3.2
+Title: PS-Integrated Methods for Incorporating Real-World Evidence in
+        Clinical Studies
+Version: 3.2-2
 Authors@R: c(
     person(given = "Chenguang", family = "Wang",
-           email = "chenguang.wang.0517@gmail.com",
-           role = c("aut", "cre")),
+           role = c("aut")),
     person(given = "Trustees of Columbia University",
            role = "cph",
            comment = "tools/make_cpp.R, R/stanmodels.R"),
     person(given = "Wei-Chen", family = "Chen",
-           role = c("aut")))
+           email = "wccsnow@gmail.com",
+           role = c("aut", "cre")))
 Description: High-quality real-world data can be transformed into scientific
-    real-world evidence (RWE) for regulatory and healthcare decision-making
+    real-world evidence for regulatory and healthcare decision-making
     using proven analytical methods and techniques. For example, propensity
-    score (PS) methodology can be applied to pre-select a subset of real-world
+    score (PS) methodology can be applied to select a subset of real-world
     data containing patients that are similar to those in the current clinical
-    study in terms of covariates, and to stratify the selected patients together
-    with those in the current study into more homogeneous strata. Then, methods
-    such as the power prior approach or composite likelihood approach can be
-    applied in each stratum to draw inference for the parameters of interest.
-    This package provides functions that implement the PS-integrated RWE
-    analysis methods proposed in Wang et al. (2019)
-    <doi:10.1080/10543406.2019.1657133>, Wang et al. (2020)
-    <doi:10.1080/10543406.2019.1684309> and Chen et al. (2020)
-    <doi:10.1080/10543406.2020.1730877>.
-Depends:
-    methods,
-    R (>= 4.0),
-    rstan (>= 2.26.0),
-    Rcpp (>= 1.0.5)
+    study in terms of baseline covariates, and to stratify the selected
+    patients together with those in the current study into more homogeneous
+    strata. Then, statistical methods such as the power prior approach or
+    composite likelihood approach can be applied in each stratum to draw
+    inference for the parameters of interest. This package provides
+    functions that implement the PS-integrated real-world 
+    evidence analysis methods such as
+    Wang et al. (2019) <doi:10.1080/10543406.2019.1657133>,
+    Wang et al. (2020) <doi:10.1080/10543406.2019.1684309>, and
+    Chen et al. (2020) <doi:10.1080/10543406.2020.1730877>.
+Depends: methods, R (>= 4.0), rstan (>= 2.26.0), Rcpp (>= 1.0.5)
 License: GPL (>= 3)
 URL: https://github.com/olssol/psrwe
 BugReports: https://github.com/olssol/psrwe/issues
-LinkingTo:
-    BH (>= 1.72.0-3),
-    rstan (>= 2.26.0),
-    Rcpp (>= 1.0.5),
-    RcppEigen (>= 0.3.3.7.0),
-    StanHeaders (>= 2.26.0),
-    RcppParallel (>= 5.0.2)
-Imports:
-    parallel (>= 3.2),
-    cowplot (>= 1.0.0),
-    dplyr (>= 0.8.5),
-    ggplot2 (>= 3.3.2),
-    randomForest (>= 4.6-14),
-    survival,
-    rstantools (>= 2.1.1)
-Suggests:
-    knitr,
-    rmarkdown
+LinkingTo: BH (>= 1.72.0-3), rstan (>= 2.26.0), Rcpp (>= 1.0.5),
+        RcppEigen (>= 0.3.3.7.0), StanHeaders (>= 2.26.0), RcppParallel
+        (>= 5.0.2)
+Imports: parallel (>= 3.2), cowplot (>= 1.0.0), dplyr (>= 0.8.5),
+        ggplot2 (>= 3.3.2), randomForest (>= 4.6-14), survival,
+        rstantools (>= 2.1.1)
+Suggests: knitr, rmarkdown
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 SystemRequirements: GNU make
 NeedsCompilation: yes
-RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
+Config/roxygen2/version: 8.1.0
+Packaged: 2026-08-05 22:02:33 UTC; snoweye
+Author: Chenguang Wang [aut],
+  Trustees of Columbia University [cph] (tools/make_cpp.R,
+    R/stanmodels.R),
+  Wei-Chen Chen [aut, cre]

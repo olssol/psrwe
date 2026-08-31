@@ -1,6 +1,6 @@
 ### Example of Section 4.3.
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_options <- options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.
@@ -13,7 +13,8 @@ dta_ps_single <- psrwe_est(ex_dta,
                      ps_method = "logistic")
 
 ### PS matching.
-dta_ps_match <- psrwe_match(dta_ps_single, ratio = 2, strata_covs = "V1")
+dta_ps_match <- psrwe_match(dta_ps_single, ratio = 2, strata_covs = "V1",
+                            seed = 123)
 dta_ps_match
 
 ### Balance assessment of PS stratification.
@@ -41,7 +42,8 @@ oa_cl
     warning("The optmatch may restrict use (academic license).")
     dta_ps_match_opt <- psrwe_match(dta_ps_single, ratio = 2,
                                     strata_covs = "V2",
-                                    mat_method = "optm", caliper = 0.5)
+                                    mat_method = "optm", caliper = 0.5,
+                                    seed = 123)
     ps_bor_match_opt <- psrwe_borrow(dta_ps_match_opt, total_borrow = 30)
     rst_cl_opt <- psrwe_compl(ps_bor_match_opt,
                               outcome_type = "binary",
@@ -50,3 +52,7 @@ oa_cl
 }
 ### Unmark below to run if optmatch is available.
 # .remark_optmatch()
+
+### Reset to user's options.
+options(org_digits)
+

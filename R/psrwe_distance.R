@@ -120,7 +120,7 @@ metric_ley <- function(cov0, cov1) {
 #'
 #' @inheritParams get_distance
 #'
-#' @details Both \code{covs} should be a reduced datset that contains only those
+#' @details Both \code{covs} should be a reduced dataset that contains only those
 #'   covariates that will be used for calculating Mahalanobis balance, for
 #'   example, \code{covs = dat[, 1:6]}. \code{trt} should be the exposure
 #'   variable, for example, \code{trt = dat$X}.

@@ -1,6 +1,6 @@
 ### Example of single arm and matching
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta)
 
 ### Obtain PSs.
@@ -10,7 +10,8 @@ dta_ps_single <- psrwe_est(ex_dta,
                      ps_method = "logistic")
 
 ### PS matching.
-dta_ps_match <- psrwe_match(dta_ps_single, ratio = 2, strata_covs = "V1")
+dta_ps_match <- psrwe_match(dta_ps_single, ratio = 2, strata_covs = "V1",
+                            seed = 123)
 
 ### Obtain discounting parameters.
 ps_bor_match <- psrwe_borrow(dta_ps_match, total_borrow = 30)
@@ -41,4 +42,7 @@ rst_cl_cbs <- psrwe_compl(ps_bor_match,
                           stderr_method = "cbs")
 oa_cl_cbs <- psrwe_outana(rst_cl_cbs, mu = 0.4)
 oa_cl_cbs
+
+## Reset to user's options.
+options(org_digits)
 

@@ -1,6 +1,6 @@
 ### Example of Section 4.1.
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta)
 
 ### First parts of Data.
@@ -23,7 +23,7 @@ ps_bor_single <- psrwe_borrow(dta_ps_single, total_borrow = 30)
 ps_bor_single
 
 ### PSPP, single arm study, binary outcome.
-options(mc.cores = 1)
+org_mc.cores <- options(mc.cores = 1)
 .msg <- capture.output({ suppressWarnings({
 rst_pp <- psrwe_powerp(ps_bor_single,
                        outcome_type = "binary",
@@ -68,4 +68,6 @@ oa_cl_score_wt <- psrwe_outana(rst_cl, method_ci = "wilson", mu = 0.40,
                                method_pval = "score_weighted")
 oa_cl_score_wt
 
+### Reset to user's options.
+options(org_digits)
 

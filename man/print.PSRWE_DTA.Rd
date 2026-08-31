@@ -12,6 +12,9 @@ the \code{\link{psrwe_est}} function.}
 
 \item{...}{Parameters for \code{summery.PSRWE_DTA}}
 }
+\value{
+A list from \code{summary(x)} with additional information
+}
 \description{
 Print summary information of PS estimation results
 }

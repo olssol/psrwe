@@ -13,6 +13,9 @@
 
 \item{...}{Additional parameters}
 }
+\value{
+None (invisible \code{NULL})
+}
 \description{
 Print summary information of outcome mean estimation results
 }

@@ -1,6 +1,6 @@
 ### Example of single arm and binary outcome
 suppressMessages(library(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 data(ex_dta)
 
 ### Obtain PSs.
@@ -28,4 +28,7 @@ rst_cl_cjk <- psrwe_compl(ps_bor_single,
                           stderr_method = "cjk")
 oa_cl_cjk <- psrwe_outana(rst_cl_cjk, mu = 0.4)
 oa_cl_cjk
+
+## Reset to user's options.
+options(org_digits)
 

@@ -24,6 +24,9 @@ data {
 
   //target borrowing
   real<lower = 0> A;
+
+  //prior only
+  int<lower = 0, upper = 1> PRIORONLY;
 }
 
 transformed data {
@@ -70,7 +73,9 @@ model {
   taus    ~ cauchy(0, 2.5);
 
   //likelihood
-  Y1 ~ normal(thetas[INX1], taus[INX1]);
+  if (0 == PRIORONLY) {
+    Y1 ~ normal(thetas[INX1], taus[INX1]);
+  }
 }
 
 generated quantities {

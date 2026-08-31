@@ -8,7 +8,10 @@ psrwe_powerp_watt(
   dta_psbor,
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
-  prior_type = c("fixed", "random"),
+  mcmc_method = c("rstan", "analytic", "wattcon"),
+  tau0_method = c("Wang2019", "weighted"),
+  ipw_method = c("Heng.Li", "Xi.Ada.Wang"),
+  prioronly = FALSE,
   ...,
   seed = NULL
 )
@@ -21,8 +24,17 @@ psrwe_powerp_watt(
 
 \item{outcome_type}{Type of outcomes: \code{continuous} or \code{binary}.}
 
-\item{prior_type}{Whether treat power parameter as fixed (\code{fixed}) or
-fully Bayesian (\code{random}).}
+\item{mcmc_method}{MCMC sampling via either \code{rstan}, \code{analytic},
+or \code{wattcon}.}
+
+\item{tau0_method}{Method for estimating SD0 via either \code{Wang2019} or
+\code{weighted} for continuous outcomes only.}
+
+\item{ipw_method}{Method for IPW via either \code{Heng.Li} or
+\code{Xi.Ada.Wang}.}
+
+\item{prioronly}{Whether only obtain power prior by excluding the current
+study data).}
 
 \item{...}{extra parameters for calling function \code{\link{rwe_stan}}.}
 

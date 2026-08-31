@@ -1,3 +1,32 @@
+# psrwe 3.2-2
+
+## Main changes
+
+* Add "prior only" option to the rstan/stan code.
+
+
+# psrwe 3.2-1
+
+## Bug fixes
+
+* Fixed CRAN error "processing vignette 'vignette.Rmd' failed" that `.dots` 
+is defunct.
+  
+
+# psrwe 3.1 and 3.2
+
+## Main changes
+
+* Added IPW and ATT weighting for Bayesian methods.
+* Added bootstrap and jackknife methods for estimating stderr.
+* Added PS-integrated survival methods (KM, log-rank, and RMST).
+* Added PS-integrated matching.
+* Added examples in demo.
+* Fixed summary and print S3 methods.
+* Fixed linking with rstan and stan including code and header.
+* Reworked documents and vignettes.
+
+
 # psrwe 1.3.9999
 
 ## Bug fixes

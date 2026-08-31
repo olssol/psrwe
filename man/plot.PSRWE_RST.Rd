@@ -13,6 +13,9 @@
 
 \item{...}{Additional parameters.}
 }
+\value{
+A plot of class in ggplot2
+}
 \description{
 S3 method plotting estimation results
 }

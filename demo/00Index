@@ -1,12 +1,13 @@
-sec_4_1_ex	psrwe	The example of Section 4.1 (PSPP, single arm)
-sec_4_2_ex	psrwe	The example of Section 4.2 (PSCL, RCT)
-sec_4_3_ex	psrwe	The example of Section 4.3 (diagnostics, matching)
-sec_4_4_ex	psrwe	The example of Section 4.4 (PSKM, single arm)
-sec_4_5_ex	psrwe	The example of Section 4.5 (PSKM, RCT)
-sec_4_6_ex	psrwe	The example of Section 4.6 (PSLRK)
-sec_4_7_ex	psrwe	The example of Section 4.7 (PSRMST)
-sec_5_1_ex	psrwe	The example of Section 5.1 (PSPP, weights of ATT)
-sec_5_2_ex	psrwe	The example of Section 5.2 (PSPP, weights of ATT, RCT)
-sec_5_3_ex	psrwe	The example of Section 5.3 (PSCL, weights of ATT)
-sec_6_1_ex	psrwe	The example of Section 6.1 (PSPP, weights of ATT, Xi.Ada.Wang)
-sec_6_2_ex	psrwe	The example of Section 6.2 (PSPP, weights of ATT, RCT, Xi.Ada.Wang)
+sec_4_1_ex	psrwe	Example for PSPP, single arm
+sec_4_2_ex	psrwe	Example for PSCL, RCT
+sec_4_3_ex	psrwe	Example for diagnostics, matching
+sec_4_4_ex	psrwe	Example for PSKM, single arm
+sec_4_5_ex	psrwe	Example for PSKM, RCT
+sec_4_6_ex	psrwe	Example for PSLRK, RCT
+sec_4_7_ex	psrwe	Example for PSRMST, RCT
+sec_5_1_ex	psrwe	Example for PSPP, weights of ATT
+sec_5_2_ex	psrwe	Example for PSPP, weights of ATT, RCT
+sec_6_1_ex	psrwe	Example for PSPP, weights of ATT, Xi.Ada.Wang
+sec_6_2_ex	psrwe	Example for PSPP, weights of ATT, RCT, Xi.Ada.Wang
+sec_7_1_ex	psrwe	Example for PSPP, single arm, plot prior only
+sec_7_2_ex	psrwe	Example for PSPP, RCT, plot prior only

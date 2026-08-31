@@ -1,7 +1,7 @@
 #' Get number of subjects borrowed from each statum
 #'
 #' Based on PS distances or number of current control subjects, split the total
-#' number of subjects to be borrowed from the external data source to each
+#' number of subjects to be borrowed from the external data source for each
 #' stratum
 #'
 #' @param dtaps  A class \code{PSRWE_DTA} or \code{PSRWE_DTA_MAT} object.
@@ -25,7 +25,7 @@
 #'     \item{Proportion}{Proportion splitting the number of total borrow among
 #'     strata.}
 #'
-#'     \item{N_Borrow}{The number of to be borrowed subjects in each stratum.}
+#'     \item{N_Borrow}{The number of subjects to be borrowed in each stratum.}
 #'
 #'     \item{Alpha}{Weight parameter value in each stratum.}
 #' }
@@ -116,6 +116,7 @@ psrwe_borrow <- function(dtaps, total_borrow,
 #'
 #' @method print PSRWE_BOR
 #'
+#' @return A list from \code{x$Borrow}
 #'
 #' @export
 #'

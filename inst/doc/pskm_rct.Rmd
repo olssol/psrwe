@@ -11,7 +11,7 @@ vignette: >
 
 ```{r, eval=T, echo=FALSE}
 suppressMessages(require(psrwe, quietly = TRUE))
-options(digits = 3)
+org_digits <- options(digits = 3)
 set.seed(1000)
 ```
 <br>
@@ -20,7 +20,7 @@ set.seed(1000)
 ## Introduction
 
 In the **psrwe**, PS-integrated survival analyses
-in randomized controlled trials (RCTs) with augmenting control arm
+in randomized controlled trials (RCTs) with an augmented control arm
 (Chen, et al., to be submitted)
 are also implemented in three functions:
 
@@ -33,12 +33,12 @@ with time-to-event endpoints.
 Therefore, these tests are only implemented for RCTs with
 augmenting control arm.
 
-Similar with the approaches: PSPP (Wang, et al., 2019),
+Similar to the approaches: PSPP (Wang, et al., 2019),
 PSCL (Wang, et al., 2020), and PSKM (Chen, et al., 2022),
 the PS-integrated study design functions, `psrwe_est()` and `psrwe_borrow()`,
-below estimate PS model, set borrowing parameters, and determine
+below estimate the PS model, set borrowing parameters, and determine
 discounting parameters for borrowing information
-for a two-arm RCT with augmenting control arm from RWD.
+for a two-arm RCT with an augmented control arm from RWD.
 
 ```{r, eval=T, echo=TRUE}
 data(ex_dta_rct)
@@ -55,11 +55,11 @@ ps_bor_rct <- psrwe_borrow(dta_ps_rct, total_borrow = 30)
 
 ## PS-integrated treatment effect test
 
-Similar with the single arm study example
+Similar to the single arm study example
 (in **psrwe/demo/sec_4_4_ex.r** and `demo("sec_4_5_ex", package = "psrwe")`),
-the code below evaluates two-arm RCT.
+the code below evaluates a two-arm RCT.
 The results show the treatment effect which is
-the survival difference between two arms at one year or 365 days.
+the survival difference between the two arms at 1 year (365 days).
 
 ```{r, eval=T, echo=TRUE}
 rst_km_rct <- psrwe_survkm(ps_bor_rct,
@@ -69,7 +69,7 @@ rst_km_rct <- psrwe_survkm(ps_bor_rct,
 rst_km_rct
 ```
 
-The estimated PSKM curves with confidence intervals can be visualized below.
+The estimated PSKM curves with confidence intervals are shown below.
 
 ```{r, echo=TRUE, fig.width=6, fig.height=5}
 plot(rst_km_rct, xlim = c(0, 730))
@@ -79,20 +79,20 @@ The inference is based on the treatment effect
 $S_{trt}(\tau) - S_{ctl}(\tau)$ at $\tau = 365$ days
 where $S_{trt}$ and $S_{ctl}$ are the
 survival probabilities of the treatment and control arms, respectively.
-i.e., the example tests
+In other words, the example tests
 $$
 H_0: S_{trt}(\tau) - S_{ctl}(\tau) \leq 0 \quad \mbox{vs.} \quad
 H_a: S_{trt}(\tau) - S_{ctl}(\tau) > 0 .
 $$
 The outcome analysis can be summarized below.
-Note that this is an one-sided test.
+Note that this is a one-sided test.
 
 ```{r, eval=T, echo=TRUE}
 oa_km_rct <- psrwe_outana(rst_km_rct, alternative = "greater")
 oa_km_rct
 ```
 
-The details of estimates for each arm can be printed via the `print()`
+The details of the estimates for each arm can be printed via the `print()`
 function with the option `show_rct = TRUE`.
 
 ```{r, eval=T, echo=TRUE}
@@ -112,10 +112,10 @@ summary(oa_km_rct, pred_tps = c(180, 365))
 
 The log-rank test is another way to compare two treatments of
 time-to-event endpoint.
-Similar the PSKM for the two-arm test above, the function
+Similar to the PSKM for the two-arm test above, the function
 `psrwe_survlrk()` computes the statistic for each distinctive time point
-beased on the observed data then returns all necessary results for
-the down-streatm analyses such as tests and confidence intervals.
+beased on the observed data, then it returns all necessary results for
+the downstream analyses, such as tests and confidence intervals.
 
 ```{r, eval=T, echo=TRUE}
 rst_lrk <- psrwe_survlrk(ps_bor_rct,
@@ -140,7 +140,7 @@ oa_lrk <- psrwe_outana(rst_lrk)
 oa_lrk
 ```
 
-The details of estimates for each arm can be printed via the `print()`
+The details of the estimates for each arm can be printed via the `print()`
 function with the option `show_rct = TRUE`.
 
 ```{r, eval=T, echo=TRUE}
@@ -158,13 +158,12 @@ summary(oa_lrk, pred_tps = c(180, 365))
 
 ## PS-integrated restricted mean survival time (RMST) test
 
-The restricted means survival time (RMST) between two
-treatments is to test whether areas under
+The restricted means survival time (RMST) tests whether areas under
 two survival distributions (AUC) are different from each other.
-Similar the log-rank test above, the function
+Similar to the log-rank test above, the function
 `psrwe_survrmst()` computes the statistic for each distinctive time point
-beased on the observed data then returns all necessary results for
-the down-streatm analyses such as tests and confidence intervals.
+beased on the observed data, then it returns all necessary results for
+the downstream analyses, such as tests and confidence intervals.
 
 ```{r, eval=T, echo=TRUE}
 rst_rmst <- psrwe_survrmst(ps_bor_rct,
@@ -174,8 +173,7 @@ rst_rmst <- psrwe_survrmst(ps_bor_rct,
 rst_rmst
 ```
 
-The inference is based on the to compare whether AUCs
-are different from each other.
+The inference is based on comparing whether AUCs are different from each other.
 The example tests
 $$
 H_0: \int_0^{\tau} S_{trt}(t) dt = \int_0^{\tau} S_{ctl}(t) dt
@@ -191,7 +189,7 @@ oa_rmst <- psrwe_outana(rst_rmst)
 oa_rmst
 ```
 
-The details of estimates for each arm can be printed via the `print()`
+The details of the estimates for each arm can be printed via the `print()`
 function with the option `show_rct = TRUE`.
 
 ```{r, eval=T, echo=TRUE}
@@ -214,7 +212,7 @@ The scripts in
 "**psrwe/demo/sec_4_6_ex.r**", and
 "**psrwe/demo/sec_4_7_ex.r**"
 source files have
-the full examples for the PS-integrated survival analyses which can be run via
+the full examples for the PS-integrated survival analyses, which can be run via
 the `demo("sec_4_5_ex", package = "psrwe")`,
 `demo("sec_4_6_ex", package = "psrwe")`, and
 `demo("sec_4_7_ex", package = "psrwe")`, respectively.
@@ -272,4 +270,12 @@ Journal of Biopharmaceutical Statistics, 29(5), 731-748.
 Propensity score-integrated composite likelihood approach for
 incorporating real-world evidence in single-arm clinical studies.
 Journal of Biopharmaceutical Statistics, 30(3), 495-507.
+
+<br>
+
+```{r, eval=T, echo=FALSE}
+## Reset to user's options.
+options(org_digits)
+```
+<br>
 

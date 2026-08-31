@@ -9,6 +9,7 @@ psrwe_powerp(
   v_outcome = "Y",
   outcome_type = c("continuous", "binary"),
   prior_type = c("fixed", "random"),
+  prioronly = FALSE,
   ...,
   seed = NULL
 )
@@ -23,6 +24,9 @@ psrwe_powerp(
 
 \item{prior_type}{Whether treat power parameter as fixed (\code{fixed}) or
 fully Bayesian (\code{random}).}
+
+\item{prioronly}{Whether only obtain power prior by excluding the current
+study data).}
 
 \item{...}{extra parameters for calling function \code{\link{rwe_stan}}.}
 

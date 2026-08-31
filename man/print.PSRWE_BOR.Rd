@@ -12,6 +12,9 @@ the \code{\link{psrwe_borrow}} function.}
 
 \item{...}{Additional parameters}
 }
+\value{
+A list from \code{x$Borrow}
+}
 \description{
 Print summary information of borrowing
 }
